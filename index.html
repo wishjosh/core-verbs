@@ -153,7 +153,7 @@
             { ko: "당신 이미 집 나선 거지?", en: "Did you leave yet?" },
             { ko: "아니, 왜?", en: "No, why?" },
             { ko: "지갑을 두고 왔네. 아래쪽으로 던져 줄 수 있을까?", en: "I forgot my wallet. Could you throw it down to me, please?" },
-            { ko: "OK.", en: "OK." },
+            { ko: "알았어.", en: "OK." },
 
             // --- [ 5일 차 ] ---
             { ko: "할 일이 산더미같이 쌓여 있다.", en: "I have tons of work to do." },
@@ -179,15 +179,23 @@
         let currentIndex = 0;
         let progressData = JSON.parse(localStorage.getItem('myVocabMemory')) || {};
 
-        function init() {
+       function init() {
             const today = new Date().getTime(); 
 
+            // 1. 오늘 복습해야 할 문장들을 전체(1~5일차)에서 골라냅니다.
             todayCards = db.filter(card => {
                 const record = progressData[card.en];
                 if (!record) return true;
                 return record.nextDate <= today;
             });
 
+            // 2. 골라낸 문장들이 순서대로 나오지 않도록 무작위로 마구 섞습니다! (Fisher-Yates 셔플 알고리즘)
+            for (let i = todayCards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [todayCards[i], todayCards[j]] = [todayCards[j], todayCards[i]];
+            }
+
+            // 3. 만약 오늘 할당량이 끝났다면 완료 화면을 보여줍니다.
             if (todayCards.length === 0) {
                 showCompletionScreen();
                 return;
@@ -196,7 +204,6 @@
             document.getElementById('total-idx').innerText = todayCards.length;
             loadCard();
         }
-
         function loadCard() {
             document.getElementById('current-idx').innerText = currentIndex + 1;
             document.getElementById('korean').innerText = todayCards[currentIndex].ko;
