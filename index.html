@@ -65,7 +65,7 @@
     <div id="card" onclick="showAnswer()">
         <div id="completion-msg">🎉<br>오늘 복습할 문장이<br>더 이상 없습니다!<br>내일 다시 만나요.</div>
         <div id="korean">여기에 한글 문장이 나옵니다</div>
-        <div id="hint">👇 화면을 터치(클릭)해서 정답 확인 👇</div>
+        <div id="hint">화면을 터치(클릭)해서 정답 확인</div>
         <div id="english">Here is the English sentence</div>
         <div id="speaker" onclick="event.stopPropagation(); playAudio();">🔊</div>
     </div>
@@ -242,11 +242,11 @@
 
             if (result === 'O') {
                 record.interval = record.interval === 0 ? 3 : record.interval * 2;
-                feedbackEl.innerText = "완벽하네요! 👏\n" + record.interval + "일 뒤에 복습합니다.";
+                feedbackEl.innerText = "완벽하네요!\n" + record.interval + "일 뒤에 복습합니다.";
                 feedbackEl.style.backgroundColor = "rgba(129, 178, 154, 0.95)"; // 차분한 세이지 그린
             } else {
                 record.interval = 1;
-                feedbackEl.innerText = "괜찮습니다! 💪\n내일 바로 다시 나옵니다.";
+                feedbackEl.innerText = "괜찮습니다!\n내일 바로 다시 나옵니다.";
                 feedbackEl.style.backgroundColor = "rgba(224, 122, 95, 0.95)"; // 차분한 테라코타
             }
 
@@ -285,6 +285,7 @@
     </script>
 </body>
 </html>
+
 
 
 
