@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Core Verbs</title>
     
-    <link rel="stylesheet" as="style" crossorigin href="[https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css](https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css)" />
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     
     <style>
         body { 
@@ -31,10 +31,7 @@
         }
         #korean { font-size: 1.35rem; color: #2c3e50; font-weight: 700; margin-bottom: 20px; word-break: keep-all; line-height: 1.5; }
         #hint { font-size: 0.95rem; color: #95a5a6; margin-top: 10px; font-weight: 500; }
-        #english { font-size: 1.25rem; color: #2980b9; margin-top: 20px; display: none; font-weight: 400; line-height: 1.5; }
-        
-        /* 볼드체 색상을 조금 더 강조하는 스타일 (원하시면 주석 처리 가능) */
-        #english b { font-weight: 800; color: #1abc9c; background-color: rgba(26, 188, 156, 0.1); padding: 2px 6px; border-radius: 4px; }
+        #english { font-size: 1.25rem; color: #2980b9; margin-top: 20px; display: none; font-weight: 600; line-height: 1.5; }
         
         #speaker { font-size: 2rem; margin-top: 15px; cursor: pointer; display: none; padding: 10px; }
         .buttons { margin-top: 30px; display: none; gap: 15px; width: 100%; max-width: 400px; justify-content: center; }
@@ -81,99 +78,99 @@
 
     <script>
         // =====================================================================
-        // 📚 데이터베이스 공간 (총 81개 - 핵심 동사 볼드체 적용)
+        // 📚 데이터베이스 공간 (총 81개 - 볼드체 제거)
         // =====================================================================
         const db = [
-            // --- [ 1일 차 : have (소유/관계/생각) / choose over ] ---
-            { ko: "내 조카는 거북이를 키운다.", en: "My nephew <b>has</b> a turtle." },
-            { ko: "나는 시카고에 사는 친구들이 있다.", en: "I <b>have</b> some friends living in Chicago." },
-            { ko: "남동생과 나는 우애가 돈독하다.", en: "My brother and I <b>have</b> a strong bond." },
-            { ko: "내 생각은 달랐다.", en: "I <b>had</b> a different idea." },
-            { ko: "친구들과 술래잡기하면서 놀던 즐거운 추억이 있다.", en: "I <b>have</b> some fond memories of playing tag with my friends." },
-            { ko: "프로젝트가 끝나서 좋죠?", en: "Are you glad the project is <b>over</b>?" },
-            { ko: "솔직히 시원섭섭해요. 일을 끝내서 홀가분하긴 한데, 팀이 그리울 것 같아요.", en: "Honestly, I <b>have mixed feelings</b>. I'm relieved we finished the work, but I'll miss the team." },
-            { ko: "음대 대신 의대를 선택한 거 맞지?", en: "You <b>chose</b> med school <b>over</b> music, right?" },
+            // --- [ 1일 차 : 15개 ] ---
+            { ko: "내 조카는 거북이를 키운다.", en: "My nephew has a turtle." },
+            { ko: "나는 시카고에 사는 친구들이 있다.", en: "I have some friends living in Chicago." },
+            { ko: "남동생과 나는 우애가 돈독하다.", en: "My brother and I have a strong bond." },
+            { ko: "내 생각은 달랐다.", en: "I had a different idea." },
+            { ko: "친구들과 술래잡기하면서 놀던 즐거운 추억이 있다.", en: "I have some fond memories of playing tag with my friends." },
+            { ko: "프로젝트가 끝나서 좋죠?", en: "Are you glad the project is over?" },
+            { ko: "솔직히 시원섭섭해요. 일을 끝내서 홀가분하긴 한데, 팀이 그리울 것 같아요.", en: "Honestly, I have mixed feelings. I'm relieved we finished the work, but I'll miss the team." },
+            { ko: "음대 대신 의대를 선택한 거 맞지?", en: "You chose med school over music, right?" },
             { ko: "응, 힘든 결정이었어.", en: "Yeah, it was a tough decision." },
-            { ko: "음악을 계속하지 않은 걸 후회해?", en: "Do you <b>have any regrets</b> about not pursuing music?" },
+            { ko: "음악을 계속하지 않은 걸 후회해?", en: "Do you have any regrets about not pursuing music?" },
             { ko: "조금은 그렇지만, 되도록 생각 안 하려고 해.", en: "A few, but I try not to think about it too much." },
-            { ko: "그녀는 공포 영화보다는 영어 강의를 택할 겁니다.", en: "She would <b>choose</b> an English lecture <b>over</b> any horror movie." },
-            { ko: "어떤 사람들은 가구를 살 때 가격보다 품질을 중시한다.", en: "Some people <b>choose</b> quality <b>over</b> price when buying furniture." },
-            { ko: "어떻게 내가 아닌 그 사람을 선택할 수가 있어!", en: "I can't believe you <b>chose</b> him <b>over</b> me!" },
-            { ko: "장기적인 목표보다 눈앞의 즐거움을 선택하는 사람들이 있다.", en: "Some people <b>choose</b> short-term pleasure <b>over</b> long-term goals." },
+            { ko: "그녀는 공포 영화보다는 영어 강의를 택할 겁니다.", en: "She would choose an English lecture over any horror movie." },
+            { ko: "어떤 사람들은 가구를 살 때 가격보다 품질을 중시한다.", en: "Some people choose quality over price when buying furniture." },
+            { ko: "어떻게 내가 아닌 그 사람을 선택할 수가 있어!", en: "I can't believe you chose him over me!" },
+            { ko: "장기적인 목표보다 눈앞의 즐거움을 선택하는 사람들이 있다.", en: "Some people choose short-term pleasure over long-term goals." },
 
-            // --- [ 2일 차 : have (먹다/마시다) / see, watch ] ---
-            { ko: "나는 아침으로 시리얼을 먹는다.", en: "I usually <b>have</b> cereal for breakfast." },
-            { ko: "저는 스테이크 먹을게요.", en: "I'll <b>have</b> the steak, please." },
-            { ko: "오늘 점심으로 아무것도 안 먹었어요.", en: "I didn't <b>have</b> anything for lunch today." },
-            { ko: "출발하기 전에 뭐라도 먹어야 해.", en: "You should <b>have</b> something before you leave." },
-            { ko: "피자 먹으면서 영화 보자.", en: "Let's <b>have</b> some pizza and watch a movie." },
-            { ko: "수업 전에 뭐 좀 먹었어?", en: "Did you <b>have</b> anything before class?" },
+            // --- [ 2일 차 : 16개 ] ---
+            { ko: "나는 아침으로 시리얼을 먹는다.", en: "I usually have cereal for breakfast." },
+            { ko: "저는 스테이크 먹을게요.", en: "I'll have the steak, please." },
+            { ko: "오늘 점심으로 아무것도 안 먹었어요.", en: "I didn't have anything for lunch today." },
+            { ko: "출발하기 전에 뭐라도 먹어야 해.", en: "You should have something before you leave." },
+            { ko: "피자 먹으면서 영화 보자.", en: "Let's have some pizza and watch a movie." },
+            { ko: "수업 전에 뭐 좀 먹었어?", en: "Did you have anything before class?" },
             { ko: "그냥 바나나 하나 먹었어. 시간이 없었어.", en: "Just a banana. I was in a rush." },
-            { ko: "점심은 주로 몇 시에 먹어요?", en: "What time do you usually <b>have</b> lunch?" },
+            { ko: "점심은 주로 몇 시에 먹어요?", en: "What time do you usually have lunch?" },
             { ko: "그렇게 안 바쁘면 대략 12시쯤이에요.", en: "Around noon, if I'm not too busy." },
             { ko: "오, 저도 그런데! 오늘 저랑 뭐 간단히 먹을래요?", en: "Oh, me too! Want to grab something together today?" },
             { ko: "좋지요! 한국 음식이라면 좋아요.", en: "Sure! I could go for some Korean food." },
-            { ko: "어제 공원에서 널 봤어. (지나가다가 우연히 보거나 목격했다는 의미)", en: "I <b>saw</b> you at the park yesterday." },
-            { ko: "어제 공원에서 널 지켜봤어. (나무 뒤에 숨어서 의도적으로 유심히 지켜봤다는 의미)", en: "I <b>watched</b> you at the park yesterday." },
-            { ko: "술집에 있는 TV에서 경기가 나오던데, 집중해서 보지는 않았어.", en: "I <b>saw</b> the game on the TV at the bar, but I didn't <b>watch</b> it." },
-            { ko: "그 영화를 대형 화면으로 봤어. (대형 화면으로 관람한 경험을 강조)", en: "I <b>saw</b> the movie on the big screen." },
-            { ko: "어젯밤에 넷플릭스 다큐멘터리를 보고 있는데 엄마한테 전화가 왔다. (시각적으로 집중해서 시청)", en: "My mom called while I was <b>watching</b> a Netflix documentary last night." },
+            { ko: "어제 공원에서 널 봤어. (지나가다가 우연히 보거나 목격했다는 의미)", en: "I saw you at the park yesterday." },
+            { ko: "어제 공원에서 널 지켜봤어. (나무 뒤에 숨어서 의도적으로 유심히 지켜봤다는 의미)", en: "I watched you at the park yesterday." },
+            { ko: "술집에 있는 TV에서 경기가 나오던데, 집중해서 보지는 않았어.", en: "I saw the game on the TV at the bar, but I didn't watch it." },
+            { ko: "그 영화를 대형 화면으로 봤어. (대형 화면으로 관람한 경험을 강조)", en: "I saw the movie on the big screen." },
+            { ko: "어젯밤에 넷플릭스 다큐멘터리를 보고 있는데 엄마한테 전화가 왔다. (시각적으로 집중해서 시청)", en: "My mom called while I was watching a Netflix documentary last night." },
 
-            // --- [ 3일 차 : have (시간/경험을 보내다) / fall out (of/over) ] ---
-            { ko: "우리는 지난주 일본에서 정말 좋은 시간을 보냈어요.", en: "We <b>had</b> a great time in Japan last week." },
-            { ko: "나는 힘든 유년 시절을 보냈다.", en: "I <b>had</b> a rough childhood." },
-            { ko: "(줌 회의에서) 제가 접속 상태가 안 좋은 것 같습니다.", en: "I think I <b>have</b> a bad connection." },
-            { ko: "(친한 친구를 언급하며) 저희는 만나면 늘 대화가 즐겁습니다.", en: "We always <b>have</b> such good conversations." },
-            { ko: "그는 비행기를 오래 타서, 잠을 좀 더 자야 해요.", en: "He <b>had</b> a long flight, so he needs some extra sleep." },
+            // --- [ 3일 차 : 15개 ] ---
+            { ko: "우리는 지난주 일본에서 정말 좋은 시간을 보냈어요.", en: "We had a great time in Japan last week." },
+            { ko: "나는 힘든 유년 시절을 보냈다.", en: "I had a rough childhood." },
+            { ko: "(줌 회의에서) 제가 접속 상태가 안 좋은 것 같습니다.", en: "I think I have a bad connection." },
+            { ko: "(친한 친구를 언급하며) 저희는 만나면 늘 대화가 즐겁습니다.", en: "We always have such good conversations." },
+            { ko: "그는 비행기를 오래 타서, 잠을 좀 더 자야 해요.", en: "He had a long flight, so he needs some extra sleep." },
             { ko: "여전히 예술 학교에 진학할 계획이니?", en: "Are you still planning to go to art school?" },
-            { ko: "잘 모르겠어. 전공 때문에 엄마랑 사이가 틀어졌거든.", en: "I'm not sure. My mom and I <b>had a falling-out over</b> my major." },
+            { ko: "잘 모르겠어. 전공 때문에 엄마랑 사이가 틀어졌거든.", en: "I'm not sure. My mom and I had a falling-out over my major." },
             { ko: "안녕, 최근에 잘 안 보이더라.", en: "Hey, I haven't seen you around lately." },
-            { ko: "응… 한 주 동안 마음이 좀 힘들었거든.", en: "I know… I <b>had</b> a rough week, emotionally." },
+            { ko: "응… 한 주 동안 마음이 좀 힘들었거든.", en: "I know… I had a rough week, emotionally." },
             { ko: "무슨 일인지 이야기해 줄래?", en: "Want to talk about it?" },
             { ko: "음, 다음에. 우선 머리 좀 식힐 시간이 필요해서.", en: "Maybe later. I just need some time to clear my head." },
-            { ko: "내가 어렸을 때, 우리 이웃이 나무에서 떨어졌어요.", en: "My neighbor <b>fell out of</b> a tree when I was young." },
-            { ko: "아무래도 버스에서 내리다 핸드폰이 주머니에서 빠진 것 같아.", en: "I think my phone <b>fell out of</b> my pocket while I was getting off the bus." },
-            { ko: "그거 못 들었어? 그 두 사람 크리스마스 이후로 사이가 완전히 틀어졌대.", en: "Didn't you hear? Those two <b>had a major falling-out</b> after Christmas." },
-            { ko: "제 동업자와 저는 돈 문제로 사이가 멀어졌어요.", en: "My business partner and I <b>had a falling-out over</b> money." },
+            { ko: "내가 어렸을 때, 우리 이웃이 나무에서 떨어졌어요.", en: "My neighbor fell out of a tree when I was young." },
+            { ko: "아무래도 버스에서 내리다 핸드폰이 주머니에서 빠진 것 같아.", en: "I think my phone fell out of my pocket while I was getting off the bus." },
+            { ko: "그거 못 들었어? 그 두 사람 크리스마스 이후로 사이가 완전히 틀어졌대.", en: "Didn't you hear? Those two had a major falling-out after Christmas." },
+            { ko: "제 동업자와 저는 돈 문제로 사이가 멀어졌어요.", en: "My business partner and I had a falling-out over money." },
 
-            // --- [ 4일 차 : have (행사/모임을 열다) / leave, throw ] ---
-            { ko: "제가 이번 주말에 집들이를 합니다.", en: "I'm <b>having</b> a housewarming party this weekend." },
-            { ko: "백화점들이 이번 주 일제히 세일을 한다.", en: "The department stores are all <b>having</b> sales this week." },
-            { ko: "우리는 6월에 코엑스에서 채용 박람회를 열었다.", en: "We <b>had</b> a job fair at COEX in June." },
-            { ko: "이번 주말에 모임이 있으니 오고 싶으면 오렴.", en: "We're <b>having</b> a get-together this weekend if you want to join." },
-            { ko: "그 제과점에서 오늘 원 플러스 원 행사를 한다.", en: "The bakery <b>has</b> a buy-one-get-one deal today." },
+            // --- [ 4일 차 : 19개 ] ---
+            { ko: "제가 이번 주말에 집들이를 합니다.", en: "I'm having a housewarming party this weekend." },
+            { ko: "백화점들이 이번 주 일제히 세일을 한다.", en: "The department stores are all having sales this week." },
+            { ko: "우리는 6월에 코엑스에서 채용 박람회를 열었다.", en: "We had a job fair at COEX in June." },
+            { ko: "이번 주말에 모임이 있으니 오고 싶으면 오렴.", en: "We're having a get-together this weekend if you want to join." },
+            { ko: "그 제과점에서 오늘 원 플러스 원 행사를 한다.", en: "The bakery has a buy-one-get-one deal today." },
             { ko: "여행용 가방을 새로 사야 해.", en: "I need to buy some new luggage." },
-            { ko: "아, 코스트코에서 지금 샘소나이트 여행 가방 세일 중인데.", en: "Oh, Costco is <b>having</b> a sale on Samsonite luggage right now." },
+            { ko: "아, 코스트코에서 지금 샘소나이트 여행 가방 세일 중인데.", en: "Oh, Costco is having a sale on Samsonite luggage right now." },
             { ko: "준호 씨, 브라질 생활 어때요?", en: "How is life in Brazil treating you, Junho?" },
             { ko: "쉽지는 않지만 나아지고 있습니다.", en: "It's not easy, but it's getting better." },
-            { ko: "지금쯤이면 친구도 사귀었겠어요?", en: "Do you <b>have</b> any friends yet?" },
-            { ko: "네, 아파트 단지에 한국인 가정이 몇 있는데 매주 금요일마다 바비큐 파티를 해요.", en: "Yeah, a couple of Korean families live in my apartment building and we <b>have</b> barbeques every Friday." },
-            { ko: "퇴근은 한 거지?", en: "Did you <b>leave</b> work yet?" },
+            { ko: "지금쯤이면 친구도 사귀었겠어요?", en: "Do you have any friends yet?" },
+            { ko: "네, 아파트 단지에 한국인 가정이 몇 있는데 매주 금요일마다 바비큐 파티를 해요.", en: "Yeah, a couple of Korean families live in my apartment building and we have barbeques every Friday." },
+            { ko: "퇴근은 한 거지?", en: "Did you leave work yet?" },
             { ko: "엄마한테 전화한 거지?", en: "Did you call your mom yet?" },
             { ko: "저녁은 먹은 거지?", en: "Did you eat dinner yet?" },
             { ko: "집안일은 다 한 거지?", en: "Did you finish your chores yet?" },
-            { ko: "당신 이미 집 나선 거지?", en: "Did you <b>leave</b> yet?" },
+            { ko: "당신 이미 집 나선 거지?", en: "Did you leave yet?" },
             { ko: "아니, 왜?", en: "No, why?" },
-            { ko: "지갑을 두고 왔네. 아래쪽으로 던져 줄 수 있을까?", en: "I forgot my wallet. Could you <b>throw</b> it down to me, please?" },
-            { ko: "알았어.", en: "OK." },
+            { ko: "지갑을 두고 왔네. 아래쪽으로 던져 줄 수 있을까?", en: "I forgot my wallet. Could you throw it down to me, please?" },
+            { ko: "OK.", en: "OK." },
 
-            // --- [ 5일 차 : have to do (해야 할 일이 있다) / take care of ] ---
-            { ko: "할 일이 산더미같이 쌓여 있다.", en: "I <b>have</b> tons of work <b>to do</b>." },
-            { ko: "답장해야 할 이메일이 몇 개 있다.", en: "I <b>have</b> a few emails <b>to reply to</b>." },
-            { ko: "오늘 오후에 몇 가지 볼일이 좀 있다.", en: "I <b>have</b> some errands <b>to run</b> this afternoon." },
-            { ko: "금요일까지 프로젝트 하나를 마무리해야 일한다.", en: "We <b>have</b> a project <b>to finish</b> by Friday." },
-            { ko: "크리스마스 쇼핑을 좀 해야 한다.", en: "I <b>have</b> some Christmas shopping <b>to do</b>." },
+            // --- [ 5일 차 : 16개 ] ---
+            { ko: "할 일이 산더미같이 쌓여 있다.", en: "I have tons of work to do." },
+            { ko: "답장해야 할 이메일이 몇 개 있다.", en: "I have a few emails to reply to." },
+            { ko: "오늘 오후에 몇 가지 볼일이 좀 있다.", en: "I have some errands to run this afternoon." },
+            { ko: "금요일까지 프로젝트 하나를 마무리해야 일한다.", en: "We have a project to finish by Friday." },
+            { ko: "크리스마스 쇼핑을 좀 해야 한다.", en: "I have some Christmas shopping to do." },
             { ko: "안녕하세요, 제리. 우리 방금 프로젝트 진행 상황에 대해 이야기하고 있었어요.", en: "Good morning, Jerry. We were just talking about the project updates." },
-            { ko: "네, 늦어서 죄송해요. 뭐 좀 처리할 게 있었어요.", en: "Yes, sorry I'm late. I <b>had</b> something <b>to take care of</b>." },
+            { ko: "네, 늦어서 죄송해요. 뭐 좀 처리할 게 있었어요.", en: "Yes, sorry I'm late. I had something to take care of." },
             { ko: "오늘 바빠? 점심 먹자.", en: "Are you busy today? Let's have lunch." },
             { ko: "안 돼. 우체국 가는 길이야.", en: "I can't. I'm on my way to the post office." },
             { ko: "정말? 왜?", en: "Really? Why?" },
-            { ko: "중고나라에서 바지 다섯 개를 팔아서, 택배 부칠 게 많아.", en: "I just sold five pairs of pants on Joonggonara, so I <b>have</b> a lot of packages <b>to ship</b>." },
-            { ko: "이번 주말에 친구 고양이를 돌봐 주기로 했어.", en: "I'm <b>taking care of</b> my friend's cat this weekend." },
-            { ko: "저희 아빠는 건강을 좀 더 신경 쓰셔야 해요.", en: "My dad needs to <b>take better care of</b> his health." },
-            { ko: "휴가 가기 전에 처리해야 할 일이 좀 있어.", en: "I <b>have</b> some work <b>to take care of</b> before I start my vacation." },
-            { ko: "저희 엄마는 주로 오후 시간에 정원을 손질하십니다.", en: "My mom usually <b>takes care of</b> her garden in the afternoons." },
-            { ko: "회사에서 모든 경비를 다 대 줬어요.", en: "The company <b>took care of</b> everything." }
+            { ko: "중고나라에서 바지 다섯 개를 팔아서, 택배 부칠 게 많아.", en: "I just sold five pairs of pants on Joonggonara, so I have a lot of packages to ship." },
+            { ko: "이번 주말에 친구 고양이를 돌봐 주기로 했어.", en: "I'm taking care of my friend's cat this weekend." },
+            { ko: "저희 아빠는 건강을 좀 더 신경 쓰셔야 해요.", en: "My dad needs to take better care of his health." },
+            { ko: "휴가 가기 전에 처리해야 할 일이 좀 있어.", en: "I have some work to take care of before I start my vacation." },
+            { ko: "저희 엄마는 주로 오후 시간에 정원을 손질하십니다.", en: "My mom usually takes care of her garden in the afternoons." },
+            { ko: "회사에서 모든 경비를 다 대 줬어요.", en: "The company took care of everything." }
         ];
         // =====================================================================
 
@@ -190,6 +187,7 @@
                 return record.nextDate <= today;
             });
 
+            // 문장 랜덤으로 섞기! (Fisher-Yates)
             for (let i = todayCards.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [todayCards[i], todayCards[j]] = [todayCards[j], todayCards[i]];
@@ -208,8 +206,8 @@
             document.getElementById('current-idx').innerText = currentIndex + 1;
             document.getElementById('korean').innerText = todayCards[currentIndex].ko;
             
-            // ★ 수정됨: innerText 대신 innerHTML을 사용하여 <b> 태그를 디자인으로 인식하게 합니다.
-            document.getElementById('english').innerHTML = todayCards[currentIndex].en;
+            // 원래대로 innerText로 되돌림
+            document.getElementById('english').innerText = todayCards[currentIndex].en;
             
             document.getElementById('english').style.display = 'none';
             document.getElementById('speaker').style.display = 'none';
@@ -227,9 +225,9 @@
         }
 
         function playAudio() {
-            // ★ 수정됨: 스피커가 "비(b) 해브 비"라고 읽지 않도록 HTML 태그를 깔끔하게 지운 텍스트만 읽게 합니다.
-            const rawText = todayCards[currentIndex].en.replace(/<[^>]*>?/gm, '');
-            const utterance = new SpeechSynthesisUtterance(rawText);
+            // 스피커 코드도 원래대로 복구
+            const text = todayCards[currentIndex].en;
+            const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'en-US';
             utterance.rate = 0.9; 
             window.speechSynthesis.speak(utterance);
