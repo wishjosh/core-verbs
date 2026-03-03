@@ -39,8 +39,9 @@
             flex: 1; padding: 15px; font-size: 1.2rem; border: none; border-radius: 12px; 
             cursor: pointer; color: white; font-weight: 700; transition: 0.2s; font-family: 'Pretendard', sans-serif;
         }
-        #btn-x { background-color: #ff4d4d; box-shadow: 0 4px 0 #cc0000; }
-        #btn-o { background-color: #4CAF50; box-shadow: 0 4px 0 #388E3C; }
+       /* 채도가 낮고 세련된 테라코타 & 세이지 그린 색상 */
+        #btn-x { background-color: #E07A5F; box-shadow: 0 4px 0 #C5634A; }
+        #btn-o { background-color: #81B29A; box-shadow: 0 4px 0 #65947E; }
         button:active { transform: translateY(4px); box-shadow: 0 0 0 transparent; } 
         
         .progress { margin-bottom: 20px; color: #555; font-weight: 700; font-size: 1.1rem; }
@@ -70,8 +71,8 @@
     </div>
 
     <div class="buttons" id="action-buttons">
-        <button id="btn-x" onclick="nextCard('X')">X (헷갈림)</button>
-        <button id="btn-o" onclick="nextCard('O')">O (완벽함)</button>
+        <button id="btn-x" onclick="nextCard('X')">X (Review)</button>
+        <button id="btn-o" onclick="nextCard('O')">O (Perfect)</button>
     </div>
 
     <div id="feedback-msg">알림 메시지</div>
@@ -284,4 +285,5 @@
     </script>
 </body>
 </html>
+
 
