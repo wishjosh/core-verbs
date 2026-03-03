@@ -238,7 +238,9 @@
             const feedbackEl = document.getElementById('feedback-msg');
             const card = todayCards[currentIndex];
             let record = progressData[card.en] || { interval: 0 }; 
-            const now = new Date();
+    
+            const todayMidnight = new Date();
+            todayMidnight.setHours(0, 0, 0, 0); 
 
             if (result === 'O') {
                 record.interval = record.interval === 0 ? 3 : record.interval * 2;
@@ -250,7 +252,7 @@
                 feedbackEl.style.backgroundColor = "rgba(224, 122, 95, 0.95)"; // 차분한 테라코타
             }
 
-            const nextDate = new Date(now.getTime() + record.interval * 24 * 60 * 60 * 1000);
+            const nextDate = new Date(todayMidnight.getTime() + record.interval * 24 * 60 * 60 * 1000);
             record.nextDate = nextDate.getTime();
             
             progressData[card.en] = record;
@@ -285,3 +287,4 @@
     </script>
 </body>
 </html>
+
