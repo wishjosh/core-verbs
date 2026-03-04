@@ -255,7 +255,7 @@
     } else {
         // X를 누르면: 연속 정답 기록(interval)을 초기화하고 당일 복습
         record.interval = 0; 
-        feedbackEl.innerText = "괜찮습니다!\n10분 뒤에 다시 나옵니다.";
+        feedbackEl.innerText = "괜찮습니다!\n60분 뒤에 다시 나옵니다.";
         feedbackEl.style.backgroundColor = "rgba(224, 122, 95, 0.95)"; 
         
         // 💡 현재 시간 기준으로 60분(60 * 60 * 1000 밀리초) 뒤로 설정
@@ -295,6 +295,7 @@
     </script>
 </body>
 </html>
+
 
 
 
