@@ -71,9 +71,9 @@
     <div class="progress" id="progress-container">오늘의 복습: <span id="current-idx">1</span> / <span id="total-idx">0</span></div>
     
 <div id="card" onclick="showAnswer()">
-        <div id="completion-msg">
+    <div id="completion-msg">
             🎉<br>오늘 복습할 문장이<br>더 이상 없습니다!<br>
-            <button id="btn-reload" onclick="location.reload()">무한 반복 🔄</button>
+            <button id="btn-reload" onclick="checkReload()">무한 반복 🔄</button>
         </div>
         <div id="korean">여기에 한글 문장이 나옵니다</div>
         <div id="hint">화면을 터치(클릭)해서 정답 확인</div>
@@ -302,14 +302,34 @@
             document.getElementById('card').onclick = null; 
         }
 
+        // 👇 여기에 새로운 '검사관' 함수가 추가되었습니다!
+        function checkReload() {
+            const now = new Date().getTime();
+            const currentData = JSON.parse(localStorage.getItem('myVocabMemory')) || {};
+            
+            // 60분이 지난(복습할) 카드가 있는지 개수 세기
+            const availableCards = db.filter(card => {
+                const record = currentData[card.en];
+                if (!record) return true;
+                return record.nextDate <= now;
+            });
+
+            if (availableCards.length > 0) {
+                // 1개라도 있으면 진짜 새로고침 실행!
+                location.reload();
+            } else {
+                // 0개면 예쁜 알림창 띄워주기
+                const feedbackEl = document.getElementById('feedback-msg');
+                feedbackEl.innerText = "아직 60분이 지나지 않았습니다!\n조금 뒤에 다시 시도해 주세요. ⏳";
+                feedbackEl.style.backgroundColor = "rgba(44, 62, 80, 0.95)"; // 세련된 네이비 톤
+                feedbackEl.style.display = 'block';
+                
+                // 2초 뒤에 알림창 숨기기
+                setTimeout(function() {
+                    feedbackEl.style.display = 'none';
+                }, 2000);
+            }
+        }
+
         init();
     </script>
-</body>
-</html>
-
-
-
-
-
-
-
