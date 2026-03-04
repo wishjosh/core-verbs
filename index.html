@@ -258,7 +258,7 @@
         feedbackEl.innerText = "괜찮습니다!\n10분 뒤에 다시 나옵니다.";
         feedbackEl.style.backgroundColor = "rgba(224, 122, 95, 0.95)"; 
         
-        // 💡 현재 시간 기준으로 10분(10 * 60 * 1000 밀리초) 뒤로 설정
+        // 💡 현재 시간 기준으로 60분(60 * 60 * 1000 밀리초) 뒤로 설정
         const nextDate = new Date(now.getTime() + 10 * 60 * 1000);
         record.nextDate = nextDate.getTime();
     }
@@ -295,5 +295,6 @@
     </script>
 </body>
 </html>
+
 
 
