@@ -239,21 +239,29 @@
             const card = todayCards[currentIndex];
             let record = progressData[card.en] || { interval: 0 }; 
     
-            const todayMidnight = new Date();
-            todayMidnight.setHours(0, 0, 0, 0); 
+        const now = new Date();
+        const todayMidnight = new Date();
+        todayMidnight.setHours(0, 0, 0, 0); 
 
-            if (result === 'O') {
-                record.interval = record.interval === 0 ? 3 : record.interval * 2;
-                feedbackEl.innerText = "완벽하네요!\n" + record.interval + "일 뒤에 복습합니다.";
-                feedbackEl.style.backgroundColor = "rgba(129, 178, 154, 0.95)"; // 차분한 세이지 그린
-            } else {
-                record.interval = 1;
-                feedbackEl.innerText = "괜찮습니다!\n내일 바로 다시 나옵니다.";
-                feedbackEl.style.backgroundColor = "rgba(224, 122, 95, 0.95)"; // 차분한 테라코타
-            }
-
-            const nextDate = new Date(todayMidnight.getTime() + record.interval * 24 * 60 * 60 * 1000);
-            record.nextDate = nextDate.getTime();
+    if (result === 'O') {
+        // O를 누르면: 장기 기억으로 보내기 (1일, 3일, 6일...)
+        record.interval = record.interval === 0 ? 1 : (record.interval === 1 ? 3 : record.interval * 2);
+        feedbackEl.innerText = "완벽하네요!\n" + record.interval + "일 뒤에 복습합니다.";
+        feedbackEl.style.backgroundColor = "rgba(129, 178, 154, 0.95)"; 
+        
+        // 오늘 자정 기준으로 일(day)을 더함
+        const nextDate = new Date(todayMidnight.getTime() + record.interval * 24 * 60 * 60 * 1000);
+        record.nextDate = nextDate.getTime();
+    } else {
+        // X를 누르면: 연속 정답 기록(interval)을 초기화하고 당일 복습
+        record.interval = 0; 
+        feedbackEl.innerText = "괜찮습니다!\n10분 뒤에 다시 나옵니다.";
+        feedbackEl.style.backgroundColor = "rgba(224, 122, 95, 0.95)"; 
+        
+        // 💡 현재 시간 기준으로 10분(10 * 60 * 1000 밀리초) 뒤로 설정
+        const nextDate = new Date(now.getTime() + 10 * 60 * 1000);
+        record.nextDate = nextDate.getTime();
+    }
             
             progressData[card.en] = record;
             localStorage.setItem('myVocabMemory', JSON.stringify(progressData));
@@ -287,4 +295,5 @@
     </script>
 </body>
 </html>
+
 
