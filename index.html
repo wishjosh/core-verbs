@@ -29,6 +29,13 @@
             text-align: center; cursor: pointer; min-height: 200px; 
             display: flex; flex-direction: column; justify-content: center; position: relative;
         }
+        
+        /* 👇 동사 뱃지 디자인 추가 (차분한 회색 톤과 자간 조절로 세련되게) */
+        #verb-badge {
+            font-size: 0.9rem; color: #7f8c8d; font-weight: 800; 
+            margin-bottom: 15px; letter-spacing: 1px;
+        }
+        
         #korean { font-size: 1.35rem; color: #2c3e50; font-weight: 700; margin-bottom: 20px; word-break: keep-all; line-height: 1.5; }
         #hint { font-size: 0.95rem; color: #95a5a6; margin-top: 10px; font-weight: 500; }
         #english { font-size: 1.25rem; color: #2980b9; margin-top: 20px; display: none; font-weight: 600; line-height: 1.5; }
@@ -71,10 +78,11 @@
     <div class="progress" id="progress-container">오늘의 복습: <span id="current-idx">1</span> / <span id="total-idx">0</span></div>
     
 <div id="card" onclick="showAnswer()">
-    <div id="completion-msg">
+        <div id="completion-msg">
             🎉<br>오늘 복습할 문장이<br>더 이상 없습니다!<br>
             <button id="btn-reload" onclick="checkReload()">무한 반복 🔄</button>
         </div>
+        <div id="verb-badge">DAY 1 [ HAVE ]</div>
         <div id="korean">여기에 한글 문장이 나옵니다</div>
         <div id="hint">화면을 터치(클릭)해서 정답 확인</div>
         <div id="english">Here is the English sentence</div>
@@ -333,3 +341,4 @@
 
         init();
     </script>
+
