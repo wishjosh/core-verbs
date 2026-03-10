@@ -125,7 +125,7 @@
                         const day = cols[0].trim();
                         const verb = cols[1].trim();
                         const ko = cols[2].trim();
-                        const en = cols[3].trim();
+                        const en = cols[3].replace(/\r/g, '').trim();
                         
                         if (en && ko) {
                             db.push({
@@ -295,5 +295,6 @@
     </script>
 </body>
 </html>
+
 
 
