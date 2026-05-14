@@ -80,6 +80,15 @@ body {
     transform: rotate(90deg) scale(0.9);
 }
 
+/* 📱 뷰 레이아웃 공통 (가운데 정렬) */
+#study-view,
+#question-view {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 /* 📊 학습 통계 대시보드 */
 .stats-container {
     width: 92%;
