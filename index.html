@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Core Verbs</title>
+    
+    <!-- Pretendard 폰트 불러오기 -->
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    
+    <!-- 🎨 역할 분리: 외부 스타일시트 불러오기 -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <!-- 🧭 상단 헤더 바 -->
+    <div class="header-bar">
+        <h1 class="app-title">Core Verbs</h1>
+        <button id="btn-settings" onclick="toggleSettings()" aria-label="발음 설정 열기">⚙️</button>
+    </div>
+
+    <!-- 🗂️ 탭 네비게이션 -->
+    <div class="tabs-nav">
+        <button id="tab-study" class="tab-btn active" onclick="switchTab('study')">🃏 카드 학습</button>
+        <button id="tab-question" class="tab-btn" onclick="switchTab('question')">📋 질문 노트 <span id="question-badge" class="tab-badge" style="display:none;">0</span></button>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 🃏 카드 학습 뷰 (Study View)                            -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div id="study-view">
+
+        <!-- 📊 학습 통계 대시보드 -->
+        <div class="stats-container">
+            <div class="stats-header">총 학습 문장: <span id="stat-total">0</span>개</div>
+            <div id="stats-dashboard">
+                <div class="stat-box new-box">🆕 새 문장<br><span id="stat-new">0</span></div>
+                <div class="stat-box danger-box">🔥 집중 복습<br><span id="stat-danger">0</span></div>
+                <div class="stat-box mid-box">⏳ 단기<br><span id="stat-mid">0</span></div>
+                <div class="stat-box long-box">🧠 장기<br><span id="stat-long">0</span></div>
+            </div>
+        </div>
+        
+        <!-- 📈 진행 바 영역 -->
+        <div class="progress-wrapper" id="progress-container">
+            <div class="session-progress">현재 세션: <span id="current-idx">1</span> / <span id="total-idx">0</span></div>
+            <div id="progress-bar-bg">
+                <div id="progress-bar-fill"></div>
+            </div>
+        </div>
+        
+        <!-- 🃏 메인 플래시 카드 영역 -->
+        <div id="card" onclick="showAnswer()">
+            <!-- 🎉 세션 완료 축하 메시지 -->
+            <div id="completion-msg">
+                🎉<br>현재 세션 완료!<br>수고하셨습니다.<br>
+                <button id="btn-reload" class="action-btn" onclick="checkReload()">다음 세션 🔄</button>
+            </div>
+            
+            <div id="verb-badge">데이터 불러오는 중...</div>
+            <div id="wrong-badge"></div>
+            <div id="korean">잠시만 기다려 주세요!</div>
+            <div id="hint">화면을 터치해서 정답 확인</div>
+            <div id="english">Here is the English sentence</div>
+            
+            <!-- 🔊 + ❓ 버튼 영역 -->
+            <div class="card-action-row" id="card-action-row">
+                <button id="speaker" onclick="event.stopPropagation(); playAudio();" aria-label="영어 발음 다시 듣기">🔊</button>
+                <button id="btn-question-memo" onclick="event.stopPropagation(); openQuestionSheet();" aria-label="질문 메모 남기기">❓</button>
+            </div>
+        </div>
+
+        <!-- 🔘 정답 피드백 제출 버튼 -->
+        <div class="buttons" id="action-buttons">
+            <button id="btn-x" class="action-btn" onclick="nextCard('X')">X (Review)</button>
+            <button id="btn-o" class="action-btn" onclick="nextCard('O')">O (Perfect)</button>
+        </div>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 📋 질문 노트 뷰 (Question Notes View)                   -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div id="question-view" style="display:none;">
+
+        <!-- 🔽 정렬 필터 바 -->
+        <div class="filter-bar">
+            <button class="filter-chip active" data-sort="latest" onclick="setQuestionSort('latest')">🕐 최신순</button>
+            <button class="filter-chip" data-sort="day" onclick="setQuestionSort('day')">📅 일차별</button>
+            <button class="filter-chip" data-sort="verb" onclick="setQuestionSort('verb')">🔤 동사별</button>
+        </div>
+
+        <!-- 📋 질문 카드 리스트 -->
+        <div id="question-list" class="question-list">
+            <!-- 동적 렌더링 영역 -->
+        </div>
+
+        <!-- 빈 상태 메시지 -->
+        <div id="question-empty" class="question-empty">
+            <div class="empty-icon">📝</div>
+            <div class="empty-title">아직 질문이 없습니다</div>
+            <div class="empty-desc">학습 중 궁금한 점이 생기면<br>❓ 버튼으로 바로 메모하세요!</div>
+        </div>
+
+        <!-- 📤 내보내기 고정 하단 버튼 -->
+        <div class="export-bar" id="export-bar" style="display:none;">
+            <button id="btn-export" class="export-btn" onclick="exportQuestions()">📤 전체 복사 (AI 논의용)</button>
+        </div>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 📝 바텀시트 메모 입력 패널                                -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div class="bottomsheet-overlay" id="bottomsheet-overlay" onclick="closeQuestionSheet()"></div>
+    <div class="bottomsheet" id="bottomsheet">
+        <div class="bottomsheet-handle"></div>
+        <div class="bottomsheet-header">
+            <span class="bottomsheet-title">❓ 질문 메모</span>
+            <button class="bottomsheet-close" onclick="closeQuestionSheet()" aria-label="닫기">✕</button>
+        </div>
+        <div class="bottomsheet-context" id="bottomsheet-context">
+            <span class="context-badge" id="bs-day-verb">DAY 1 [ get ]</span>
+            <div class="context-ko" id="bs-ko">한글 문장</div>
+            <div class="context-en" id="bs-en">English sentence</div>
+        </div>
+        <textarea id="question-input" class="question-textarea" placeholder="궁금한 점을 적어보세요&#10;예: should vs need to 차이? / 왜 현재형?" rows="3"></textarea>
+        <div class="bottomsheet-actions">
+            <button class="bs-btn bs-cancel" onclick="closeQuestionSheet()">취소</button>
+            <button class="bs-btn bs-save" onclick="saveQuestion()">저장</button>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 📝 질문 수정 바텀시트                                     -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div class="bottomsheet-overlay" id="edit-bottomsheet-overlay" onclick="closeEditSheet()"></div>
+    <div class="bottomsheet" id="edit-bottomsheet">
+        <div class="bottomsheet-handle"></div>
+        <div class="bottomsheet-header">
+            <span class="bottomsheet-title">✏️ 질문 수정</span>
+            <button class="bottomsheet-close" onclick="closeEditSheet()" aria-label="닫기">✕</button>
+        </div>
+        <div class="bottomsheet-context" id="edit-context">
+            <span class="context-badge" id="edit-day-verb">DAY 1 [ get ]</span>
+            <div class="context-ko" id="edit-ko">한글 문장</div>
+            <div class="context-en" id="edit-en">English sentence</div>
+        </div>
+        <textarea id="edit-question-input" class="question-textarea" placeholder="질문을 수정하세요" rows="3"></textarea>
+        <div class="bottomsheet-actions">
+            <button class="bs-btn bs-cancel" onclick="closeEditSheet()">취소</button>
+            <button class="bs-btn bs-save" onclick="saveEditQuestion()">수정 완료</button>
+        </div>
+    </div>
+
+    <!-- 🔔 플로팅 알림 메시지 토스트 -->
+    <div id="feedback-msg">알림 메시지</div>
+
+    <!-- ⚙️ 원어민 발음 설정 패널 오버레이 (뒷배경 블러용) -->
+    <div class="settings-overlay" id="settings-overlay" onclick="toggleSettings()"></div>
+
+    <!-- ⚙️ 원어민 발음 설정 패널 드로어 (우측 슬라이드인) -->
+    <div id="settings-panel" class="settings-panel">
+        <div class="settings-header">
+            <h3>원어민 발음 설정</h3>
+            <button id="close-settings" onclick="toggleSettings()" aria-label="설정 닫기">✕</button>
+        </div>
+        <div class="settings-body">
+            <div class="setting-item">
+                <label for="voice-select">🗣️ 목소리 선택 (추천순)</label>
+                <select id="voice-select" onchange="changeVoice()"></select>
+            </div>
+            <div class="setting-item">
+                <label for="rate-range">⚡ 발음 속도: <span id="rate-val">0.9x</span></label>
+                <input type="range" id="rate-range" min="0.5" max="1.5" step="0.1" value="0.9" oninput="updateRateLabel(this.value)">
+            </div>
+            <button id="btn-test-voice" onclick="testVoice()">🔊 현재 설정 테스트</button>
+        </div>
+        <div class="settings-footer">
+            Core Verbs © 2026<br>자연스러운 인토네이션 학습 모드
+        </div>
+    </div>
+
+    <!-- 🧠 역할 분리: 애플리케이션 핵심 비즈니스 로직 스크립트 연결 -->
+    <script src="app.js"></script>
+</body>
+</html>
