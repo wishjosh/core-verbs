@@ -437,32 +437,46 @@ function init() {
 
     shuffleArray(newCards);
 
-    // 2. 당일 외울 새 문장 10개 선정 (기본동사 단위)
+    // 2. 동적 세션 타겟팅 (일일 10개 엄수 & 복습 우선)
+    const todayStr = new Date().toLocaleDateString('en-CA');
+    const dailyLearned = progressData.dailyStats?.[todayStr]?.newLearned || 0;
+    const pendingReviews = dueReviewCards.length;
+    const DAILY_LIMIT = 10;
+
+    let targetNew = 0;
+    let targetReview = 20;
+
+    if (pendingReviews >= 20) {
+        // 원칙 2: 복습 폭발 방어 (복습에 몰빵)
+        targetNew = 0;
+        targetReview = 20;
+    } else {
+        // 원칙 1 & 3: 남은 일일 할당량 내에서만 새 문장 허용
+        let remainToday = Math.max(0, DAILY_LIMIT - dailyLearned);
+        targetNew = Math.min(remainToday, 10);
+        targetReview = 20 - targetNew;
+    }
+
+    // 3. 당일 외울 새 문장 선정 (기본동사 단위)
     let selectedNew = [];
-    if (newCards.length > 0) {
+    if (targetNew > 0 && newCards.length > 0) {
         // 첫 번째 새 문장의 동사를 타겟 동사로 지정
         const targetVerb = newCards[0].verb;
         const verbCards = newCards.filter(card => card.verb === targetVerb);
         const otherNewCards = newCards.filter(card => card.verb !== targetVerb);
         
-        let takeVerb = Math.min(verbCards.length, 10);
+        let takeVerb = Math.min(verbCards.length, targetNew);
         selectedNew.push(...verbCards.slice(0, takeVerb));
         
-        // 10개가 안 되면 나머지 랜덤 새 문장으로 채움
-        if (selectedNew.length < 10 && otherNewCards.length > 0) {
-            let remain = 10 - selectedNew.length;
+        // 목표치가 안 되면 나머지 랜덤 새 문장으로 채움
+        if (selectedNew.length < targetNew && otherNewCards.length > 0) {
+            let remain = targetNew - selectedNew.length;
             let takeOther = Math.min(otherNewCards.length, remain);
             selectedNew.push(...otherNewCards.slice(0, takeOther));
-            
-            // 남은 newCards 갱신 (리뷰 부족 시 채우기 위해)
-            newCards = otherNewCards.slice(takeOther);
-        } else {
-            // 남은 newCards 갱신
-            newCards = [...verbCards.slice(takeVerb), ...otherNewCards];
         }
     }
 
-    // 3. 복습 문장 10개 선정
+    // 4. 복습 문장 선정
     let dangerCards = [];
     let midCards = [];
     let longCards = [];
@@ -478,7 +492,6 @@ function init() {
     shuffleArray(midCards);
     shuffleArray(longCards);
 
-    let targetReview = 10; // 복습 목표 10개
     let selectedReview = [];
 
     // 비율 할당: 집중 50%, 단기 30%, 장기 20%
@@ -501,13 +514,6 @@ function init() {
     qLong += remMid;
     let takeLong = Math.min(longCards.length, qLong);
     selectedReview.push(...longCards.slice(0, takeLong));
-
-    // 복습 문장이 10개가 안 될 경우, 남은 새 문장에서 채움
-    if (selectedReview.length < 10 && newCards.length > 0) {
-        let extraNewNeeded = 10 - selectedReview.length;
-        let takeExtraNew = Math.min(newCards.length, extraNewNeeded);
-        selectedNew.push(...newCards.slice(0, takeExtraNew));
-    }
 
     todayCards = [...selectedNew, ...selectedReview];
 
@@ -652,7 +658,18 @@ function nextCard(result) {
     const card = todayCards[currentIndex];
     if (!card || !feedbackEl) return;
     
+    const isBrandNew = !progressData[card.en];
     let record = progressData[card.en] || {}; 
+    
+    // 일일 새 문장 학습량 추적 (최초 뒤집기 시점 1회)
+    if (isBrandNew) {
+        const todayStr = new Date().toLocaleDateString('en-CA');
+        progressData.dailyStats = progressData.dailyStats || {};
+        if (!progressData.dailyStats[todayStr]) {
+            progressData.dailyStats[todayStr] = { newLearned: 0 };
+        }
+        progressData.dailyStats[todayStr].newLearned += 1;
+    }
     
     record.interval = record.interval || 0;
     record.wrongCount = record.wrongCount || 0;
