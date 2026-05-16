@@ -437,18 +437,39 @@ function init() {
 
     shuffleArray(newCards);
 
-    // 2. 새 문장 우선 최대 20개 선정
-    let takeNew = Math.min(newCards.length, 20); 
-    const selectedNew = newCards.slice(0, takeNew);
+    // 2. 당일 외울 새 문장 10개 선정 (기본동사 단위)
+    let selectedNew = [];
+    if (newCards.length > 0) {
+        // 첫 번째 새 문장의 동사를 타겟 동사로 지정
+        const targetVerb = newCards[0].verb;
+        const verbCards = newCards.filter(card => card.verb === targetVerb);
+        const otherNewCards = newCards.filter(card => card.verb !== targetVerb);
+        
+        let takeVerb = Math.min(verbCards.length, 10);
+        selectedNew.push(...verbCards.slice(0, takeVerb));
+        
+        // 10개가 안 되면 나머지 랜덤 새 문장으로 채움
+        if (selectedNew.length < 10 && otherNewCards.length > 0) {
+            let remain = 10 - selectedNew.length;
+            let takeOther = Math.min(otherNewCards.length, remain);
+            selectedNew.push(...otherNewCards.slice(0, takeOther));
+            
+            // 남은 newCards 갱신 (리뷰 부족 시 채우기 위해)
+            newCards = otherNewCards.slice(takeOther);
+        } else {
+            // 남은 newCards 갱신
+            newCards = [...verbCards.slice(takeVerb), ...otherNewCards];
+        }
+    }
 
-    // 3. 복습 문장 우선순위 세분화 (집중복습 > 단기 > 장기)
+    // 3. 복습 문장 10개 선정
     let dangerCards = [];
     let midCards = [];
     let longCards = [];
 
     dueReviewCards.forEach(card => {
         const interval = progressData[card.en].interval || 0;
-        if (interval === 0) dangerCards.push(card);
+        if (interval === 0 || interval === 0.5) dangerCards.push(card);
         else if (interval <= 3) midCards.push(card);
         else longCards.push(card);
     });
@@ -457,14 +478,13 @@ function init() {
     shuffleArray(midCards);
     shuffleArray(longCards);
 
-    let targetReview = 30 - takeNew; // 한 세션 최대 30개 타겟
-    
+    let targetReview = 10; // 복습 목표 10개
+    let selectedReview = [];
+
     // 비율 할당: 집중 50%, 단기 30%, 장기 20%
     let qDanger = Math.ceil(targetReview * 0.5);
     let qMid = Math.ceil(targetReview * 0.3);
     let qLong = targetReview - qDanger - qMid;
-
-    let selectedReview = [];
 
     // 집중 복습 채우기
     let takeDanger = Math.min(dangerCards.length, qDanger);
@@ -482,10 +502,11 @@ function init() {
     let takeLong = Math.min(longCards.length, qLong);
     selectedReview.push(...longCards.slice(0, takeLong));
 
-    // 복습 문장 부족 시, 새 문장에서 남은 데이터로 30개 채움
-    if (selectedNew.length + selectedReview.length < 30 && newCards.length > takeNew) {
-        let extraNewNeeded = 30 - (selectedNew.length + selectedReview.length);
-        selectedNew.push(...newCards.slice(takeNew, takeNew + extraNewNeeded));
+    // 복습 문장이 10개가 안 될 경우, 남은 새 문장에서 채움
+    if (selectedReview.length < 10 && newCards.length > 0) {
+        let extraNewNeeded = 10 - selectedReview.length;
+        let takeExtraNew = Math.min(newCards.length, extraNewNeeded);
+        selectedNew.push(...newCards.slice(0, takeExtraNew));
     }
 
     todayCards = [...selectedNew, ...selectedReview];
@@ -527,7 +548,7 @@ function updateDashboardStats() {
             countNew++;
         } else {
             const interval = record.interval || 0;
-            if (interval === 0) {
+            if (interval === 0 || interval === 0.5) {
                 countDanger++; 
             } else if (interval >= 1 && interval <= 3) {
                 countMid++;
@@ -648,7 +669,16 @@ function nextCard(result) {
         const wState = record.warningState;
         
         record.wrongCount = 0; 
-        record.interval = record.interval === 0 ? 1 : (record.interval === 1 ? 3 : record.interval * 2);
+        
+        if (record.interval === 0) {
+            record.interval = 0.5; // 60 minutes
+        } else if (record.interval === 0.5) {
+            record.interval = 1;
+        } else if (record.interval === 1) {
+            record.interval = 3;
+        } else {
+            record.interval = record.interval * 2;
+        }
         
         if (consecutive >= 3) {
             feedbackEl.innerHTML = `정복 완료! 🔥<br><span style="font-size:0.95rem; font-weight:500;">총 ${total}번 틀린 문장입니다. 확실히 기억하세요!</span>`;
@@ -663,12 +693,21 @@ function nextCard(result) {
             feedbackEl.style.backgroundColor = "rgba(52, 152, 219, 0.95)"; 
             record.warningState = 0; 
         } else {
-            feedbackEl.innerHTML = `완벽하네요!<br><span style="font-size:0.95rem; font-weight:500;">${record.interval}일 뒤에 복습합니다.</span>`;
+            if (record.interval === 0.5) {
+                feedbackEl.innerHTML = `완벽하네요!<br><span style="font-size:0.95rem; font-weight:500;">60분 뒤에 복습합니다.</span>`;
+            } else {
+                feedbackEl.innerHTML = `완벽하네요!<br><span style="font-size:0.95rem; font-weight:500;">${record.interval}일 뒤에 복습합니다.</span>`;
+            }
             feedbackEl.style.backgroundColor = "rgba(129, 178, 154, 0.95)"; 
         }
         
-        const nextDate = new Date(todayMidnight.getTime() + record.interval * 24 * 60 * 60 * 1000);
-        record.nextDate = nextDate.getTime();
+        if (record.interval === 0.5) {
+            const nextDate = new Date(now.getTime() + 60 * 60 * 1000); // 60분 뒤
+            record.nextDate = nextDate.getTime();
+        } else {
+            const nextDate = new Date(todayMidnight.getTime() + record.interval * 24 * 60 * 60 * 1000);
+            record.nextDate = nextDate.getTime();
+        }
     } else {
         record.wrongCount += 1; 
         record.totalWrong += 1; 
