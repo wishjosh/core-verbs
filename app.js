@@ -1052,9 +1052,39 @@ function buildQuestionCard(note) {
         </div>
         <div class="q-card-actions">
             <button class="q-action-btn" onclick="openEditSheet(${note.id})">✏️ 수정</button>
+            <button class="q-action-btn copy" onclick="copyQuestion(${note.id})">📋 복사</button>
             <button class="q-action-btn delete" onclick="deleteQuestion(${note.id})">🗑️ 삭제</button>
         </div>
     </div>`;
+}
+
+/* ---------- 개별 질문 복사 ---------- */
+
+function copyQuestion(id) {
+    const n = questionNotes.find(q => q.id === id);
+    if (!n) return;
+
+    const text = `📌 DAY ${n.day} [${n.verb}] - "${n.ko}" / "${n.en}"\n❓ ${n.question}`;
+
+    const showFeedback = () => {
+        const feedbackEl = document.getElementById('feedback-msg');
+        if (feedbackEl) {
+            feedbackEl.innerHTML = `📋 복사 완료!<br><span style="font-size:0.9rem;font-weight:500;">AI에게 붙여넣기 하세요</span>`;
+            feedbackEl.style.backgroundColor = 'rgba(44, 62, 80, 0.95)';
+            feedbackEl.style.display = 'block';
+            setTimeout(() => feedbackEl.style.display = 'none', 1800);
+        }
+    };
+
+    navigator.clipboard.writeText(text).then(showFeedback).catch(() => {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        alert('클립보드에 복사되었습니다!');
+    });
 }
 
 /* ---------- 내보내기 (클립보드 복사) ---------- */

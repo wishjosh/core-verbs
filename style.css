@@ -958,6 +958,12 @@ button.action-btn:active {
     background: #f8f9fa;
 }
 
+.q-action-btn.copy:hover {
+    border-color: #2c3e50;
+    color: #2c3e50;
+    background: #eef2f7;
+}
+
 .q-action-btn.delete:hover {
     border-color: #e53935;
     color: #e53935;
