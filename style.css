@@ -228,6 +228,18 @@ body {
     border: 1px solid #f9d5cc;
 }
 
+#new-badge {
+    display: none;
+    font-size: 0.82rem;
+    color: #558b2f;
+    background-color: #f1f8e9;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    border: 1px solid #dcedc8;
+}
+
 #korean { 
     font-size: clamp(1.2rem, 5.2vw, 1.45rem); 
     color: var(--text-main); 

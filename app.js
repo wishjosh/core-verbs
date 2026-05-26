@@ -599,7 +599,18 @@ function loadCard() {
     const record = progressData[card.en] || {};
     const wrongCount = record.wrongCount || 0;
     const wrongBadge = document.getElementById('wrong-badge');
-    
+    const newBadge = document.getElementById('new-badge');
+    const isBrandNew = !progressData[card.en];
+
+    if (newBadge) {
+        if (isBrandNew) {
+            newBadge.innerText = '🆕 오늘의 새 문장';
+            newBadge.style.display = 'inline-block';
+        } else {
+            newBadge.style.display = 'none';
+        }
+    }
+
     if (wrongBadge) {
         if (wrongCount > 0) {
             wrongBadge.innerText = `⚠️ 연속 틀림: ${wrongCount}회`;
