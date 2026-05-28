@@ -373,6 +373,48 @@ function saveProgress() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(progressData));
 }
 
+function getTodayKey() {
+    return new Date().toLocaleDateString('en-CA');
+}
+
+function ensureTodayNewCards(todayStr = getTodayKey()) {
+    const current = progressData.todayNewCards;
+    const needsReset = !current || current.date !== todayStr || !Array.isArray(current.sentences);
+
+    if (needsReset) {
+        progressData.todayNewCards = {
+            date: todayStr,
+            sentences: []
+        };
+        saveProgress();
+    }
+
+    return progressData.todayNewCards;
+}
+
+function rememberTodayNewCards(cards) {
+    const registry = ensureTodayNewCards();
+    const beforeCount = registry.sentences.length;
+    const sentenceSet = new Set(registry.sentences);
+
+    cards.forEach(card => {
+        if (card?.en) sentenceSet.add(card.en);
+    });
+
+    registry.sentences = Array.from(sentenceSet);
+
+    if (registry.sentences.length !== beforeCount) {
+        saveProgress();
+    }
+}
+
+function isTodayNewCard(card) {
+    if (!card?.en) return false;
+
+    const registry = ensureTodayNewCards();
+    return registry.sentences.includes(card.en);
+}
+
 /**
  * 🌐 구글 스프레드시트(TSV)로부터 데이터 로딩 및 초기 데이터베이스 구성
  */
@@ -438,7 +480,8 @@ function init() {
     shuffleArray(newCards);
 
     // 2. 동적 세션 타겟팅 (일일 10개 엄수 & 복습 우선)
-    const todayStr = new Date().toLocaleDateString('en-CA');
+    const todayStr = getTodayKey();
+    ensureTodayNewCards(todayStr);
     const dailyLearned = progressData.dailyStats?.[todayStr]?.newLearned || 0;
     const pendingReviews = dueReviewCards.length;
     const DAILY_LIMIT = 10;
@@ -475,6 +518,8 @@ function init() {
             selectedNew.push(...otherNewCards.slice(0, takeOther));
         }
     }
+
+    rememberTodayNewCards(selectedNew);
 
     // 4. 복습 문장 선정
     let dangerCards = [];
@@ -598,19 +643,17 @@ function loadCard() {
     
     const record = progressData[card.en] || {};
     const wrongCount = record.wrongCount || 0;
-    const wrongBadge = document.getElementById('wrong-badge');
     const newBadge = document.getElementById('new-badge');
-    const isBrandNew = !progressData[card.en];
+    const wrongBadge = document.getElementById('wrong-badge');
 
     if (newBadge) {
-        if (isBrandNew) {
-            newBadge.innerText = '🆕 오늘의 새 문장';
+        if (isTodayNewCard(card)) {
             newBadge.style.display = 'inline-block';
         } else {
             newBadge.style.display = 'none';
         }
     }
-
+    
     if (wrongBadge) {
         if (wrongCount > 0) {
             wrongBadge.innerText = `⚠️ 연속 틀림: ${wrongCount}회`;
@@ -674,7 +717,7 @@ function nextCard(result) {
     
     // 일일 새 문장 학습량 추적 (최초 뒤집기 시점 1회)
     if (isBrandNew) {
-        const todayStr = new Date().toLocaleDateString('en-CA');
+        const todayStr = getTodayKey();
         progressData.dailyStats = progressData.dailyStats || {};
         if (!progressData.dailyStats[todayStr]) {
             progressData.dailyStats[todayStr] = { newLearned: 0 };

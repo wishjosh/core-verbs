@@ -216,6 +216,18 @@ body {
     text-transform: uppercase;
 }
 
+#new-badge {
+    display: none;
+    font-size: 0.82rem;
+    color: #3f7f4a;
+    background-color: #f1f8e9;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 800;
+    margin-bottom: 10px;
+    border: 1px solid #dcedc8;
+}
+
 #wrong-badge {
     display: none;
     font-size: 0.82rem;
