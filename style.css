@@ -24,16 +24,17 @@
     -webkit-tap-highlight-color: transparent;
 } 
 
-body { 
-    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif; 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-    justify-content: flex-start; 
-    min-height: 100dvh; 
-    background-color: var(--bg-primary); 
-    margin: 0; 
-    padding: 2vh 0; 
+body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100dvh;
+    background-color: var(--bg-primary);
+    margin: 0;
+    /* 📱 홈 화면 앱(standalone)으로 실행 시 노치/상태바·하단 인디케이터(safe-area)를 피해 배치 */
+    padding: max(2vh, env(safe-area-inset-top)) env(safe-area-inset-right) max(2vh, env(safe-area-inset-bottom)) env(safe-area-inset-left);
     overflow-x: hidden;
 }
 
@@ -475,6 +476,9 @@ button.action-btn:active {
     flex-direction: column;
     gap: 24px;
     flex-grow: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-right: 2px;
 }
 
 .setting-item {
@@ -570,6 +574,64 @@ button.action-btn:active {
 }
 
 #btn-test-voice:active {
+    transform: scale(0.98);
+}
+
+/* 💾 백업 / 복원 섹션 */
+.backup-section {
+    border-top: 1px solid #edf2f7;
+    padding-top: 20px;
+    gap: 10px;
+}
+
+.backup-desc {
+    font-size: 0.78rem;
+    color: var(--text-hint);
+    font-weight: 500;
+    line-height: 1.5;
+    margin: 0 0 4px;
+}
+
+#btn-backup,
+#btn-restore {
+    width: 100%;
+    border-radius: 12px;
+    padding: 12px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+#btn-backup {
+    background-color: #eafaf1;
+    color: #2e7d57;
+    border: 1.5px solid #cdeeda;
+}
+
+#btn-backup:hover {
+    background-color: #d8f3e3;
+    border-color: #a9ddc1;
+}
+
+#btn-restore {
+    background-color: #eef2f7;
+    color: #34495e;
+    border: 1.5px solid #d9e1ea;
+}
+
+#btn-restore:hover {
+    background-color: #e1e8f0;
+    border-color: #c2cdd9;
+}
+
+#btn-backup:active,
+#btn-restore:active {
     transform: scale(0.98);
 }
 

@@ -330,6 +330,22 @@ function startIOSResumeHack() {
     }, 3000);
 }
 
+/**
+ * 🎚️ 현재 사용자 설정(목소리/속도)에 맞춘 발화 객체를 생성하는 헬퍼
+ */
+function buildUtterance(text) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-US';
+    utterance.rate = progressData.settings.rate || 0.9;
+    utterance.pitch = 1.0;
+
+    const selectedVoiceName = progressData.settings.voiceName;
+    const voice = availableVoices.find(v => v.name === selectedVoiceName);
+    if (voice) utterance.voice = voice;
+
+    return utterance;
+}
+
 function playAudio() {
     const card = todayCards[currentIndex];
     if (!card) return;
@@ -337,28 +353,37 @@ function playAudio() {
     const text = card.en;
     clearInterval(iosResumeTimer);
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'en-US';
-    utterance.rate = progressData.settings.rate || 0.9;
-    utterance.pitch = 1.0;
-    utterance.onend = () => clearInterval(iosResumeTimer);
-
-    // 설정된 프리미엄 목소리 바인딩
-    const selectedVoiceName = progressData.settings.voiceName;
-    const voice = availableVoices.find(v => v.name === selectedVoiceName);
-    if (voice) utterance.voice = voice;
-
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const synth = window.speechSynthesis;
 
-    if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
-        window.speechSynthesis.cancel();
-        setTimeout(() => {
-            window.speechSynthesis.speak(utterance);
-            if (isIOS) startIOSResumeHack();
-        }, 80);
-    } else {
-        window.speechSynthesis.speak(utterance);
+    // 🔇 무음 예열(warm-up) → 본 문장 순으로 큐에 넣는다.
+    //    엔진은 "유휴 상태 이후 첫 발화"의 앞 음절을 자주 씹는데,
+    //    들리지 않는 예열 발화를 먼저 흘려 본 문장이 첫 발화가 되지 않게 하여
+    //    시작 부분 발음이 뭉개지는 현상을 방지한다.
+    const speakSequence = () => {
+        const warmUp = buildUtterance(' ');
+        warmUp.volume = 0; // 들리지 않게 (공백이라 발음 자체도 없음)
+        warmUp.rate = 1;
+
+        const utterance = buildUtterance(text);
+        utterance.onend = () => clearInterval(iosResumeTimer);
+
+        synth.speak(warmUp);
+        synth.speak(utterance);
         if (isIOS) startIOSResumeHack();
+    };
+
+    const wasBusy = synth.speaking || synth.pending;
+    synth.cancel(); // 큐에 남은 이전 발화를 비워 엔진 꼬임 방지
+
+    if (isIOS) {
+        // iOS: 오디오 정책상 user gesture 안에서 즉시(동기) 호출해야 재생됨
+        speakSequence();
+    } else if (wasBusy) {
+        // 데스크톱(Chrome/Edge): cancel 직후 동기 speak는 누락될 수 있어 짧게 지연
+        setTimeout(speakSequence, 100);
+    } else {
+        speakSequence();
     }
 }
 
@@ -700,8 +725,8 @@ function showAnswer() {
     if (hintEl) hintEl.style.display = 'none';
     if (actionBtnEl) actionBtnEl.style.display = 'flex';
 
-    // iOS 오디오 정책: setTimeout 없이 user gesture 내에서 직접 호출해야 재생됨
-    playAudio();
+    // 🔇 자동 재생하지 않는다. 사용자가 🔊 버튼을 눌러 수동으로 발음을 듣는다.
+    //    (먼저 한글 문장을 보고 스스로 발음을 떠올린 뒤 듣도록 유도)
 }
 
 /**
@@ -1180,3 +1205,123 @@ function exportQuestions() {
 
 // 🔢 초기 뱃지 업데이트
 updateQuestionBadge();
+
+/* ==========================================================================
+   💾 학습 기록 백업 / 복원 (Backup & Restore)
+   진도·복습 일정·설정·질문 노트를 하나의 JSON 파일로 내보내고,
+   재설치/새 기기에서 불러와 기존 진도를 그대로 이어서 학습한다.
+   ========================================================================== */
+
+const BACKUP_FORMAT = 'core-verbs-backup';
+const BACKUP_VERSION = 1;
+
+// 🔔 백업 관련 토스트 피드백
+function showBackupToast(html, bg) {
+    const feedbackEl = document.getElementById('feedback-msg');
+    if (!feedbackEl) return;
+    feedbackEl.innerHTML = html;
+    feedbackEl.style.backgroundColor = bg;
+    feedbackEl.style.display = 'block';
+    setTimeout(() => feedbackEl.style.display = 'none', 2200);
+}
+
+// ⬇️ 현재 localStorage의 학습 데이터를 JSON 파일로 내려받는다.
+function exportBackup() {
+    const payload = {
+        format: BACKUP_FORMAT,
+        version: BACKUP_VERSION,
+        exportedAt: new Date().toISOString(),
+        data: {
+            [STORAGE_KEY]: JSON.parse(localStorage.getItem(STORAGE_KEY)) || {},
+            [QUESTION_STORAGE_KEY]: JSON.parse(localStorage.getItem(QUESTION_STORAGE_KEY)) || []
+        }
+    };
+
+    const json = JSON.stringify(payload, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    const stamp = new Date().toISOString().slice(0, 10);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `core-verbs-backup-${stamp}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+    showBackupToast(
+        `💾 백업 완료!<br><span style="font-size:0.9rem;font-weight:500;">파일을 안전한 곳에 보관하세요</span>`,
+        'rgba(129, 178, 154, 0.95)'
+    );
+}
+
+// ⬆️ 선택한 백업 파일을 읽어 학습 데이터를 복원한다.
+function importBackup(inputEl) {
+    const file = inputEl.files && inputEl.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const parsed = JSON.parse(e.target.result);
+
+            // 백업 파일 형식 검증
+            const data = parsed && parsed.data;
+            if (!parsed || parsed.format !== BACKUP_FORMAT || !data || typeof data !== 'object') {
+                throw new Error('형식 불일치');
+            }
+
+            const memory = data[STORAGE_KEY];
+            const notes = data[QUESTION_STORAGE_KEY];
+            if (typeof memory !== 'object' || memory === null) {
+                throw new Error('학습 데이터 없음');
+            }
+
+            const when = parsed.exportedAt ? new Date(parsed.exportedAt).toLocaleString('ko-KR') : '알 수 없음';
+            const ok = confirm(
+                `이 백업으로 현재 학습 기록을 덮어쓸까요?\n\n` +
+                `백업 시점: ${when}\n\n` +
+                `현재 기기의 진도/질문 노트는 백업 내용으로 대체됩니다.`
+            );
+            if (!ok) {
+                inputEl.value = '';
+                return;
+            }
+
+            // localStorage에 복원
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(memory));
+            if (Array.isArray(notes)) {
+                localStorage.setItem(QUESTION_STORAGE_KEY, JSON.stringify(notes));
+            }
+
+            showBackupToast(
+                `✅ 복원 완료!<br><span style="font-size:0.9rem;font-weight:500;">잠시 후 학습을 이어서 시작합니다</span>`,
+                'rgba(52, 152, 219, 0.95)'
+            );
+
+            // 새 데이터로 깔끔하게 재시작
+            setTimeout(() => location.reload(), 1500);
+        } catch (err) {
+            console.error('백업 복원 실패', err);
+            showBackupToast(
+                `❌ 복원 실패<br><span style="font-size:0.9rem;font-weight:500;">올바른 Core Verbs 백업 파일이 아닙니다</span>`,
+                'rgba(224, 122, 95, 0.95)'
+            );
+        } finally {
+            inputEl.value = ''; // 같은 파일 재선택 가능하도록 초기화
+        }
+    };
+    reader.readAsText(file);
+}
+
+/* ==========================================================================
+   📲 서비스 워커 등록 (PWA 설치 / 오프라인 실행)
+   ========================================================================== */
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch((err) => {
+            console.warn('서비스 워커 등록 실패(앱 기능에는 영향 없음):', err);
+        });
+    });
+}

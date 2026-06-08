@@ -2,12 +2,26 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- 📱 스마트폰 화면에 자동으로 맞춤 + 노치(safe-area) 대응 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Core Verbs</title>
-    
+
+    <!-- 📲 PWA: 홈 화면에 추가하면 앱처럼 전체화면으로 실행 -->
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#81B29A">
+    <meta name="description" content="기본동사 중심 영어 문장 SRS 학습 앱">
+
+    <!-- 🍎 iOS Safari: 홈 화면 앱(독립 실행) 메타 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Core Verbs">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+
     <!-- Pretendard 폰트 불러오기 -->
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
-    
+
     <!-- 🎨 역할 분리: 외부 스타일시트 불러오기 -->
     <link rel="stylesheet" href="style.css">
 </head>
@@ -66,7 +80,7 @@
             
             <!-- 🔊 + ❓ 버튼 영역 -->
             <div class="card-action-row" id="card-action-row">
-                <button id="speaker" onclick="event.stopPropagation(); playAudio();" aria-label="영어 발음 다시 듣기">🔊</button>
+                <button id="speaker" onclick="event.stopPropagation(); playAudio();" aria-label="영어 발음 듣기" title="영어 발음 듣기">🔊</button>
                 <button id="btn-question-memo" onclick="event.stopPropagation(); openQuestionSheet();" aria-label="질문 메모 남기기">❓</button>
             </div>
         </div>
@@ -176,6 +190,15 @@
                 <input type="range" id="rate-range" min="0.5" max="1.5" step="0.1" value="0.9" oninput="updateRateLabel(this.value)">
             </div>
             <button id="btn-test-voice" onclick="testVoice()">🔊 현재 설정 테스트</button>
+
+            <!-- 💾 학습 기록 백업 / 복원 -->
+            <div class="setting-item backup-section">
+                <label>💾 학습 기록 백업 / 복원</label>
+                <p class="backup-desc">진도·복습 일정·질문 노트를 파일로 저장하고, 새 기기나 재설치 후 그대로 이어서 학습할 수 있어요.</p>
+                <button id="btn-backup" onclick="exportBackup()">⬇️ 백업 파일 내보내기</button>
+                <button id="btn-restore" onclick="document.getElementById('restore-file').click()">⬆️ 백업 파일 불러오기</button>
+                <input type="file" id="restore-file" accept="application/json,.json" style="display:none" onchange="importBackup(this)">
+            </div>
         </div>
         <div class="settings-footer">
             Core Verbs © 2026<br>자연스러운 인토네이션 학습 모드
