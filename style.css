@@ -143,6 +143,25 @@ body {
 .mid-box { background-color: #fff8e1; color: #f57f17; border: 1px solid #ffe082; }
 .long-box { background-color: #e3f2fd; color: #1565c0; border: 1px solid #bbdefb; }
 
+.error-profile {
+    width: 100%;
+    margin-top: 10px;
+    padding: 9px 11px;
+    border-radius: 11px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #64748b;
+    font-size: 0.76rem;
+    line-height: 1.45;
+    text-align: left;
+}
+
+.error-profile-title {
+    color: #334155;
+    font-weight: 800;
+    margin-right: 6px;
+}
+
 /* 📈 진행 바 */
 .progress-wrapper {
     display: flex; 
@@ -262,7 +281,7 @@ body {
     line-height: 1.45; 
 }
 
-#hint { 
+#hint {
     font-size: 0.9rem; 
     color: var(--text-hint); 
     margin-top: 10px; 
@@ -272,7 +291,140 @@ body {
     border-radius: 20px;
 }
 
-#english { 
+.practice-panel {
+    display: none;
+    width: 100%;
+    margin-top: 8px;
+    cursor: default;
+}
+
+.practice-title {
+    color: #334155;
+    font-size: 0.94rem;
+    font-weight: 800;
+    margin-bottom: 5px;
+}
+
+.practice-subtitle {
+    color: #718096;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    margin-bottom: 12px;
+}
+
+.practice-slots,
+.practice-bank {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 48px;
+    padding: 8px;
+    border-radius: 13px;
+}
+
+.practice-slots {
+    background: #f1f5f9;
+    border: 1px dashed #94a3b8;
+    margin-bottom: 10px;
+}
+
+.practice-slot-placeholder {
+    width: 42px;
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    border: 1px dashed #cbd5e1;
+    color: #94a3b8;
+    background: rgba(255, 255, 255, 0.7);
+    font-size: 0.75rem;
+    font-weight: 800;
+}
+
+.practice-bank {
+    background: #fffaf0;
+    border: 1px solid #fde68a;
+}
+
+.practice-chip {
+    min-height: 42px;
+    padding: 9px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 11px;
+    background: white;
+    color: #1e293b;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 750;
+    line-height: 1.2;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(15, 23, 42, 0.06);
+}
+
+.practice-chip:active {
+    transform: translateY(1px);
+    box-shadow: none;
+}
+
+.practice-chip.used {
+    opacity: 0.28;
+    pointer-events: none;
+}
+
+.practice-chip.selected {
+    background: #e0f2fe;
+    border-color: #7dd3fc;
+    color: #075985;
+}
+
+.practice-chip.correct {
+    background: #dcfce7;
+    border-color: #86efac;
+    color: #166534;
+}
+
+.practice-chip.wrong {
+    background: #fee2e2;
+    border-color: #fca5a5;
+    color: #991b1b;
+}
+
+.practice-controls {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
+.practice-small-btn,
+.practice-check-btn {
+    min-height: 42px;
+    padding: 9px 14px;
+    border-radius: 11px;
+    border: none;
+    font-family: inherit;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.practice-small-btn {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+.practice-check-btn {
+    background: #0f766e;
+    color: white;
+}
+
+.practice-check-btn:disabled {
+    background: #cbd5e1;
+    cursor: not-allowed;
+}
+#english {
     font-size: clamp(1.15rem, 4.8vw, 1.38rem); 
     color: #2980b9; 
     margin-top: 10px; 
@@ -280,6 +432,40 @@ body {
     font-weight: 700; 
     line-height: 1.45; 
     animation: fadeIn 0.3s ease-out;
+}
+
+.core-phrase-box {
+    display: none;
+    width: 100%;
+    margin-top: 13px;
+    padding: 12px 14px;
+    border-radius: 13px;
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    color: #065f46;
+    text-align: left;
+    line-height: 1.45;
+    animation: fadeIn 0.25s ease-out;
+}
+
+.core-phrase-label {
+    display: block;
+    color: #047857;
+    font-size: 0.72rem;
+    font-weight: 800;
+    margin-bottom: 3px;
+}
+
+#core-phrase-text {
+    display: block;
+    font-size: 1rem;
+}
+
+#practice-result-tip {
+    display: block;
+    color: #475569;
+    font-size: 0.78rem;
+    margin-top: 6px;
 }
 
 /* 🔊 스피커 버튼 */
@@ -332,14 +518,19 @@ button.action-btn {
     box-shadow: 0 4px 6px rgba(0,0,0,0.06);
 }
 
-#btn-x { 
-    background-color: var(--accent-red); 
-    box-shadow: 0 4px 0 #b71c1c; 
+#btn-next {
+    background-color: var(--accent-green);
+    box-shadow: 0 4px 0 #1b5e20;
 }
 
-#btn-o { 
-    background-color: var(--accent-green); 
-    box-shadow: 0 4px 0 #1b5e20; 
+#btn-show-answer {
+    background-color: #64748b;
+    box-shadow: 0 4px 0 #334155;
+}
+
+#btn-next,
+#btn-show-answer {
+    display: none;
 }
 
 button.action-btn:active { 

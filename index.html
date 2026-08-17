@@ -53,6 +53,10 @@
                 <div class="stat-box mid-box">⏳ 단기<br><span id="stat-mid">0</span></div>
                 <div class="stat-box long-box">🧠 장기<br><span id="stat-long">0</span></div>
             </div>
+            <div class="error-profile" id="error-profile">
+                <span class="error-profile-title">🔎 나의 오류</span>
+                <span id="error-summary">구문 훈련을 시작하면 자주 틀리는 부분을 보여 드려요.</span>
+            </div>
         </div>
         
         <!-- 📈 진행 바 영역 -->
@@ -64,7 +68,7 @@
         </div>
         
         <!-- 🃏 메인 플래시 카드 영역 -->
-        <div id="card" onclick="showAnswer()">
+        <div id="card" onclick="startPractice()">
             <!-- 🎉 세션 완료 축하 메시지 -->
             <div id="completion-msg">
                 🎉<br>현재 세션 완료!<br>수고하셨습니다.<br>
@@ -75,8 +79,26 @@
             <div id="new-badge">🆕 오늘의 새 문장</div>
             <div id="wrong-badge"></div>
             <div id="korean">잠시만 기다려 주세요!</div>
-            <div id="hint">화면을 터치해서 정답 확인</div>
+            <div id="hint">영어 문장을 떠올린 뒤 화면을 터치하세요</div>
+
+            <!-- 🧩 모바일 핵심 구문 선택·조립 -->
+            <div id="practice-panel" class="practice-panel">
+                <div class="practice-title">🧩 표현 덩어리를 순서대로 선택하세요</div>
+                <div class="practice-subtitle" id="practice-subtitle">관사·복수·전치사·한국어 직역형도 함께 확인합니다.</div>
+                <div id="practice-slots" class="practice-slots" aria-live="polite"></div>
+                <div id="practice-bank" class="practice-bank"></div>
+                <div class="practice-controls">
+                    <button id="btn-practice-reset" class="practice-small-btn" onclick="event.stopPropagation(); resetPracticeSelection();">다시 고르기</button>
+                    <button id="btn-practice-check" class="practice-check-btn" onclick="event.stopPropagation(); checkPracticeAnswer();" disabled>확인</button>
+                </div>
+            </div>
+
             <div id="english">Here is the English sentence</div>
+            <div id="core-phrase-box" class="core-phrase-box">
+                <span class="core-phrase-label">오늘의 핵심 표현</span>
+                <strong id="core-phrase-text"></strong>
+                <span id="practice-result-tip"></span>
+            </div>
             
             <!-- 🔊 + ❓ 버튼 영역 -->
             <div class="card-action-row" id="card-action-row">
@@ -85,10 +107,10 @@
             </div>
         </div>
 
-        <!-- 🔘 정답 피드백 제출 버튼 -->
+        <!-- 🔘 구문 훈련 보조·다음 버튼 -->
         <div class="buttons" id="action-buttons">
-            <button id="btn-x" class="action-btn" onclick="nextCard('X')">X (Review)</button>
-            <button id="btn-o" class="action-btn" onclick="nextCard('O')">O (Perfect)</button>
+            <button id="btn-show-answer" class="action-btn secondary" onclick="revealAnswerAsReview()">정답 보기</button>
+            <button id="btn-next" class="action-btn" onclick="advanceCard()">다음 문장 →</button>
         </div>
 
     </div>
@@ -194,7 +216,7 @@
             <!-- 💾 학습 기록 백업 / 복원 -->
             <div class="setting-item backup-section">
                 <label>💾 학습 기록 백업 / 복원</label>
-                <p class="backup-desc">진도·복습 일정·질문 노트를 파일로 저장하고, 새 기기나 재설치 후 그대로 이어서 학습할 수 있어요.</p>
+                <p class="backup-desc">진도·복습 일정·개인 오류·질문 노트를 파일로 저장하고, 새 기기나 재설치 후 그대로 이어서 학습할 수 있어요.</p>
                 <button id="btn-backup" onclick="exportBackup()">⬇️ 백업 파일 내보내기</button>
                 <button id="btn-restore" onclick="document.getElementById('restore-file').click()">⬆️ 백업 파일 불러오기</button>
                 <input type="file" id="restore-file" accept="application/json,.json" style="display:none" onchange="importBackup(this)">
@@ -205,7 +227,8 @@
         </div>
     </div>
 
-    <!-- 🧠 역할 분리: 애플리케이션 핵심 비즈니스 로직 스크립트 연결 -->
+    <!-- 🧠 학습 문제 생성·배정 규칙과 애플리케이션 화면 로직 -->
+    <script src="learning-engine.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

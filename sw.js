@@ -4,13 +4,14 @@
    ※ 학습 데이터(구글 시트)·폰트 등 외부 리소스는 항상 네트워크를 우선한다.
    ========================================================================== */
 
-const CACHE_NAME = 'core-verbs-shell-v1';
+const CACHE_NAME = 'core-verbs-shell-v2';
 
 // 앱 셸(자체 호스팅 파일)만 사전 캐시한다.
 const APP_SHELL = [
     './',
     './index.html',
     './style.css',
+    './learning-engine.js',
     './app.js',
     './manifest.webmanifest',
     './icon-192.png',

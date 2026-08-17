@@ -2,8 +2,13 @@
    Core Verbs - 프리미엄 애플리케이션 로직 (app.js)
    ========================================================================== */
 
-const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSR1wby3k5QhlAL8f8MeH-Ni1qjGgRMu8ROHDoPCKci-GYrbpx1DzTsAvcr_l5qBcemui93D4cqMLa0/pub?output=tsv"; 
-const STORAGE_KEY = 'coreVerbs_Memory_v1'; 
+const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSR1wby3k5QhlAL8f8MeH-Ni1qjGgRMu8ROHDoPCKci-GYrbpx1DzTsAvcr_l5qBcemui93D4cqMLa0/pub?output=tsv";
+const STORAGE_KEY = 'coreVerbs_Memory_v1';
+const Learning = window.CoreVerbsLearning;
+
+if (!Learning) {
+    throw new Error('learning-engine.js를 먼저 불러와야 합니다.');
+}
 
 // 🧠 애플리케이션 상태(State) 변수
 let db = [];
@@ -11,6 +16,11 @@ let todayCards = [];
 let currentIndex = 0;
 let availableVoices = [];
 let iosResumeTimer = null; // iOS Speech Synthesis 중간 무음 버그 방지 타이머
+let currentPractice = null;
+let selectedPracticeIds = [];
+let currentPracticeResult = null;
+let currentAssessmentRecorded = false;
+let sessionRetryCounts = {};
 
 // 💾 학습 진행 상태 및 사용자 설정 로드
 let progressData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
@@ -448,6 +458,18 @@ async function fetchDatabase() {
         const response = await fetch(SHEET_URL);
         const data = await response.text();
         const rows = data.split('\n');
+        const headers = (rows[0] || '').split('\t').map(header => header.replace(/^\uFEFF/, '').trim().toUpperCase());
+        const columnIndex = (...names) => {
+            for (const name of names) {
+                const index = headers.indexOf(name);
+                if (index >= 0) return index;
+            }
+            return -1;
+        };
+        const optionalValue = (cols, names) => {
+            const index = columnIndex(...names);
+            return index >= 0 ? (cols[index] || '').replace(/\r/g, '').trim() : '';
+        };
         
         db = []; // 초기화
         for (let i = 1; i < rows.length; i++) {
@@ -457,10 +479,22 @@ async function fetchDatabase() {
                 const day = cols[0].trim();
                 const verb = cols[1].trim();
                 const ko = cols[2].trim();
-                const en = cols[3].replace(/\r/g, '').trim(); 
-                
+                const en = cols[3].replace(/\r/g, '').trim();
+
                 if (en && ko) {
-                    db.push({ day: parseInt(day) || "?", verb: verb, ko: ko, en: en });
+                    const priorityRaw = optionalValue(cols, ['PRIORITY', 'WEIGHT']);
+                    const priority = parseFloat(priorityRaw);
+                    db.push({
+                        day: parseInt(day) || "?",
+                        verb,
+                        ko,
+                        en,
+                        corePhrase: optionalValue(cols, ['CORE_CHUNK', 'CORE_PHRASE']),
+                        errorType: optionalValue(cols, ['ERROR_TYPE', 'ERROR']),
+                        distractor: optionalValue(cols, ['DISTRACTOR', 'WRONG_CHUNK']),
+                        tip: optionalValue(cols, ['TIP', 'EXPLANATION']),
+                        priority: Number.isFinite(priority) && priority > 0 ? priority : 1
+                    });
                 }
             }
         }
@@ -502,14 +536,17 @@ function init() {
         }
     });
 
-    shuffleArray(newCards);
-
     // 2. 동적 세션 타겟팅 (일일 10개 엄수 & 복습 우선)
     const todayStr = getTodayKey();
     ensureTodayNewCards(todayStr);
     const dailyLearned = progressData.dailyStats?.[todayStr]?.newLearned || 0;
     const pendingReviews = dueReviewCards.length;
     const DAILY_LIMIT = 10;
+    const adaptiveLimit = Learning.getAdaptiveNewLimit(
+        pendingReviews,
+        progressData.practiceHistory || [],
+        DAILY_LIMIT
+    );
 
     let targetNew = 0;
     let targetReview = 20;
@@ -521,28 +558,13 @@ function init() {
     } else {
         // 원칙 1 & 3: 남은 일일 할당량 내에서만 새 문장 허용
         let remainToday = Math.max(0, DAILY_LIMIT - dailyLearned);
-        targetNew = Math.min(remainToday, 10);
+        targetNew = Math.min(remainToday, adaptiveLimit);
         targetReview = 20 - targetNew;
     }
 
-    // 3. 당일 외울 새 문장 선정 (기본동사 단위)
-    let selectedNew = [];
-    if (targetNew > 0 && newCards.length > 0) {
-        // 첫 번째 새 문장의 동사를 타겟 동사로 지정
-        const targetVerb = newCards[0].verb;
-        const verbCards = newCards.filter(card => card.verb === targetVerb);
-        const otherNewCards = newCards.filter(card => card.verb !== targetVerb);
-        
-        let takeVerb = Math.min(verbCards.length, targetNew);
-        selectedNew.push(...verbCards.slice(0, takeVerb));
-        
-        // 목표치가 안 되면 나머지 랜덤 새 문장으로 채움
-        if (selectedNew.length < targetNew && otherNewCards.length > 0) {
-            let remain = targetNew - selectedNew.length;
-            let takeOther = Math.min(otherNewCards.length, remain);
-            selectedNew.push(...otherNewCards.slice(0, takeOther));
-        }
-    }
+    // 3. 원본 자료의 동사별 문장 비중을 유지하며 새 문장을 선정한다.
+    // DAY 순서를 강제하지 않되, 고빈도 기본동사가 더 많이 배치된 책의 의도는 보존한다.
+    const selectedNew = Learning.selectWeightedNewCards(newCards, targetNew, db);
 
     rememberTodayNewCards(selectedNew);
 
@@ -584,6 +606,14 @@ function init() {
     qLong += remMid;
     let takeLong = Math.min(longCards.length, qLong);
     selectedReview.push(...longCards.slice(0, takeLong));
+
+    // 비어 있는 범주의 몫 때문에 세션이 목표보다 작아지지 않도록 남은 복습에서 보충한다.
+    if (selectedReview.length < targetReview) {
+        const selectedSentences = new Set(selectedReview.map(card => card.en));
+        const remainingDue = dueReviewCards.filter(card => !selectedSentences.has(card.en));
+        shuffleArray(remainingDue);
+        selectedReview.push(...remainingDue.slice(0, targetReview - selectedReview.length));
+    }
 
     todayCards = [...selectedNew, ...selectedReview];
 
@@ -645,12 +675,37 @@ function updateDashboardStats() {
     if (statDanger) statDanger.innerText = countDanger;
     if (statMid) statMid.innerText = countMid;
     if (statLong) statLong.innerText = countLong;
+
+    const errorSummary = document.getElementById('error-summary');
+    if (errorSummary) {
+        const errorStats = progressData.errorStats || {};
+        const ranked = Object.entries(errorStats)
+            .filter(([, value]) => (value.wrong || 0) > 0)
+            .sort((a, b) => (b[1].wrong || 0) - (a[1].wrong || 0))
+            .slice(0, 3);
+
+        if (ranked.length === 0) {
+            const attempts = Object.values(errorStats).reduce((sum, value) => sum + (value.attempts || 0), 0);
+            errorSummary.innerText = attempts > 0
+                ? '현재 뚜렷하게 반복되는 오류가 없습니다.'
+                : '구문 훈련을 시작하면 자주 틀리는 부분을 보여 드려요.';
+        } else {
+            errorSummary.innerText = ranked
+                .map(([type, value]) => `${Learning.ERROR_LABELS[type] || type} ${value.wrong}회`)
+                .join(' · ');
+        }
+    }
 }
 
 /**
  * 🃏 개별 학습 카드 데이터를 화면에 로드
  */
 function loadCard() {
+    currentPractice = null;
+    selectedPracticeIds = [];
+    currentPracticeResult = null;
+    currentAssessmentRecorded = false;
+
     const currentIdxEl = document.getElementById('current-idx');
     if (currentIdxEl) currentIdxEl.innerText = currentIndex + 1;
     
@@ -693,6 +748,11 @@ function loadCard() {
     const hintEl = document.getElementById('hint');
     const cardActionRow = document.getElementById('card-action-row');
     const actionBtnEl = document.getElementById('action-buttons');
+    const practicePanel = document.getElementById('practice-panel');
+    const corePhraseBox = document.getElementById('core-phrase-box');
+    const showAnswerBtn = document.getElementById('btn-show-answer');
+    const nextBtn = document.getElementById('btn-next');
+    const cardEl = document.getElementById('card');
 
     if (koreanEl) koreanEl.innerText = card.ko;
     if (englishEl) {
@@ -700,144 +760,279 @@ function loadCard() {
         englishEl.style.display = 'none';
     }
     
-    if (hintEl) hintEl.style.display = 'block';
+    if (hintEl) {
+        hintEl.innerText = '영어 문장을 떠올린 뒤 화면을 터치하세요';
+        hintEl.style.display = 'block';
+    }
+    if (practicePanel) practicePanel.style.display = 'none';
+    if (corePhraseBox) corePhraseBox.style.display = 'none';
     if (cardActionRow) cardActionRow.style.display = 'none';
     if (actionBtnEl) actionBtnEl.style.display = 'none';
+    if (showAnswerBtn) showAnswerBtn.style.display = 'none';
+    if (nextBtn) nextBtn.style.display = 'none';
+    if (cardEl) cardEl.onclick = startPractice;
 }
-
 /**
- * 👁️ 화면을 터치했을 때 정답(영어)을 노출
+ * 🧩 정답을 바로 노출하지 않고 모바일 표현 덩어리 훈련을 시작한다.
  */
-function showAnswer() {
-    const englishEl = document.getElementById('english');
-    if (!englishEl || englishEl.style.display === 'block') return;
-
-    // iOS: 첫 터치 시점에 목소리가 아직 안 로드된 경우 즉시 재시도
-    if (availableVoices.length === 0) populateVoiceList();
-
-    englishEl.style.display = 'block';
-
-    const cardActionRow = document.getElementById('card-action-row');
-    const hintEl = document.getElementById('hint');
-    const actionBtnEl = document.getElementById('action-buttons');
-
-    if (cardActionRow) cardActionRow.style.display = 'flex';
-    if (hintEl) hintEl.style.display = 'none';
-    if (actionBtnEl) actionBtnEl.style.display = 'flex';
-
-    // 🔇 자동 재생하지 않는다. 사용자가 🔊 버튼을 눌러 수동으로 발음을 듣는다.
-    //    (먼저 한글 문장을 보고 스스로 발음을 떠올린 뒤 듣도록 유도)
-}
-
-/**
- * ➡️ 학습 카드 제출 (O: Perfect / X: Review) 및 스마트 망각 스케줄링 계산
- */
-function nextCard(result) {
-    const feedbackEl = document.getElementById('feedback-msg');
+function startPractice() {
+    if (currentPractice || currentAssessmentRecorded) return;
     const card = todayCards[currentIndex];
-    if (!card || !feedbackEl) return;
-    
+    if (!card) return;
+
+    if (availableVoices.length === 0) populateVoiceList();
+    currentPractice = Learning.buildPracticeQuestion(card);
+    selectedPracticeIds = [];
+    currentPracticeResult = null;
+
+    const hintEl = document.getElementById('hint');
+    const practicePanel = document.getElementById('practice-panel');
+    const practiceSubtitle = document.getElementById('practice-subtitle');
+    const actionButtons = document.getElementById('action-buttons');
+    const showAnswerBtn = document.getElementById('btn-show-answer');
+
+    if (hintEl) hintEl.style.display = 'none';
+    if (practicePanel) practicePanel.style.display = 'block';
+    if (practiceSubtitle) practiceSubtitle.innerText = `집중 확인: ${currentPractice.errorLabel}`;
+    if (actionButtons) actionButtons.style.display = 'flex';
+    if (showAnswerBtn) showAnswerBtn.style.display = 'inline-flex';
+    renderPracticeSelection();
+}
+
+// 기존 인라인 호출이나 저장된 화면과의 호환을 유지한다.
+function showAnswer() {
+    startPractice();
+}
+
+function renderPracticeSelection() {
+    if (!currentPractice) return;
+    const slotsEl = document.getElementById('practice-slots');
+    const bankEl = document.getElementById('practice-bank');
+    const checkBtn = document.getElementById('btn-practice-check');
+    const resetBtn = document.getElementById('btn-practice-reset');
+    if (!slotsEl || !bankEl) return;
+
+    slotsEl.innerHTML = '';
+    for (let index = 0; index < currentPractice.targetIds.length; index++) {
+        const selectedId = selectedPracticeIds[index];
+        if (!selectedId) {
+            const placeholder = document.createElement('span');
+            placeholder.className = 'practice-slot-placeholder';
+            placeholder.innerText = `${index + 1}`;
+            slotsEl.appendChild(placeholder);
+            continue;
+        }
+
+        const entry = currentPractice.bank.find(item => item.id === selectedId);
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'practice-chip selected';
+        chip.innerText = entry?.text || '';
+        if (currentPracticeResult) {
+            chip.classList.add(selectedId === currentPractice.targetIds[index] ? 'correct' : 'wrong');
+            chip.disabled = true;
+        } else {
+            chip.onclick = (event) => {
+                event.stopPropagation();
+                selectedPracticeIds.splice(index, 1);
+                renderPracticeSelection();
+            };
+        }
+        slotsEl.appendChild(chip);
+    }
+
+    bankEl.innerHTML = '';
+    currentPractice.bank.forEach(entry => {
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'practice-chip';
+        chip.innerText = entry.text;
+        const used = selectedPracticeIds.includes(entry.id);
+        if (used) chip.classList.add('used');
+        chip.disabled = used || Boolean(currentPracticeResult) || selectedPracticeIds.length >= currentPractice.targetIds.length;
+        chip.onclick = (event) => {
+            event.stopPropagation();
+            selectPracticeChunk(entry.id);
+        };
+        bankEl.appendChild(chip);
+    });
+
+    if (checkBtn) checkBtn.disabled = Boolean(currentPracticeResult) || selectedPracticeIds.length !== currentPractice.targetIds.length;
+    if (resetBtn) resetBtn.disabled = Boolean(currentPracticeResult);
+}
+
+function selectPracticeChunk(id) {
+    if (!currentPractice || currentPracticeResult) return;
+    if (selectedPracticeIds.length >= currentPractice.targetIds.length) return;
+    if (selectedPracticeIds.includes(id)) return;
+    selectedPracticeIds.push(id);
+    renderPracticeSelection();
+}
+
+function resetPracticeSelection() {
+    if (currentPracticeResult) return;
+    selectedPracticeIds = [];
+    renderPracticeSelection();
+}
+
+function checkPracticeAnswer() {
+    if (!currentPractice || currentPracticeResult || currentAssessmentRecorded) return;
+    currentPracticeResult = Learning.evaluatePractice(currentPractice, selectedPracticeIds);
+    const result = currentPracticeResult.correct ? 'O' : 'X';
+    const scheduleMessage = recordAssessment(
+        result,
+        currentPracticeResult.errorTypes,
+        false,
+        currentPractice.errorType
+    );
+    renderPracticeSelection();
+    revealPracticeAnswer(
+        currentPracticeResult.correct ? '정확합니다. 구문과 어순을 기억했습니다.' : `${currentPracticeResult.errorLabel}을 다시 확인하세요.`,
+        `${currentPracticeResult.tip} ${scheduleMessage}`
+    );
+}
+
+function revealAnswerAsReview() {
+    if (currentAssessmentRecorded) return;
+    if (!currentPractice) startPractice();
+    if (!currentPractice) return;
+    currentPracticeResult = {
+        correct: false,
+        errorTypes: ['recall'],
+        errorLabel: Learning.ERROR_LABELS.recall,
+        tip: '정답을 본 문장은 같은 세션에서 다시 조립합니다.'
+    };
+    const scheduleMessage = recordAssessment('X', ['recall'], true, currentPractice.errorType);
+    renderPracticeSelection();
+    revealPracticeAnswer('정답을 확인했습니다.', `${currentPracticeResult.tip} ${scheduleMessage}`);
+}
+
+function revealPracticeAnswer(headline, detail) {
+    const card = todayCards[currentIndex];
+    if (!card || !currentPractice) return;
+    const englishEl = document.getElementById('english');
+    const corePhraseBox = document.getElementById('core-phrase-box');
+    const corePhraseText = document.getElementById('core-phrase-text');
+    const resultTip = document.getElementById('practice-result-tip');
+    const cardActionRow = document.getElementById('card-action-row');
+    const showAnswerBtn = document.getElementById('btn-show-answer');
+    const nextBtn = document.getElementById('btn-next');
+    const actionButtons = document.getElementById('action-buttons');
+    const cardEl = document.getElementById('card');
+
+    if (englishEl) englishEl.style.display = 'block';
+    if (corePhraseText) corePhraseText.innerText = currentPractice.corePhrase;
+    if (resultTip) resultTip.innerText = `${headline} ${detail}`;
+    if (corePhraseBox) corePhraseBox.style.display = 'block';
+    if (cardActionRow) cardActionRow.style.display = 'flex';
+    if (actionButtons) actionButtons.style.display = 'flex';
+    if (showAnswerBtn) showAnswerBtn.style.display = 'none';
+    if (nextBtn) nextBtn.style.display = 'inline-flex';
+    if (cardEl) cardEl.onclick = null;
+}
+
+function updatePracticeHistory(card, result, errorTypes, usedHint, attemptedType) {
+    const correct = result === 'O';
+    const types = new Set([attemptedType, ...(errorTypes || [])].filter(Boolean));
+    progressData.errorStats = progressData.errorStats || {};
+    types.forEach(type => {
+        const current = progressData.errorStats[type] || { attempts: 0, wrong: 0 };
+        current.attempts += 1;
+        if (!correct && ((errorTypes || []).includes(type) || type === attemptedType)) current.wrong += 1;
+        progressData.errorStats[type] = current;
+    });
+
+    progressData.practiceHistory = progressData.practiceHistory || [];
+    progressData.practiceHistory.push({
+        timestamp: Date.now(),
+        sentence: card.en,
+        verb: card.verb,
+        correct,
+        usedHint,
+        errorTypes: [...types]
+    });
+    progressData.practiceHistory = progressData.practiceHistory.slice(-100);
+}
+
+/**
+ * 실제 구문 선택 결과를 복습 일정과 개인 오류 기록에 반영한다.
+ */
+function recordAssessment(result, errorTypes = [], usedHint = false, attemptedType = 'word_order') {
+    if (currentAssessmentRecorded) return '';
+    const card = todayCards[currentIndex];
+    if (!card) return '';
+    currentAssessmentRecorded = true;
+
     const isBrandNew = !progressData[card.en];
-    let record = progressData[card.en] || {}; 
-    
-    // 일일 새 문장 학습량 추적 (최초 뒤집기 시점 1회)
+    const record = progressData[card.en] || {};
     if (isBrandNew) {
         const todayStr = getTodayKey();
         progressData.dailyStats = progressData.dailyStats || {};
-        if (!progressData.dailyStats[todayStr]) {
-            progressData.dailyStats[todayStr] = { newLearned: 0 };
-        }
+        if (!progressData.dailyStats[todayStr]) progressData.dailyStats[todayStr] = { newLearned: 0 };
         progressData.dailyStats[todayStr].newLearned += 1;
     }
-    
+
     record.interval = record.interval || 0;
     record.wrongCount = record.wrongCount || 0;
     record.totalWrong = Math.max((record.totalWrong || 0), record.wrongCount);
     record.warningState = record.warningState || 0;
-    
+
     const now = new Date();
     const todayMidnight = new Date();
-    todayMidnight.setHours(0, 0, 0, 0); 
+    todayMidnight.setHours(0, 0, 0, 0);
+    let scheduleMessage = '';
 
     if (result === 'O') {
         const consecutive = record.wrongCount;
-        const total = record.totalWrong;
-        const wState = record.warningState;
-        
-        record.wrongCount = 0; 
-        
-        if (record.interval === 0) {
-            record.interval = 0.5; // 60 minutes
-        } else if (record.interval === 0.5) {
-            record.interval = 1;
-        } else if (record.interval === 1) {
-            record.interval = 3;
-        } else {
-            record.interval = record.interval * 2;
-        }
-        
-        if (consecutive >= 3) {
-            feedbackEl.innerHTML = `정복 완료! 🔥<br><span style="font-size:0.95rem; font-weight:500;">총 ${total}번 틀린 문장입니다. 확실히 기억하세요!</span>`;
-            feedbackEl.style.backgroundColor = "rgba(230, 126, 34, 0.95)"; 
-            record.warningState = 1; 
-        } else if (wState === 1) {
-            feedbackEl.innerHTML = `훌륭해요! 🎉<br><span style="font-size:0.95rem; font-weight:500;">주의 문장 방어 성공!</span>`;
-            feedbackEl.style.backgroundColor = "rgba(129, 178, 154, 0.95)"; 
-            record.warningState = 2; 
-        } else if (wState === 2) {
-            feedbackEl.innerHTML = `완벽 마스터! 👑<br><span style="font-size:0.95rem; font-weight:500;">주의 문장에서 해제되었습니다!</span>`;
-            feedbackEl.style.backgroundColor = "rgba(52, 152, 219, 0.95)"; 
-            record.warningState = 0; 
-        } else {
-            if (record.interval === 0.5) {
-                feedbackEl.innerHTML = `완벽하네요!<br><span style="font-size:0.95rem; font-weight:500;">60분 뒤에 복습합니다.</span>`;
-            } else {
-                feedbackEl.innerHTML = `완벽하네요!<br><span style="font-size:0.95rem; font-weight:500;">${record.interval}일 뒤에 복습합니다.</span>`;
-            }
-            feedbackEl.style.backgroundColor = "rgba(129, 178, 154, 0.95)"; 
-        }
-        
+        record.wrongCount = 0;
+        if (record.interval === 0) record.interval = 0.5;
+        else if (record.interval === 0.5) record.interval = 1;
+        else if (record.interval === 1) record.interval = 3;
+        else record.interval *= 2;
+
+        if (consecutive >= 3) record.warningState = 1;
+        else if (record.warningState === 1) record.warningState = 2;
+        else if (record.warningState === 2) record.warningState = 0;
+
         if (record.interval === 0.5) {
-            const nextDate = new Date(now.getTime() + 60 * 60 * 1000); // 60분 뒤
-            record.nextDate = nextDate.getTime();
+            record.nextDate = now.getTime() + 60 * 60 * 1000;
+            scheduleMessage = '60분 뒤에 복습합니다.';
         } else {
-            const nextDate = new Date(todayMidnight.getTime() + record.interval * 24 * 60 * 60 * 1000);
-            record.nextDate = nextDate.getTime();
+            record.nextDate = todayMidnight.getTime() + record.interval * 24 * 60 * 60 * 1000;
+            scheduleMessage = `${record.interval}일 뒤에 복습합니다.`;
         }
     } else {
-        record.wrongCount += 1; 
-        record.totalWrong += 1; 
-        record.interval = 0; 
-        record.warningState = 0; 
-        
-        if (record.wrongCount >= 3) {
-            feedbackEl.innerHTML = `연속 3번 이상 틀렸네요!<br><span style="font-size:0.95rem; font-weight:500;">1분 뒤에 바로 다시 나옵니다. 🔥</span>`;
-            feedbackEl.style.backgroundColor = "rgba(224, 122, 95, 0.95)"; 
-            const nextDate = new Date(now.getTime() + 1 * 60 * 1000); 
-            record.nextDate = nextDate.getTime();
+        record.wrongCount += 1;
+        record.totalWrong += 1;
+        record.interval = 0;
+        record.warningState = 0;
+        record.nextDate = now.getTime() + (record.wrongCount >= 3 ? 1 : 60) * 60 * 1000;
+
+        const retryCount = sessionRetryCounts[card.en] || 0;
+        if (retryCount < 2) {
+            sessionRetryCounts[card.en] = retryCount + 1;
+            const insertAt = Math.min(currentIndex + 4, todayCards.length);
+            todayCards.splice(insertAt, 0, card);
+            const totalIdx = document.getElementById('total-idx');
+            if (totalIdx) totalIdx.innerText = todayCards.length;
+            scheduleMessage = '몇 문장 뒤에 같은 구문을 다시 조립합니다.';
         } else {
-            feedbackEl.innerHTML = `괜찮습니다!<br><span style="font-size:0.95rem; font-weight:500;">60분 뒤에 다시 나옵니다.</span>`;
-            feedbackEl.style.backgroundColor = "rgba(224, 122, 95, 0.95)"; 
-            const nextDate = new Date(now.getTime() + 60 * 60 * 1000); 
-            record.nextDate = nextDate.getTime();
+            scheduleMessage = record.wrongCount >= 3 ? '1분 뒤 복습 대상으로 남깁니다.' : '60분 뒤 복습 대상으로 남깁니다.';
         }
     }
 
     progressData[card.en] = record;
+    updatePracticeHistory(card, result, errorTypes, usedHint, attemptedType);
     saveProgress();
+    updateDashboardStats();
+    return scheduleMessage;
+}
 
-    feedbackEl.style.display = 'block';
-
-    setTimeout(function() {
-        feedbackEl.style.display = 'none';
-        currentIndex++;
-        
-        if (currentIndex >= todayCards.length) {
-            showCompletionScreen();
-        } else {
-            loadCard();
-        }
-    }, 1600); // 딜레이를 1.8초에서 1.6초로 개선하여 가속도 부여
+function advanceCard() {
+    if (!currentAssessmentRecorded) return;
+    currentIndex++;
+    if (currentIndex >= todayCards.length) showCompletionScreen();
+    else loadCard();
 }
 
 /**
@@ -850,9 +1045,9 @@ function showCompletionScreen() {
     if (completionMsg) completionMsg.style.display = 'block';
     
     const elementsToHide = [
-        'korean', 'english', 'hint', 'card-action-row', 
-        'action-buttons', 'progress-container', 
-        'verb-badge', 'wrong-badge'
+        'korean', 'english', 'hint', 'practice-panel', 'core-phrase-box', 'card-action-row',
+        'action-buttons', 'progress-container',
+        'verb-badge', 'new-badge', 'wrong-badge'
     ];
     
     elementsToHide.forEach(id => {
