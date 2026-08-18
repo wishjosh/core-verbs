@@ -23,7 +23,7 @@ Google Sheets의 앞 네 열은 기존 형식을 유지합니다.
 | `KO` | 필수 | 한국어 문장 |
 | `EN` | 필수 | 영어 문장 |
 | `CORE_CHUNK` | 선택 | 직접 검토한 원어민 핵심 구문 |
-| `ERROR_TYPE` | 선택 | `article`, `plural`, `preposition`, `koreanism`, `word_order` |
+| `ERROR_TYPE` | 선택 | `article`, `plural`, `preposition`, `koreanism`, `tense_auxiliary`, `word_order` |
 | `DISTRACTOR` | 선택 | 학습자가 구별할 방해 표현 |
 | `TIP` | 선택 | 정답 뒤에 보여 줄 짧은 설명 |
 | `PRIORITY` | 선택 | 문장 비중을 조정할 양수. 비어 있으면 `1` |

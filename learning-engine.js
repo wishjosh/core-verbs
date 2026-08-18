@@ -13,6 +13,7 @@
         plural: '단수·복수',
         preposition: '전치사',
         koreanism: '한국어 직역형',
+        tense_auxiliary: '시제·조동사',
         word_order: '어순',
         recall: '회상 실패'
     };
@@ -103,17 +104,134 @@
         return null;
     }
 
-    function buildChunks(sentence, focusPhrase) {
-        const words = String(sentence || '').trim().split(/\s+/).filter(Boolean);
-        const focus = findPhraseRange(words, focusPhrase);
-        if (!focus) return chunkWords(words, words.length > 12 ? 4 : 3);
+    function splitSentenceSegments(words) {
+        const segments = [];
+        let current = [];
+        words.forEach(word => {
+            current.push(word);
+            if (/[.!?]["']?$/.test(word)) {
+                segments.push(current);
+                current = [];
+            }
+        });
+        if (current.length) segments.push(current);
+        return segments;
+    }
 
-        const beforeWords = words.slice(0, focus.start);
+    function groupNaturalSegment(words) {
+        if (!words.length) return [];
+        if (words.length <= 5) return [words.join(' ')];
+
+        const normalized = words.map(word => normalizeText(cleanWord(word)));
+        const prepositions = new Set(['to', 'at', 'in', 'on', 'for', 'with', 'from', 'by', 'of']);
+        const tailStart = normalized.findIndex((word, index) =>
+            index >= 2 && prepositions.has(word) && words.length - index <= 5
+        );
+        if (tailStart > 0) {
+            return [
+                ...chunkWords(words.slice(0, tailStart), 4),
+                words.slice(tailStart).join(' ')
+            ];
+        }
+        return chunkWords(words, 4);
+    }
+
+    function buildSegmentChunks(words, focusPhrase) {
+        const focus = findPhraseRange(words, focusPhrase);
+        if (!focus) return groupNaturalSegment(words);
+
+        let beforeWords = words.slice(0, focus.start);
         const afterWords = words.slice(focus.end);
-        const before = chunkWords(beforeWords, Math.max(1, Math.ceil(beforeWords.length / 2)));
-        const focused = words.slice(focus.start, focus.end).join(' ');
-        const after = chunkWords(afterWords, Math.max(1, Math.ceil(afterWords.length / 2)));
-        return [...before, focused, ...after].filter(Boolean);
+        let focusedWords = words.slice(focus.start, focus.end);
+        const contractedSubject = /^(i'm|you're|he's|she's|it's|we're|they're)$/;
+        if (beforeWords.length === 1 && contractedSubject.test(normalizeText(cleanWord(beforeWords[0])))) {
+            focusedWords = [...beforeWords, ...focusedWords];
+            beforeWords = [];
+        }
+
+        return [
+            ...groupNaturalSegment(beforeWords),
+            focusedWords.join(' '),
+            ...groupNaturalSegment(afterWords)
+        ].filter(Boolean);
+    }
+
+    function mergeChunksToLimit(chunks, limit) {
+        const result = [...chunks];
+        while (result.length > limit) {
+            let bestIndex = 0;
+            let bestScore = Number.POSITIVE_INFINITY;
+            for (let index = 0; index < result.length - 1; index++) {
+                const crossesSentence = /[.!?]["']?$/.test(result[index]);
+                const combinedWords = `${result[index]} ${result[index + 1]}`.split(/\s+/).length;
+                const score = combinedWords + (crossesSentence ? 100 : 0);
+                if (score < bestScore) {
+                    bestScore = score;
+                    bestIndex = index;
+                }
+            }
+            result.splice(bestIndex, 2, `${result[bestIndex]} ${result[bestIndex + 1]}`);
+        }
+        return result;
+    }
+
+    function splitChunkAroundPhrase(chunks, phrase) {
+        for (let index = 0; index < chunks.length; index++) {
+            const words = chunks[index].split(/\s+/).filter(Boolean);
+            const range = findPhraseRange(words, phrase);
+            if (!range) continue;
+            const before = words.slice(0, range.start).join(' ');
+            const focused = words.slice(range.start, range.end).join(' ');
+            let after = words.slice(range.end).join(' ');
+            let remainingStart = index + 1;
+            if (/^(i|you|he|she|it|we|they)$/i.test(after) && chunks[index + 1]) {
+                after = `${after} ${chunks[index + 1]}`;
+                remainingStart = index + 2;
+            }
+            const replacement = [before, focused, after].filter(Boolean);
+            return [...chunks.slice(0, index), ...replacement, ...chunks.slice(remainingStart)];
+        }
+        return chunks;
+    }
+
+    function splitShortChunkNaturally(chunk) {
+        const words = String(chunk || '').split(/\s+/).filter(Boolean);
+        if (words.length <= 1) return words.length ? [chunk] : [];
+        const normalized = words.map(word => normalizeText(cleanWord(word)));
+        const subjects = new Set(['i', 'you', 'he', 'she', 'it', 'we', 'they', 'who']);
+        const auxiliaries = new Set(['am', 'is', 'are', 'was', 'were', 'do', 'does', 'did', 'have', 'has', 'had', 'can', 'could', 'will', 'would', 'should', 'may', 'might', 'must']);
+        let splitAt = -1;
+
+        const punctuationBoundary = words.findIndex((word, index) => index < words.length - 1 && /[,;:]$/.test(word));
+        if (punctuationBoundary >= 0) {
+            splitAt = punctuationBoundary + 1;
+        } else if (auxiliaries.has(normalized[0]) && subjects.has(normalized[1])) {
+            splitAt = 2;
+        } else if (subjects.has(normalized[0]) && (/n't$/.test(normalized[1]) || auxiliaries.has(normalized[1]))) {
+            splitAt = 2;
+        } else {
+            const prepositions = new Set(['about', 'at', 'by', 'for', 'from', 'in', 'into', 'of', 'on', 'to', 'with']);
+            for (let index = words.length - 2; index >= 2; index--) {
+                if (prepositions.has(normalized[index])) {
+                    splitAt = index;
+                    break;
+                }
+            }
+        }
+
+        if (splitAt <= 0 || splitAt >= words.length) splitAt = Math.ceil(words.length / 2);
+        return [words.slice(0, splitAt).join(' '), words.slice(splitAt).join(' ')].filter(Boolean);
+    }
+
+    function buildChunks(sentence, focusPhrase, separatePhrase = '') {
+        const words = String(sentence || '').trim().split(/\s+/).filter(Boolean);
+        const sentenceChunks = splitSentenceSegments(words)
+            .flatMap(segment => buildSegmentChunks(segment, focusPhrase));
+        const baseLimit = separatePhrase ? 4 : 5;
+        const merged = mergeChunksToLimit(sentenceChunks, baseLimit);
+        return separatePhrase
+            ? mergeChunksToLimit(splitChunkAroundPhrase(merged, separatePhrase), 5)
+            : merged;
     }
 
     function deriveCorePhrase(card) {
@@ -175,6 +293,9 @@
             prep: 'preposition',
             direct_translation: 'koreanism',
             korean_expression: 'koreanism',
+            tense: 'tense_auxiliary',
+            auxiliary: 'tense_auxiliary',
+            tense_auxiliary: 'tense_auxiliary',
             order: 'word_order'
         };
         return aliases[value] || (ERROR_LABELS[value] ? value : 'word_order');
@@ -202,6 +323,19 @@
                 candidates.push({ type: 'koreanism', correct: match[0], wrong: rule.wrong, tip: rule.tip });
             }
         });
+
+        const auxiliaryMatch = sentence.match(/^\s*(Did|Do|Does)\b/i);
+        if (auxiliaryMatch) {
+            const correct = auxiliaryMatch[1];
+            const alternatives = { did: 'Do', do: 'Did', does: 'Do' };
+            candidates.push({
+                type: 'tense_auxiliary',
+                correct,
+                wrong: alternatives[correct.toLowerCase()],
+                separate: true,
+                tip: '한 번의 과거 행동을 묻는지, 현재의 습관이나 상태를 묻는지 먼저 확인하세요.'
+            });
+        }
 
         const pluralMatch = sentence.match(/\b(any|some|many|several|these|those)\s+([A-Za-z]+s)\b/i);
         if (pluralMatch && pluralMatch[2].length > 2 && !/ss$/i.test(pluralMatch[2])) {
@@ -251,21 +385,47 @@
         return result;
     }
 
+    function buildDistractorChunk(chunks, error) {
+        if (!error) return null;
+        for (let index = 0; index < chunks.length; index++) {
+            const words = chunks[index].split(/\s+/).filter(Boolean);
+            const range = findPhraseRange(words, error.correct);
+            if (!range) continue;
+
+            const originalEnd = words[range.end - 1] || '';
+            const punctuation = originalEnd.match(/[^A-Za-z0-9'’]+$/)?.[0] || '';
+            const wrongWords = String(error.wrong || '').trim().split(/\s+/).filter(Boolean);
+            if (punctuation && wrongWords.length && !/[^A-Za-z0-9'’]$/.test(wrongWords.at(-1))) {
+                wrongWords[wrongWords.length - 1] += punctuation;
+            }
+
+            const text = [
+                ...words.slice(0, range.start),
+                ...wrongWords,
+                ...words.slice(range.end)
+            ].join(' ');
+            return { text, targetIndex: index };
+        }
+        return null;
+    }
+
     function buildPracticeQuestion(card, rng = Math.random) {
         const corePhrase = deriveCorePhrase(card);
         const candidates = buildErrorCandidates(card);
         const error = candidates.length ? candidates[hashText(card?.en) % candidates.length] : null;
-        const focusPhrase = error?.correct || corePhrase;
-        const chunks = buildChunks(card?.en, focusPhrase);
+        let chunks = buildChunks(card?.en, corePhrase, error?.separate ? error.correct : '');
+        if (!error && chunks.length === 1) chunks = splitShortChunkNaturally(chunks[0]);
         const targetIds = chunks.map((_, index) => `target-${index}`);
         const bank = chunks.map((text, index) => ({ id: targetIds[index], text, isDistractor: false }));
+        const distractorChunk = buildDistractorChunk(chunks, error);
 
-        if (error) {
+        if (error && distractorChunk) {
             bank.push({
                 id: 'distractor-0',
-                text: error.wrong,
+                text: distractorChunk.text,
                 isDistractor: true,
                 errorType: error.type,
+                targetIndex: distractorChunk.targetIndex,
                 tip: error.tip
             });
         }

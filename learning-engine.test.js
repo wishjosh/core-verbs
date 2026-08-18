@@ -18,6 +18,41 @@ test('uses a meaningful comparison chunk when the day verb is not in the sentenc
     );
 });
 
+test('separates a question auxiliary and offers a tense contrast', () => {
+    const question = engine.buildPracticeQuestion(
+        { verb: 'DO', en: 'Did you leave work yet?' },
+        fixedRandom
+    );
+    assert.deepEqual(question.targetChunks, ['Did', 'you leave work yet?']);
+    assert.equal(question.errorType, 'tense_auxiliary');
+    const distractor = question.bank.find(item => item.isDistractor);
+    assert.equal(distractor.text, 'Do');
+
+    const wrongSelection = [...question.targetIds];
+    wrongSelection[0] = distractor.id;
+    const result = engine.evaluatePractice(question, wrongSelection);
+    assert.equal(result.correct, false);
+    assert.deepEqual(result.errorTypes, ['tense_auxiliary']);
+});
+
+test('keeps sentence boundaries and native phrases together', () => {
+    const question = engine.buildPracticeQuestion({
+        verb: 'HAVE',
+        en: "I can't. I'm on my way to the post office."
+    }, fixedRandom);
+    assert.equal(question.corePhrase, "I'm on my way");
+    assert.deepEqual(question.targetChunks, ["I can't.", "I'm on my way", 'to the post office.']);
+    assert.ok(question.bank.some(item => item.isDistractor && item.text === 'to post office.'));
+});
+
+test('avoids a one-button exercise for a short sentence without a contrast', () => {
+    const question = engine.buildPracticeQuestion(
+        { verb: 'GO', en: 'May I come in?' },
+        fixedRandom
+    );
+    assert.deepEqual(question.targetChunks, ['May I', 'come in?']);
+});
+
 test('builds a mobile chunk question with a plural or Koreanism contrast', () => {
     const question = engine.buildPracticeQuestion(
         { verb: 'HAVE', en: 'Do you have any pets?', ko: '반려동물 키우시나요?' },
@@ -25,9 +60,10 @@ test('builds a mobile chunk question with a plural or Koreanism contrast', () =>
     );
     assert.ok(question.targetChunks.length >= 2);
     assert.ok(question.targetChunks.length <= 5);
+    assert.deepEqual(question.targetChunks, ['Do', 'you have any pets?']);
     assert.equal(question.targetChunks.join(' '), 'Do you have any pets?');
     assert.ok(question.bank.some(item => item.isDistractor));
-    assert.ok(['plural', 'koreanism'].includes(question.errorType));
+    assert.ok(['plural', 'koreanism', 'tense_auxiliary'].includes(question.errorType));
 });
 
 test('limits long mobile practice questions to five chunks', () => {
