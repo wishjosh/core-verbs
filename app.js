@@ -18,8 +18,8 @@ let currentIndex = 0;
 let availableVoices = [];
 let iosResumeTimer = null; // iOS Speech Synthesis 중간 무음 버그 방지 타이머
 let currentPractice = null;
-let selectedPracticeIds = [];
-let currentPracticeResult = null;
+let selectedMistakeIndexes = [];
+let wordOrderMistake = false;
 let currentAssessmentRecorded = false;
 let sessionRetryCounts = {};
 
@@ -738,8 +738,8 @@ function updateDashboardStats() {
  */
 function loadCard() {
     currentPractice = null;
-    selectedPracticeIds = [];
-    currentPracticeResult = null;
+    selectedMistakeIndexes = [];
+    wordOrderMistake = false;
     currentAssessmentRecorded = false;
 
     const currentIdxEl = document.getElementById('current-idx');
@@ -788,6 +788,7 @@ function loadCard() {
     const cardActionRow = document.getElementById('card-action-row');
     const actionBtnEl = document.getElementById('action-buttons');
     const practicePanel = document.getElementById('practice-panel');
+    const mistakeReview = document.getElementById('mistake-review');
     const corePhraseBox = document.getElementById('core-phrase-box');
     const showAnswerBtn = document.getElementById('btn-show-answer');
     const nextBtn = document.getElementById('btn-next');
@@ -801,15 +802,16 @@ function loadCard() {
         const glosses = Array.isArray(card.orderGlosses) && card.orderGlosses.length
             ? card.orderGlosses
             : [card.ko];
-        glosses.forEach(gloss => {
+        glosses.forEach((gloss, index) => {
             const chip = document.createElement('span');
             chip.className = 'order-gloss-chip';
+            chip.dataset.chunk = String(index + 1);
             chip.innerText = gloss;
             orderGlosses.appendChild(chip);
         });
     }
     if (englishEl) {
-        englishEl.innerText = card.en;
+        englishEl.innerHTML = '';
         englishEl.style.display = 'none';
     }
     
@@ -818,6 +820,7 @@ function loadCard() {
         hintEl.style.display = 'block';
     }
     if (practicePanel) practicePanel.style.display = 'none';
+    if (mistakeReview) mistakeReview.style.display = 'none';
     if (corePhraseBox) corePhraseBox.style.display = 'none';
     if (cardActionRow) cardActionRow.style.display = 'none';
     if (actionBtnEl) actionBtnEl.style.display = 'none';
@@ -826,7 +829,7 @@ function loadCard() {
     if (cardEl) cardEl.onclick = startPractice;
 }
 /**
- * 🧩 정답을 바로 노출하지 않고 모바일 표현 덩어리 훈련을 시작한다.
+ * 🧠 한국어 어순 청크를 단서로 먼저 회상하고, 준비되면 정답을 확인한다.
  */
 function startPractice() {
     if (currentPractice || currentAssessmentRecorded) return;
@@ -835,8 +838,9 @@ function startPractice() {
 
     if (availableVoices.length === 0) populateVoiceList();
     currentPractice = Learning.buildPracticeQuestion(card);
-    selectedPracticeIds = [];
-    currentPracticeResult = null;
+    currentPractice.reviewChunks = Learning.buildReviewTokens(card);
+    selectedMistakeIndexes = [];
+    wordOrderMistake = false;
 
     const hintEl = document.getElementById('hint');
     const practicePanel = document.getElementById('practice-panel');
@@ -846,10 +850,11 @@ function startPractice() {
 
     if (hintEl) hintEl.style.display = 'none';
     if (practicePanel) practicePanel.style.display = 'block';
-    if (practiceSubtitle) practiceSubtitle.innerText = `영어 어순대로 조립 · 집중 확인: ${currentPractice.errorLabel}`;
+    const practiceTitle = document.querySelector('#practice-panel .practice-title');
+    if (practiceTitle) practiceTitle.innerText = '🧠 영어 문장을 먼저 떠올려 보세요';
+    if (practiceSubtitle) practiceSubtitle.innerText = '머릿속으로 말해 본 뒤 정답을 열고, 실제로 틀린 부분만 직접 체크합니다.';
     if (actionButtons) actionButtons.style.display = 'flex';
     if (showAnswerBtn) showAnswerBtn.style.display = 'inline-flex';
-    renderPracticeSelection();
 }
 
 // 기존 인라인 호출이나 저장된 화면과의 호환을 유지한다.
@@ -857,114 +862,140 @@ function showAnswer() {
     startPractice();
 }
 
-function renderPracticeSelection() {
-    if (!currentPractice) return;
-    const slotsEl = document.getElementById('practice-slots');
-    const bankEl = document.getElementById('practice-bank');
-    const checkBtn = document.getElementById('btn-practice-check');
-    const resetBtn = document.getElementById('btn-practice-reset');
-    if (!slotsEl || !bankEl) return;
-
-    slotsEl.innerHTML = '';
-    for (let index = 0; index < currentPractice.targetIds.length; index++) {
-        const selectedId = selectedPracticeIds[index];
-        if (!selectedId) {
-            const placeholder = document.createElement('span');
-            placeholder.className = 'practice-slot-placeholder';
-            placeholder.innerText = `${index + 1}`;
-            slotsEl.appendChild(placeholder);
-            continue;
-        }
-
-        const entry = currentPractice.bank.find(item => item.id === selectedId);
-        const chip = document.createElement('button');
-        chip.type = 'button';
-        chip.className = 'practice-chip selected';
-        chip.innerText = entry?.text || '';
-        if (currentPracticeResult) {
-            chip.classList.add(selectedId === currentPractice.targetIds[index] ? 'correct' : 'wrong');
-            chip.disabled = true;
-        } else {
-            chip.onclick = (event) => {
-                event.stopPropagation();
-                selectedPracticeIds.splice(index, 1);
-                renderPracticeSelection();
-            };
-        }
-        slotsEl.appendChild(chip);
-    }
-
-    bankEl.innerHTML = '';
-    currentPractice.bank.forEach(entry => {
-        const chip = document.createElement('button');
-        chip.type = 'button';
-        chip.className = 'practice-chip';
-        chip.innerText = entry.text;
-        const used = selectedPracticeIds.includes(entry.id);
-        if (used) chip.classList.add('used');
-        chip.disabled = used || Boolean(currentPracticeResult) || selectedPracticeIds.length >= currentPractice.targetIds.length;
-        chip.onclick = (event) => {
-            event.stopPropagation();
-            selectPracticeChunk(entry.id);
-        };
-        bankEl.appendChild(chip);
-    });
-
-    if (checkBtn) checkBtn.disabled = Boolean(currentPracticeResult) || selectedPracticeIds.length !== currentPractice.targetIds.length;
-    if (resetBtn) resetBtn.disabled = Boolean(currentPracticeResult);
-}
-
-function selectPracticeChunk(id) {
-    if (!currentPractice || currentPracticeResult) return;
-    if (selectedPracticeIds.length >= currentPractice.targetIds.length) return;
-    if (selectedPracticeIds.includes(id)) return;
-    selectedPracticeIds.push(id);
-    renderPracticeSelection();
-}
-
-function resetPracticeSelection() {
-    if (currentPracticeResult) return;
-    selectedPracticeIds = [];
-    renderPracticeSelection();
-}
-
-function checkPracticeAnswer() {
-    if (!currentPractice || currentPracticeResult || currentAssessmentRecorded) return;
-    currentPracticeResult = Learning.evaluatePractice(currentPractice, selectedPracticeIds);
-    const result = currentPracticeResult.correct ? 'O' : 'X';
-    const scheduleMessage = recordAssessment(
-        result,
-        currentPracticeResult.errorTypes,
-        false,
-        currentPractice.errorType
-    );
-    renderPracticeSelection();
-    revealPracticeAnswer(
-        currentPracticeResult.correct ? '정확합니다. 구문과 어순을 기억했습니다.' : `${currentPracticeResult.errorLabel}을 다시 확인하세요.`,
-        `${currentPracticeResult.tip} ${scheduleMessage}`
-    );
-}
-
 function revealAnswerAsReview() {
     if (currentAssessmentRecorded) return;
     if (!currentPractice) startPractice();
     if (!currentPractice) return;
-    currentPracticeResult = {
-        correct: false,
-        errorTypes: ['recall'],
-        errorLabel: Learning.ERROR_LABELS.recall,
-        tip: '정답을 본 문장은 같은 세션에서 다시 조립합니다.'
-    };
-    const scheduleMessage = recordAssessment('X', ['recall'], true, currentPractice.errorType);
-    renderPracticeSelection();
-    revealPracticeAnswer('정답을 확인했습니다.', `${currentPracticeResult.tip} ${scheduleMessage}`);
+    revealPracticeAnswer();
 }
 
-function revealPracticeAnswer(headline, detail) {
+function renderEnglishReview() {
+    const card = todayCards[currentIndex];
+    if (!card || !currentPractice) return;
+    const englishEl = document.getElementById('english');
+    if (!englishEl) return;
+
+    englishEl.innerHTML = '';
+    (currentPractice.reviewChunks || Learning.buildReviewTokens(card)).forEach((chunk, chunkIndex) => {
+        const chunkEl = document.createElement('span');
+        chunkEl.className = 'english-chunk';
+        chunkEl.dataset.chunk = String(chunkIndex + 1);
+
+        chunk.tokens.forEach(token => {
+            const word = document.createElement('button');
+            word.type = 'button';
+            word.className = 'mistake-word';
+            word.innerText = token.text;
+            word.setAttribute('aria-pressed', selectedMistakeIndexes.includes(token.index) ? 'true' : 'false');
+            if (selectedMistakeIndexes.includes(token.index)) word.classList.add('selected');
+            word.disabled = currentAssessmentRecorded;
+            word.onclick = (event) => {
+                event.stopPropagation();
+                toggleMistakeWord(token.index);
+            };
+            chunkEl.appendChild(word);
+        });
+        englishEl.appendChild(chunkEl);
+    });
+}
+
+function toggleMistakeWord(index) {
+    if (currentAssessmentRecorded) return;
+    if (selectedMistakeIndexes.includes(index)) {
+        selectedMistakeIndexes = selectedMistakeIndexes.filter(value => value !== index);
+    } else {
+        selectedMistakeIndexes.push(index);
+    }
+    selectedMistakeIndexes.sort((a, b) => a - b);
+    renderEnglishReview();
+    updateMistakeReview();
+}
+
+function toggleWordOrderMistake() {
+    if (currentAssessmentRecorded) return;
+    wordOrderMistake = !wordOrderMistake;
+    updateMistakeReview();
+}
+
+function getCurrentMistakeClassification() {
+    const card = todayCards[currentIndex];
+    if (!card) return { mistakes: [], errorTypes: [] };
+    return Learning.classifyMistakeSelections(card, selectedMistakeIndexes, { wordOrder: wordOrderMistake });
+}
+
+function updateMistakeReview() {
+    const summary = document.getElementById('mistake-summary');
+    const saveButton = document.getElementById('btn-save-mistakes');
+    const orderButton = document.getElementById('btn-word-order');
+    const classification = getCurrentMistakeClassification();
+
+    if (summary) {
+        summary.innerHTML = '';
+        if (!classification.mistakes.length) {
+            summary.innerText = '선택한 오류가 아직 없습니다.';
+            summary.classList.add('empty');
+        } else {
+            summary.classList.remove('empty');
+            classification.mistakes.forEach(mistake => {
+                const chip = document.createElement('span');
+                chip.className = 'mistake-summary-chip';
+                chip.innerText = `${mistake.text} · ${Learning.ERROR_LABELS[mistake.type]}`;
+                summary.appendChild(chip);
+            });
+        }
+    }
+    if (saveButton) saveButton.disabled = currentAssessmentRecorded || classification.mistakes.length === 0;
+    if (orderButton) {
+        orderButton.classList.toggle('selected', wordOrderMistake);
+        orderButton.setAttribute('aria-pressed', wordOrderMistake ? 'true' : 'false');
+        orderButton.disabled = currentAssessmentRecorded;
+    }
+}
+
+function finishSelfAssessment(result, errorTypes, details, headline, usedHint = false) {
+    if (currentAssessmentRecorded) return;
+    const scheduleMessage = recordAssessment(result, errorTypes, usedHint, null, details);
+    renderEnglishReview();
+    updateMistakeReview();
+
+    const resultTip = document.getElementById('practice-result-tip');
+    const nextBtn = document.getElementById('btn-next');
+    const selfCheckButtons = document.querySelectorAll('.self-check-btn');
+    selfCheckButtons.forEach(button => { button.disabled = true; });
+    if (resultTip) resultTip.innerText = `${headline} ${scheduleMessage}`;
+    if (nextBtn) nextBtn.style.display = 'inline-flex';
+}
+
+function saveSelectedMistakes() {
+    const classification = getCurrentMistakeClassification();
+    if (!classification.mistakes.length) return;
+    finishSelfAssessment(
+        'X',
+        classification.errorTypes,
+        classification.mistakes,
+        `${classification.errorTypes.map(type => Learning.ERROR_LABELS[type]).join(' · ')} 오류로 기록했습니다.`
+    );
+}
+
+function markNoMistakes() {
+    selectedMistakeIndexes = [];
+    wordOrderMistake = false;
+    finishSelfAssessment('O', [], [], '틀린 곳 없음으로 기록했습니다.');
+}
+
+function markRecallFailure() {
+    selectedMistakeIndexes = [];
+    wordOrderMistake = false;
+    const details = [{ start: null, end: null, text: '문장 전체', type: 'recall' }];
+    finishSelfAssessment('X', ['recall'], details, '문장 전체 회상 실패로 기록했습니다.', true);
+}
+
+function revealPracticeAnswer() {
     const card = todayCards[currentIndex];
     if (!card || !currentPractice) return;
     const englishEl = document.getElementById('english');
     const naturalAnswer = document.getElementById('natural-answer');
+    const mistakeReview = document.getElementById('mistake-review');
     const corePhraseBox = document.getElementById('core-phrase-box');
     const corePhraseText = document.getElementById('core-phrase-text');
     const resultTip = document.getElementById('practice-result-tip');
@@ -973,9 +1004,13 @@ function revealPracticeAnswer(headline, detail) {
     const nextBtn = document.getElementById('btn-next');
     const actionButtons = document.getElementById('action-buttons');
     const cardEl = document.getElementById('card');
+    const practiceTitle = document.querySelector('#practice-panel .practice-title');
+    const practiceSubtitle = document.getElementById('practice-subtitle');
 
-    if (englishEl) englishEl.style.display = 'block';
+    renderEnglishReview();
+    if (englishEl) englishEl.style.display = 'flex';
     if (naturalAnswer) naturalAnswer.style.display = 'block';
+    if (mistakeReview) mistakeReview.style.display = 'block';
     if (corePhraseText) {
         corePhraseText.innerHTML = '';
         const patterns = currentPractice.corePatterns?.length
@@ -988,16 +1023,19 @@ function revealPracticeAnswer(headline, detail) {
             corePhraseText.appendChild(chip);
         });
     }
-    if (resultTip) resultTip.innerText = `${headline} ${detail}`;
+    if (practiceTitle) practiceTitle.innerText = '👆 실제로 틀린 단어나 구문을 누르세요';
+    if (practiceSubtitle) practiceSubtitle.innerText = '같은 청크 안에서 이어서 누른 단어는 하나의 구문 오류로 묶습니다.';
+    if (resultTip) resultTip.innerText = '선택한 부분은 관사·단복수·시제·전치사·핵심 구문으로 자동 분류됩니다.';
     if (corePhraseBox) corePhraseBox.style.display = 'block';
     if (cardActionRow) cardActionRow.style.display = 'flex';
     if (actionButtons) actionButtons.style.display = 'flex';
     if (showAnswerBtn) showAnswerBtn.style.display = 'none';
-    if (nextBtn) nextBtn.style.display = 'inline-flex';
+    if (nextBtn) nextBtn.style.display = 'none';
     if (cardEl) cardEl.onclick = null;
+    updateMistakeReview();
 }
 
-function updatePracticeHistory(card, result, errorTypes, usedHint, attemptedType) {
+function updatePracticeHistory(card, result, errorTypes, usedHint, attemptedType, mistakeDetails = []) {
     const correct = result === 'O';
     const types = new Set([attemptedType, ...(errorTypes || [])].filter(Boolean));
     progressData.errorStats = progressData.errorStats || {};
@@ -1015,15 +1053,16 @@ function updatePracticeHistory(card, result, errorTypes, usedHint, attemptedType
         verb: card.verb,
         correct,
         usedHint,
-        errorTypes: [...types]
+        errorTypes: [...types],
+        mistakes: mistakeDetails
     });
     progressData.practiceHistory = progressData.practiceHistory.slice(-100);
 }
 
 /**
- * 실제 구문 선택 결과를 복습 일정과 개인 오류 기록에 반영한다.
+ * 사용자가 직접 체크한 오류를 복습 일정과 개인 오류 기록에 반영한다.
  */
-function recordAssessment(result, errorTypes = [], usedHint = false, attemptedType = 'word_order') {
+function recordAssessment(result, errorTypes = [], usedHint = false, attemptedType = null, mistakeDetails = []) {
     if (currentAssessmentRecorded) return '';
     const card = todayCards[currentIndex];
     if (!card) return '';
@@ -1081,14 +1120,14 @@ function recordAssessment(result, errorTypes = [], usedHint = false, attemptedTy
             todayCards.splice(insertAt, 0, card);
             const totalIdx = document.getElementById('total-idx');
             if (totalIdx) totalIdx.innerText = todayCards.length;
-            scheduleMessage = '몇 문장 뒤에 같은 구문을 다시 조립합니다.';
+            scheduleMessage = '몇 문장 뒤에 같은 문장을 다시 확인합니다.';
         } else {
             scheduleMessage = record.wrongCount >= 3 ? '1분 뒤 복습 대상으로 남깁니다.' : '60분 뒤 복습 대상으로 남깁니다.';
         }
     }
 
     progressData[card.en] = record;
-    updatePracticeHistory(card, result, errorTypes, usedHint, attemptedType);
+    updatePracticeHistory(card, result, errorTypes, usedHint, attemptedType, mistakeDetails);
     saveProgress();
     updateDashboardStats();
     return scheduleMessage;

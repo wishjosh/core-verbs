@@ -14,6 +14,7 @@
         preposition: '전치사',
         koreanism: '한국어 직역형',
         tense_auxiliary: '시제·조동사',
+        expression: '핵심 구문',
         word_order: '어순',
         recall: '회상 실패'
     };
@@ -503,6 +504,110 @@
         };
     }
 
+    function buildReviewTokens(card) {
+        const storedChunks = Array.isArray(card?.assemblyChunks)
+            ? card.assemblyChunks.map(chunk => String(chunk).trim()).filter(Boolean)
+            : [];
+        const chunks = storedChunks.length && joinChunks(storedChunks) === String(card?.en || '').trim()
+            ? storedChunks
+            : buildChunks(card?.en, deriveCorePhrase(card));
+        let globalIndex = 0;
+
+        return chunks.map((text, chunkIndex) => ({
+            text,
+            chunkIndex,
+            tokens: text.split(/\s+/).filter(Boolean).map((token, tokenIndex) => ({
+                id: `word-${globalIndex}`,
+                index: globalIndex++,
+                chunkIndex,
+                tokenIndex,
+                text: token,
+                normalized: normalizeText(cleanWord(token))
+            }))
+        }));
+    }
+
+    function classifyMistakeSelections(card, selectedIndexes, options = {}) {
+        const chunks = buildReviewTokens(card);
+        const tokens = chunks.flatMap(chunk => chunk.tokens);
+        const selected = [...new Set((selectedIndexes || [])
+            .map(Number)
+            .filter(index => Number.isInteger(index) && index >= 0 && index < tokens.length))]
+            .sort((a, b) => a - b);
+        const selectedGroups = [];
+
+        selected.forEach(index => {
+            const token = tokens[index];
+            const previousGroup = selectedGroups.at(-1);
+            const previousIndex = previousGroup?.at(-1);
+            const continuesGroup = previousGroup &&
+                previousIndex === index - 1 &&
+                tokens[previousIndex]?.chunkIndex === token.chunkIndex;
+            if (continuesGroup) previousGroup.push(index);
+            else selectedGroups.push([index]);
+        });
+
+        const errorRanges = (Array.isArray(card?.errorPoints) ? card.errorPoints : [])
+            .map(point => {
+                const range = findPhraseRange(tokens.map(token => token.text), point?.correct);
+                return range ? { ...range, type: normalizeErrorType(point.type) } : null;
+            })
+            .filter(Boolean);
+        const articles = new Set(['a', 'an', 'the']);
+        const auxiliaries = new Set([
+            'am', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
+            'do', 'does', 'did', 'have', 'has', 'had',
+            'will', 'would', 'can', 'could', 'should', 'may', 'might', 'must',
+            "i'm", "you're", "he's", "she's", "it's", "we're", "they're",
+            "isn't", "aren't", "wasn't", "weren't", "don't", "doesn't", "didn't",
+            "haven't", "hasn't", "hadn't", "won't", "wouldn't", "can't", "couldn't", "shouldn't"
+        ]);
+        const prepositions = new Set([
+            'to', 'at', 'in', 'on', 'for', 'with', 'from', 'by', 'of', 'about',
+            'after', 'before', 'into', 'over', 'under', 'through', 'without'
+        ]);
+        const pluralCues = new Set(['any', 'some', 'many', 'several', 'these', 'those', 'few', 'both']);
+
+        function classifyGroup(group) {
+            const explicit = errorRanges.find(range =>
+                group.some(index => index >= range.start && index < range.end)
+            );
+            if (explicit) return explicit.type;
+
+            const words = group.map(index => tokens[index].normalized);
+            if (words.some(word => articles.has(word))) return 'article';
+            if (words.some(word => auxiliaries.has(word))) return 'tense_auxiliary';
+
+            const hasPluralForm = group.some(index => {
+                const word = tokens[index].normalized;
+                const previous = tokens[index - 1]?.normalized;
+                return word.length > 2 && /s$/.test(word) && !/ss$/.test(word) &&
+                    (pluralCues.has(previous) || pluralCues.has(words[0]));
+            });
+            if (hasPluralForm) return 'plural';
+            if (group.length > 1) return 'expression';
+            if (prepositions.has(words[0])) return 'preposition';
+            return 'expression';
+        }
+
+        const mistakes = selectedGroups.map(group => ({
+            start: group[0],
+            end: group.at(-1) + 1,
+            text: group.map(index => tokens[index].text).join(' '),
+            type: classifyGroup(group)
+        }));
+
+        if (options.wordOrder) {
+            mistakes.push({ start: null, end: null, text: '문장 어순', type: 'word_order' });
+        }
+
+        return {
+            chunks,
+            mistakes,
+            errorTypes: [...new Set(mistakes.map(mistake => mistake.type))]
+        };
+    }
+
     function selectWeightedNewCards(newCards, targetCount, allCards, rng = Math.random) {
         if (!Array.isArray(newCards) || targetCount <= 0) return [];
         const available = new Map();
@@ -562,6 +667,8 @@
         deriveCorePhrase,
         buildPracticeQuestion,
         evaluatePractice,
+        buildReviewTokens,
+        classifyMistakeSelections,
         selectWeightedNewCards,
         getAdaptiveNewLimit
     };

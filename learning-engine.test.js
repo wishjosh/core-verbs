@@ -89,6 +89,52 @@ test('uses a stored learner error point as a selectable contrast', () => {
     assert.equal(distractor.errorType, 'tense_auxiliary');
 });
 
+test('keeps reviewed chunk boundaries while exposing tappable words', () => {
+    const card = {
+        en: 'I barely made it to the airport on time, only to have my flight delayed.',
+        assemblyChunks: ['I barely', 'made it to the airport', 'on time,', 'only to have my flight delayed.']
+    };
+    const chunks = engine.buildReviewTokens(card);
+    assert.deepEqual(chunks.map(chunk => chunk.text), card.assemblyChunks);
+    assert.equal(chunks[1].tokens.map(token => token.text).join(' '), 'made it to the airport');
+    assert.deepEqual(chunks.flatMap(chunk => chunk.tokens).map(token => token.index),
+        Array.from({ length: 15 }, (_, index) => index));
+});
+
+test('classifies a tapped Did as a tense and auxiliary error', () => {
+    const card = {
+        en: 'Did you leave work yet?',
+        assemblyChunks: ['Did', 'you leave work yet?'],
+        errorPoints: [{ type: 'tense_auxiliary', correct: 'Did', distractor: 'Do' }]
+    };
+    const result = engine.classifyMistakeSelections(card, [0]);
+    assert.deepEqual(result.errorTypes, ['tense_auxiliary']);
+    assert.deepEqual(result.mistakes[0], {
+        start: 0,
+        end: 1,
+        text: 'Did',
+        type: 'tense_auxiliary'
+    });
+});
+
+test('groups adjacent selected words inside a chunk as one expression error', () => {
+    const card = {
+        en: 'I barely made it to the airport on time.',
+        assemblyChunks: ['I barely', 'made it to the airport', 'on time.']
+    };
+    const result = engine.classifyMistakeSelections(card, [2, 3, 4]);
+    assert.equal(result.mistakes.length, 1);
+    assert.equal(result.mistakes[0].text, 'made it to');
+    assert.equal(result.mistakes[0].type, 'expression');
+});
+
+test('adds an explicit word-order error without requiring word selection', () => {
+    const card = { en: 'Did you leave work yet?', assemblyChunks: ['Did', 'you leave work yet?'] };
+    const result = engine.classifyMistakeSelections(card, [], { wordOrder: true });
+    assert.deepEqual(result.errorTypes, ['word_order']);
+    assert.equal(result.mistakes[0].text, '문장 어순');
+});
+
 test('avoids a one-button exercise for a short sentence without a contrast', () => {
     const question = engine.buildPracticeQuestion(
         { verb: 'GO', en: 'May I come in?' },

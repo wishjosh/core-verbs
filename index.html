@@ -88,19 +88,24 @@
             </div>
             <div id="hint">영어 문장을 떠올린 뒤 화면을 터치하세요</div>
 
-            <!-- 🧩 모바일 핵심 구문 선택·조립 -->
+            <!-- 🧠 회상 후 직접 오류 체크 -->
             <div id="practice-panel" class="practice-panel">
-                <div class="practice-title">🧩 위 한국어 어순을 따라 영어 덩어리를 고르세요</div>
-                <div class="practice-subtitle" id="practice-subtitle">원어민 청크와 자주 틀리는 문법을 함께 확인합니다.</div>
-                <div id="practice-slots" class="practice-slots" aria-live="polite"></div>
-                <div id="practice-bank" class="practice-bank"></div>
-                <div class="practice-controls">
-                    <button id="btn-practice-reset" class="practice-small-btn" onclick="event.stopPropagation(); resetPracticeSelection();">다시 고르기</button>
-                    <button id="btn-practice-check" class="practice-check-btn" onclick="event.stopPropagation(); checkPracticeAnswer();" disabled>확인</button>
-                </div>
+                <div class="practice-title">🧠 영어 문장을 먼저 떠올려 보세요</div>
+                <div class="practice-subtitle" id="practice-subtitle">머릿속으로 말해 본 뒤 정답을 열고, 실제로 틀린 부분만 직접 체크합니다.</div>
             </div>
 
-            <div id="english">Here is the English sentence</div>
+            <div id="english" aria-label="영어 정답"></div>
+            <div id="mistake-review" class="mistake-review">
+                <span class="mistake-review-label">나의 오류 체크</span>
+                <div class="mistake-review-help">틀린 단어를 누르세요. 구문 전체를 틀렸다면 같은 청크 안의 단어를 이어서 누르세요.</div>
+                <button id="btn-word-order" class="word-order-btn" type="button" aria-pressed="false" onclick="event.stopPropagation(); toggleWordOrderMistake();">↔ 어순도 틀렸어요</button>
+                <div id="mistake-summary" class="mistake-summary empty" aria-live="polite">선택한 오류가 아직 없습니다.</div>
+                <div class="self-check-controls">
+                    <button class="self-check-btn recall-fail" type="button" onclick="event.stopPropagation(); markRecallFailure();">전체 문장 실패</button>
+                    <button class="self-check-btn no-mistakes" type="button" onclick="event.stopPropagation(); markNoMistakes();">틀린 곳 없음</button>
+                    <button id="btn-save-mistakes" class="self-check-btn save-mistakes" type="button" onclick="event.stopPropagation(); saveSelectedMistakes();" disabled>선택한 오류 저장</button>
+                </div>
+            </div>
             <div id="core-phrase-box" class="core-phrase-box">
                 <span class="core-phrase-label">이 문장의 핵심 구문</span>
                 <strong id="core-phrase-text" class="core-pattern-list"></strong>
@@ -114,7 +119,7 @@
             </div>
         </div>
 
-        <!-- 🔘 구문 훈련 보조·다음 버튼 -->
+        <!-- 🔘 정답 공개·다음 버튼 -->
         <div class="buttons" id="action-buttons">
             <button id="btn-show-answer" class="action-btn secondary" onclick="revealAnswerAsReview()">정답 보기</button>
             <button id="btn-next" class="action-btn" onclick="advanceCard()">다음 문장 →</button>

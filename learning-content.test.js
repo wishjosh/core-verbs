@@ -69,3 +69,15 @@ test('all 869 stored items build an answerable practice question', () => {
         assert.equal(engine.evaluatePractice(question, question.targetIds).correct, true, item.id);
     }
 });
+
+test('all 869 stored items keep identical Korean and English chunk numbering for review', () => {
+    for (const item of content.items) {
+        const card = { ...item, en: item.english, ko: item.naturalKo };
+        const reviewChunks = engine.buildReviewTokens(card);
+        assert.equal(reviewChunks.length, item.orderGlosses.length, item.id);
+        assert.equal(joinChunks(reviewChunks.map(chunk => chunk.text)), item.english, item.id);
+        reviewChunks.forEach(chunk => {
+            assert.equal(chunk.tokens.map(token => token.text).join(' '), chunk.text, item.id);
+        });
+    }
+});
