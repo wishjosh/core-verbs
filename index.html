@@ -68,7 +68,7 @@
         </div>
         
         <!-- 🃏 메인 플래시 카드 영역 -->
-        <div id="card" onclick="startPractice()">
+        <div id="card">
             <!-- 🎉 세션 완료 축하 메시지 -->
             <div id="completion-msg">
                 🎉<br>현재 세션 완료!<br>수고하셨습니다.<br>
@@ -79,7 +79,7 @@
             <div id="new-badge">🆕 오늘의 새 문장</div>
             <div id="wrong-badge"></div>
             <div id="order-guide" class="order-guide">
-                <span class="order-guide-label">영어 어순 힌트</span>
+                <span class="order-guide-label">영어 의미 전개 순서 · 앞에서부터 뜻을 쌓아 보세요</span>
                 <div id="order-glosses" class="order-glosses">잠시만 기다려 주세요!</div>
             </div>
             <div id="natural-answer" class="natural-answer">
@@ -88,21 +88,44 @@
             </div>
             <div id="hint">영어 문장을 떠올린 뒤 화면을 터치하세요</div>
 
-            <!-- 🧠 회상 후 직접 오류 체크 -->
+            <!-- 🧩 청크 조립 + 청크 안 단어별 오류 체크 -->
             <div id="practice-panel" class="practice-panel">
                 <div class="practice-title">🧠 영어 문장을 먼저 떠올려 보세요</div>
-                <div class="practice-subtitle" id="practice-subtitle">머릿속으로 말해 본 뒤 정답을 열고, 실제로 틀린 부분만 직접 체크합니다.</div>
+                <div class="practice-subtitle" id="practice-subtitle">머릿속으로 말해 본 뒤 영어 청크를 확인하세요.</div>
+                <div id="practice-workspace" class="practice-workspace">
+                    <span id="practice-slots-label" class="practice-area-label">내가 만든 문장 · 청크를 고르면 단어별로 펼쳐져요</span>
+                    <div id="practice-slots" class="practice-slots" aria-label="내가 만든 문장" aria-live="polite"></div>
+                    <span id="practice-bank-label" class="practice-area-label">영어 청크 후보 · 어순을 생각해서 고르세요</span>
+                    <div id="practice-bank" class="practice-bank"></div>
+                    <div class="practice-controls">
+                        <button id="btn-practice-reset" class="practice-small-btn" type="button" onclick="event.stopPropagation(); resetPracticeSelection();">다시 고르기</button>
+                        <button id="btn-practice-reveal" class="practice-small-btn reveal" type="button" onclick="event.stopPropagation(); revealAnswerAsReview();">정답 바로 보기</button>
+                        <button id="btn-practice-check" class="practice-check-btn" type="button" onclick="event.stopPropagation(); checkPracticeAnswer();" disabled>조립 확인</button>
+                    </div>
+                </div>
             </div>
 
+            <div id="english-answer-label" class="english-answer-label">영어 정답 · 청크 경계 안에서 단어를 하나씩 선택할 수 있어요</div>
             <div id="english" aria-label="영어 정답"></div>
             <div id="mistake-review" class="mistake-review">
                 <span class="mistake-review-label">나의 오류 체크</span>
-                <div class="mistake-review-help">틀린 단어를 누르세요. 구문 전체를 틀렸다면 같은 청크 안의 단어를 이어서 누르세요.</div>
+                <div class="mistake-review-help">틀린 단어를 하나씩 누르세요. 구문 전체를 틀렸다면 이어진 단어를 모두 누르세요.</div>
                 <button id="btn-word-order" class="word-order-btn" type="button" aria-pressed="false" onclick="event.stopPropagation(); toggleWordOrderMistake();">↔ 어순도 틀렸어요</button>
                 <div id="mistake-summary" class="mistake-summary empty" aria-live="polite">선택한 오류가 아직 없습니다.</div>
+                <div class="error-type-picker">
+                    <span>선택한 오류 전체의 종류 · 자동 선택되며, 다르면 직접 바꿀 수 있어요</span>
+                    <div class="error-type-buttons">
+                        <button type="button" data-error-type="article" aria-pressed="false" onclick="event.stopPropagation(); toggleReportedErrorType('article');" disabled>관사</button>
+                        <button type="button" data-error-type="plural" aria-pressed="false" onclick="event.stopPropagation(); toggleReportedErrorType('plural');" disabled>단·복수</button>
+                        <button type="button" data-error-type="tense_auxiliary" aria-pressed="false" onclick="event.stopPropagation(); toggleReportedErrorType('tense_auxiliary');" disabled>시제·조동사</button>
+                        <button type="button" data-error-type="preposition" aria-pressed="false" onclick="event.stopPropagation(); toggleReportedErrorType('preposition');" disabled>전치사</button>
+                        <button type="button" data-error-type="koreanism" aria-pressed="false" onclick="event.stopPropagation(); toggleReportedErrorType('koreanism');" disabled>한국식 표현</button>
+                        <button type="button" data-error-type="expression" aria-pressed="false" onclick="event.stopPropagation(); toggleReportedErrorType('expression');" disabled>핵심 구문</button>
+                    </div>
+                </div>
                 <div class="self-check-controls">
                     <button class="self-check-btn recall-fail" type="button" onclick="event.stopPropagation(); markRecallFailure();">전체 문장 실패</button>
-                    <button class="self-check-btn no-mistakes" type="button" onclick="event.stopPropagation(); markNoMistakes();">틀린 곳 없음</button>
+                    <button class="self-check-btn no-mistakes" type="button" onclick="event.stopPropagation(); markNoMistakes();">단어 오류 없음</button>
                     <button id="btn-save-mistakes" class="self-check-btn save-mistakes" type="button" onclick="event.stopPropagation(); saveSelectedMistakes();" disabled>선택한 오류 저장</button>
                 </div>
             </div>
@@ -121,7 +144,7 @@
 
         <!-- 🔘 정답 공개·다음 버튼 -->
         <div class="buttons" id="action-buttons">
-            <button id="btn-show-answer" class="action-btn secondary" onclick="revealAnswerAsReview()">정답 보기</button>
+            <button id="btn-show-answer" class="action-btn secondary" onclick="startPractice()">영어 청크로 확인</button>
             <button id="btn-next" class="action-btn" onclick="advanceCard()">다음 문장 →</button>
         </div>
 

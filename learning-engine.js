@@ -456,9 +456,13 @@
         let chunks = hasValidStoredChunks
             ? storedChunks
             : buildChunks(card?.en, corePhrase, error?.separate ? error.correct : '');
-        if (!error && chunks.length === 1) chunks = splitShortChunkNaturally(chunks[0]);
         const targetIds = chunks.map((_, index) => `target-${index}`);
-        const bank = chunks.map((text, index) => ({ id: targetIds[index], text, isDistractor: false }));
+        const bank = chunks.map((text, index) => ({
+            id: targetIds[index],
+            text,
+            isDistractor: false,
+            targetIndex: index
+        }));
         const distractorChunk = buildDistractorChunk(chunks, error);
 
         if (error && distractorChunk) {
@@ -472,6 +476,19 @@
             });
         }
 
+        const shuffledBank = shuffle(bank, rng);
+        const visibleEntries = shuffledBank.filter(entry => !entry.isDistractor);
+        const exposesTargetOrder = visibleEntries.length > 1 &&
+            visibleEntries.every((entry, index) => entry.id === targetIds[index]);
+        if (exposesTargetOrder) {
+            const firstIndex = shuffledBank.indexOf(visibleEntries[0]);
+            const secondIndex = shuffledBank.indexOf(visibleEntries[1]);
+            [shuffledBank[firstIndex], shuffledBank[secondIndex]] = [
+                shuffledBank[secondIndex],
+                shuffledBank[firstIndex]
+            ];
+        }
+
         return {
             corePhrase,
             corePatterns,
@@ -481,7 +498,7 @@
             tip: error?.tip || '영어는 단어보다 자주 함께 쓰는 표현 덩어리와 어순으로 기억하세요.',
             targetIds,
             targetChunks: chunks,
-            bank: shuffle(bank, rng)
+            bank: shuffledBank
         };
     }
 
@@ -504,13 +521,40 @@
         };
     }
 
-    function buildReviewTokens(card) {
+    function buildPracticeSlots(question, reviewChunks, selectedIds) {
+        const targetIds = Array.isArray(question?.targetIds) ? question.targetIds : [];
+        const bank = Array.isArray(question?.bank) ? question.bank : [];
+        const reviews = Array.isArray(reviewChunks) ? reviewChunks : [];
+        const selected = Array.isArray(selectedIds) ? selectedIds : [];
+        return targetIds.map((_, slotIndex) => {
+            const id = selected[slotIndex] || null;
+            const entry = id ? bank.find(item => item.id === id && !item.isDistractor) : null;
+            const reviewChunk = entry && Number.isInteger(entry.targetIndex)
+                ? reviews[entry.targetIndex]
+                : null;
+            return {
+                slotIndex,
+                id,
+                targetIndex: entry?.targetIndex ?? null,
+                text: entry?.text || '',
+                tokens: Array.isArray(reviewChunk?.tokens) ? reviewChunk.tokens : []
+            };
+        });
+    }
+
+    function buildReviewTokens(card, chunkOverride = null) {
+        const requestedChunks = Array.isArray(chunkOverride)
+            ? chunkOverride.map(chunk => String(chunk).trim()).filter(Boolean)
+            : [];
         const storedChunks = Array.isArray(card?.assemblyChunks)
             ? card.assemblyChunks.map(chunk => String(chunk).trim()).filter(Boolean)
             : [];
-        const chunks = storedChunks.length && joinChunks(storedChunks) === String(card?.en || '').trim()
-            ? storedChunks
-            : buildChunks(card?.en, deriveCorePhrase(card));
+        const sentence = String(card?.en || '').trim();
+        const chunks = requestedChunks.length && joinChunks(requestedChunks) === sentence
+            ? requestedChunks
+            : (storedChunks.length && joinChunks(storedChunks) === sentence
+                ? storedChunks
+                : buildChunks(card?.en, deriveCorePhrase(card)));
         let globalIndex = 0;
 
         return chunks.map((text, chunkIndex) => ({
@@ -540,9 +584,7 @@
             const token = tokens[index];
             const previousGroup = selectedGroups.at(-1);
             const previousIndex = previousGroup?.at(-1);
-            const continuesGroup = previousGroup &&
-                previousIndex === index - 1 &&
-                tokens[previousIndex]?.chunkIndex === token.chunkIndex;
+            const continuesGroup = previousGroup && previousIndex === index - 1;
             if (continuesGroup) previousGroup.push(index);
             else selectedGroups.push([index]);
         });
@@ -570,7 +612,7 @@
 
         function classifyGroup(group) {
             const explicit = errorRanges.find(range =>
-                group.some(index => index >= range.start && index < range.end)
+                group[0] <= range.start && group.at(-1) + 1 >= range.end
             );
             if (explicit) return explicit.type;
 
@@ -667,6 +709,7 @@
         deriveCorePhrase,
         buildPracticeQuestion,
         evaluatePractice,
+        buildPracticeSlots,
         buildReviewTokens,
         classifyMistakeSelections,
         selectWeightedNewCards,

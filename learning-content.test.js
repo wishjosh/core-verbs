@@ -1,26 +1,95 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
 const engine = require('./learning-engine.js');
 
 const contentPath = path.join(__dirname, 'data', 'learning-content.json');
 const content = JSON.parse(fs.readFileSync(contentPath, 'utf8'));
+const meaningFlowOverridesPath = path.join(__dirname, 'data', 'meaning-flow-overrides.json');
+const meaningFlowOverrides = JSON.parse(fs.readFileSync(meaningFlowOverridesPath, 'utf8'));
 const joinChunks = chunks => chunks.reduce((sentence, chunk, index) => (
     index === 0 ? chunk : `${sentence}${/[—–]$/.test(sentence) ? '' : ' '}${chunk}`
 ), '');
 
+function obviousDraftChunkIssues(item) {
+    const determiners = new Set(['a', 'an', 'the', 'my', 'your', 'his', 'our', 'their', 'this', 'these', 'those']);
+    const connectors = new Set(['and', 'but', 'or']);
+    const prepositions = new Set(['to', 'at', 'in', 'on', 'for', 'with', 'from', 'by', 'of', 'about', 'after', 'before', 'into', 'over', 'under', 'through', 'without']);
+    const issues = [];
+    item.assemblyChunks.slice(0, -1).forEach((chunk, index) => {
+        const words = chunk.toLowerCase().replace(/[^a-z'\s]/g, ' ').trim().split(/\s+/).filter(Boolean);
+        const last = words.at(-1);
+        if (determiners.has(last)) issues.push(`${index + 1}: determiner`);
+        if (connectors.has(last) && !/^(yeah|yes|no|well|okay|ok|right)\s+(and|but|or)$/i.test(words.join(' '))) {
+            issues.push(`${index + 1}: connector`);
+        }
+        if (words.length === 1 && prepositions.has(words[0])) issues.push(`${index + 1}: lone preposition`);
+        if (/^(yeah|yes|no|well|okay|ok|right|honestly|actually|sorry),\s+\S/i.test(chunk) && !/[.!?]["']?$/.test(chunk)) {
+            issues.push(`${index + 1}: discourse boundary`);
+        }
+    });
+    return issues;
+}
+
 test('stores the complete 50-day, 869-sentence learning set', () => {
     assert.equal(content.schemaVersion, 1);
+    assert.equal(content.chunkRulesVersion, 2);
     assert.equal(content.total, 869);
     assert.equal(content.items.length, 869);
     assert.equal(new Set(content.items.map(item => item.id)).size, 869);
     assert.equal(Math.max(...content.items.map(item => item.day)), 50);
 });
 
+test('stores a reviewed 30-sentence English meaning-flow pilot across all 15 verb groups', () => {
+    assert.equal(content.meaningFlowRulesVersion, 1);
+    assert.equal(content.meaningFlowReviewCount, 30);
+    assert.equal(meaningFlowOverrides.rulesVersion, 1);
+    assert.equal(meaningFlowOverrides.reviewStatus, 'reviewed');
+    assert.equal(meaningFlowOverrides.items.length, 30);
+    assert.equal(new Set(meaningFlowOverrides.items.map(item => item.id)).size, 30);
+
+    const byId = new Map(content.items.map(item => [item.id, item]));
+    const verbs = new Set();
+    for (const override of meaningFlowOverrides.items) {
+        const item = byId.get(override.id);
+        assert.ok(item, override.id);
+        assert.equal(item.english, override.english, override.id);
+        assert.deepEqual(item.assemblyChunks, override.assemblyChunks, override.id);
+        assert.deepEqual(item.orderGlosses, override.orderGlosses, override.id);
+        assert.equal(item.orderGlosses.length, item.assemblyChunks.length, override.id);
+        assert.ok(item.orderGlosses.every(value => value.trim()), override.id);
+        assert.deepEqual(item.meaningFlow, { rulesVersion: 1, reviewStatus: 'reviewed' }, override.id);
+        verbs.add(item.verb);
+    }
+
+    assert.deepEqual([...verbs].sort(), [
+        'DO', 'GET', 'GIVE', 'GO', 'HAVE', 'KEEP', 'KNOW', 'LET',
+        'LIKE', 'MAKE', 'SAY', 'SEE', 'TAKE', 'WANT', 'WORK'
+    ]);
+    for (const id of ['cv-0062', 'cv-0079', 'cv-0135', 'cv-0148', 'cv-0430']) {
+        assert.ok(meaningFlowOverrides.items.some(item => item.id === id), id);
+    }
+});
+
+test('meaning-flow pilot fixes representative reverse-translation traps', () => {
+    const byId = new Map(content.items.map(item => [item.id, item]));
+    assert.deepEqual(byId.get('cv-0062').orderGlosses, ['(과거 질문으로 시작)', '너는 벌써 퇴근했어?']);
+    assert.deepEqual(byId.get('cv-0148').orderGlosses, ['어떻게 구했어요', '이 명품 가방을?']);
+    assert.deepEqual(byId.get('cv-0421').orderGlosses, [
+        '혼자 일해 본 것이',
+        '내가 깨닫게 했어요',
+        '불안정한 수입은',
+        '사람을 불안하게 할 수 있다는 걸.'
+    ]);
+    assert.deepEqual(byId.get('cv-0750').orderGlosses, ['포장지에는 적혀 있어요', '이탈리아에서 만들어졌다고.']);
+});
+
 test('every English sentence is reconstructed exactly from native chunks', () => {
     for (const item of content.items) {
-        assert.ok(item.assemblyChunks.length >= 1 && item.assemblyChunks.length <= 6, item.id);
+        assert.ok(item.assemblyChunks.length >= 1 && item.assemblyChunks.length <= 10, item.id);
+        assert.ok(item.assemblyChunks.every(chunk => chunk.split(/\s+/).length <= 5), item.id);
         assert.equal(joinChunks(item.assemblyChunks), item.english, item.id);
         assert.equal(item.orderGlosses.length, item.assemblyChunks.length, item.id);
         assert.ok(item.orderGlosses.every(Boolean), item.id);
@@ -28,18 +97,40 @@ test('every English sentence is reconstructed exactly from native chunks', () =>
     }
 });
 
-test('stored learner contrasts are selectable inside one chunk', () => {
+test('most learning chunks stay within the preferred one-to-four-word range', () => {
+    const chunks = content.items.flatMap(item => item.assemblyChunks);
+    const compactChunks = chunks.filter(chunk => chunk.split(/\s+/).length <= 4);
+    assert.ok(compactChunks.length / chunks.length >= 0.85);
+});
+
+test('AI draft chunks have no known placeholder or obvious broken boundary', () => {
+    assert.equal(content.qualityReviewModel, 'gemma4:26b');
+    for (const item of content.items) {
+        assert.ok(item.orderGlosses.every(gloss => !/^(뜻 확인|이어서|확인 필요|번역 필요)$/.test(gloss)), item.id);
+        if (item.reviewStatus === 'ai_draft') {
+            assert.deepEqual(obviousDraftChunkIssues(item), [], item.id);
+        }
+    }
+});
+
+test('source English remains byte-for-byte unchanged as a complete set', () => {
+    const sourceHash = crypto.createHash('sha256')
+        .update(content.items.map(item => item.english).join('\n'))
+        .digest('hex');
+    assert.equal(sourceHash, '6973959301fb57da9d18f8818939f617bdd0cafd3012223b400fc9c1a7394358');
+});
+
+test('stored learner error points remain exact source substrings across visual chunks', () => {
     for (const item of content.items) {
         for (const point of item.errorPoints) {
             assert.ok(item.english.includes(point.correct), `${item.id}: ${point.correct}`);
-            assert.ok(item.assemblyChunks.some(chunk => chunk.includes(point.correct)), `${item.id}: ${point.correct}`);
             assert.notEqual(point.correct, point.distractor, item.id);
             assert.ok(point.tip, item.id);
         }
     }
 });
 
-test('the three reviewed examples preserve the agreed learning intent', () => {
+test('reviewed examples preserve the agreed learning intent', () => {
     const byEnglish = new Map(content.items.map(item => [item.english, item]));
     const did = byEnglish.get('Did you leave work yet?');
     assert.deepEqual(did.assemblyChunks, ['Did', 'you leave work yet?']);
@@ -52,8 +143,13 @@ test('the three reviewed examples preserve the agreed learning intent', () => {
     assert.equal(onMyWay.reviewStatus, 'reviewed');
 
     const airport = byEnglish.get('I barely made it to the airport on time, only to have my flight delayed.');
-    assert.deepEqual(airport.assemblyChunks, ['I barely', 'made it to the airport', 'on time,', 'only to have my flight delayed.']);
+    assert.deepEqual(airport.assemblyChunks, ['I barely', 'made it to', 'the airport', 'on time,', 'only to', 'have my flight delayed.']);
     assert.equal(airport.reviewStatus, 'reviewed');
+
+    const client = byEnglish.get('She is currently with a client right now. May I take a message?');
+    assert.deepEqual(client.assemblyChunks, ['She', 'is currently', 'with a client', 'right now.', 'May I take', 'a message?']);
+    assert.equal(client.orderGlosses.length, 6);
+    assert.equal(client.reviewStatus, 'reviewed');
 });
 
 test('all 869 stored items build an answerable practice question', () => {
@@ -63,21 +159,51 @@ test('all 869 stored items build an answerable practice question', () => {
             en: item.english,
             ko: item.naturalKo
         }, () => 0.37);
-        assert.ok(question.targetChunks.length >= 1 && question.targetChunks.length <= 6, item.id);
+        assert.ok(question.targetChunks.length >= 1 && question.targetChunks.length <= 10, item.id);
         assert.equal(joinChunks(question.targetChunks), item.english, item.id);
         assert.equal(question.targetIds.length, question.targetChunks.length, item.id);
         assert.equal(engine.evaluatePractice(question, question.targetIds).correct, true, item.id);
     }
 });
 
-test('all 869 stored items keep identical Korean and English chunk numbering for review', () => {
+test('all 869 stored items keep one-to-one Korean and English chunk boundaries for review', () => {
     for (const item of content.items) {
         const card = { ...item, en: item.english, ko: item.naturalKo };
         const reviewChunks = engine.buildReviewTokens(card);
+        const question = engine.buildPracticeQuestion(card, () => 0.37);
+        const practiceReviewChunks = engine.buildReviewTokens(card, question.targetChunks);
+        const filledSlots = engine.buildPracticeSlots(question, practiceReviewChunks, question.targetIds);
         assert.equal(reviewChunks.length, item.orderGlosses.length, item.id);
+        assert.equal(filledSlots.length, question.targetChunks.length, item.id);
         assert.equal(joinChunks(reviewChunks.map(chunk => chunk.text)), item.english, item.id);
         reviewChunks.forEach(chunk => {
             assert.equal(chunk.tokens.map(token => token.text).join(' '), chunk.text, item.id);
         });
+        question.targetChunks.forEach((chunk, index) => {
+            assert.equal(filledSlots[index].tokens.map(token => token.text).join(' '), chunk, item.id);
+        });
+    }
+});
+
+test('the mobile review screen exposes word-level marking and editable error categories', () => {
+    const html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+    const app = fs.readFileSync(path.join(__dirname, 'app.js'), 'utf8');
+    assert.match(html, /영어 청크로 확인/);
+    assert.match(html, /영어 의미 전개 순서/);
+    assert.match(app, /의미 단서를 앞에서부터 따라가며/);
+    assert.match(app, /pilot.*meaning-flow/);
+    assert.match(app, /meaningFlow\?\.reviewStatus === 'reviewed'/);
+    assert.doesNotMatch(html, /같은 번호|번째 청크/);
+    assert.doesNotMatch(app, /data-slot|번째 청크/);
+    assert.match(html, /id="practice-slots"/);
+    assert.match(html, /id="practice-bank"/);
+    assert.match(app, /practice-empty-guide/);
+    assert.match(app, /clearMistakesForPracticeChunks\(\[removedId\]\)/);
+    assert.match(app, /if \(wordOrderMistake\) \{[\s\S]*?finishSelfAssessment\('X', \['word_order'\]/);
+    assert.doesNotMatch(app, /function markNoMistakes\(\) \{[\s\S]{0,180}wordOrderMistake = false/);
+    assert.match(html, />단어 오류 없음<\/button>/);
+    assert.match(app, /createMistakeWordButton\(token, 'practice-slot-word'\)/);
+    for (const type of ['article', 'plural', 'tense_auxiliary', 'preposition', 'koreanism', 'expression']) {
+        assert.match(html, new RegExp(`data-error-type=["']${type}["']`));
     }
 });

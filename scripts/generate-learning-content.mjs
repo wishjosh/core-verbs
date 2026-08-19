@@ -8,8 +8,11 @@ const DATA_DIR = path.join(ROOT, 'data');
 const OUTPUT_PATH = path.join(DATA_DIR, 'learning-content.json');
 const CACHE_PATH = path.join(DATA_DIR, '.learning-content-cache.json');
 const PILOT_PATH = path.join(DATA_DIR, 'learning-content-pilot.json');
+const MEANING_FLOW_OVERRIDES_PATH = path.join(DATA_DIR, 'meaning-flow-overrides.json');
 const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSR1wby3k5QhlAL8f8MeH-Ni1qjGgRMu8ROHDoPCKci-GYrbpx1DzTsAvcr_l5qBcemui93D4cqMLa0/pub?output=tsv';
 const OLLAMA_URL = 'http://127.0.0.1:11434/api/chat';
+const CHUNK_RULES_VERSION = 2;
+const MEANING_FLOW_RULES_VERSION = 1;
 const ERROR_TYPES = ['article', 'plural', 'preposition', 'koreanism', 'tense_auxiliary'];
 const REVIEWED_OVERRIDES = new Map([
     ['Did you leave work yet?', {
@@ -34,9 +37,49 @@ const REVIEWED_OVERRIDES = new Map([
             tip: '말하는 사람과 듣는 사람이 떠올릴 수 있는 목적지인 우체국에는 the를 붙입니다.'
         }]
     }],
+    ['She is currently with a client right now. May I take a message?', {
+        assemblyChunks: ['She', 'is currently', 'with a client', 'right now.', 'May I take', 'a message?'],
+        orderGlosses: ['그녀는', '현재 ~있어요', '의뢰인과 함께', '지금.', '제가 받아 둘까요?', '메시지를?'],
+        corePatterns: ['be with + 사람', 'right now', 'May I + 동사원형?', 'take a message'],
+        errorPoints: [{
+            type: 'article',
+            correct: 'a client',
+            distractor: 'client',
+            tip: '처음 언급하는 한 명의 의뢰인이므로 a client라고 합니다.'
+        }, {
+            type: 'article',
+            correct: 'a message',
+            distractor: 'message',
+            tip: '전해 둘 하나의 메시지를 뜻하므로 a message라고 합니다.'
+        }]
+    }],
+    ['Yeah, a couple of Korean families live in my apartment building and we have barbeques every Friday.', {
+        assemblyChunks: ['Yeah,', 'a couple of Korean families', 'live', 'in my apartment building', 'and we have barbeques', 'every Friday.'],
+        orderGlosses: ['응,', '두어 한국인 가족들이', '살아요', '내 아파트 건물에', '그리고 우리는 바비큐를 해요', '매주 금요일마다.'],
+        corePatterns: ['a couple of + 복수명사', 'live in + 장소', 'have barbeques', 'every + 요일'],
+        errorPoints: []
+    }],
+    ['I see. So I should try to have lunch with people from other departments.', {
+        assemblyChunks: ['I see.', 'So I should', 'try to have lunch', 'with people', 'from other departments.'],
+        orderGlosses: ['그렇군요.', '그러니 나는 해야겠네요', '점심을 먹어 보기를', '사람들과', '다른 부서의.'],
+        corePatterns: ['try to + 동사원형', 'have lunch with + 사람', 'people from + 부서'],
+        errorPoints: []
+    }],
+    ['Yeah, that works better.', {
+        assemblyChunks: ['Yeah,', 'that works better.'],
+        orderGlosses: ['응,', '그게 더 나아요.'],
+        corePatterns: ['work better'],
+        errorPoints: []
+    }],
+    ['I was thinking of quitting every week. I’m so glad I kept studying, and that I made it to the end of the semester.', {
+        assemblyChunks: ['I was thinking', 'of quitting', 'every week.', 'I’m so glad', 'I kept studying,', 'and that', 'I made it to', 'the end of the semester.'],
+        orderGlosses: ['나는 생각하고 있었어요', '포기하는 것을', '매주.', '나는 정말 기뻐요', '내가 계속 공부했고,', '그리고 ~라는 것이', '내가 도달했다는', '그 학기 말까지.'],
+        corePatterns: ['think of + 동명사', 'be glad + 문장', 'make it to + 시간/장소'],
+        errorPoints: []
+    }],
     ['I barely made it to the airport on time, only to have my flight delayed.', {
-        assemblyChunks: ['I barely', 'made it to the airport', 'on time,', 'only to have my flight delayed.'],
-        orderGlosses: ['나는 간신히', '공항에 도착했는데', '제시간에,', '결국 비행기가 지연되는 일을 겪었다.'],
+        assemblyChunks: ['I barely', 'made it to', 'the airport', 'on time,', 'only to', 'have my flight delayed.'],
+        orderGlosses: ['나는 간신히', '도착했다', '그 공항에', '제시간에,', '결국 ~하게 됐다', '내 비행기가 지연되는 일을.'],
         corePatterns: ['make it to + 장소', 'on time', 'only to + 동사원형', 'have + 목적어 + 과거분사'],
         errorPoints: [{
             type: 'article',
@@ -46,8 +89,8 @@ const REVIEWED_OVERRIDES = new Map([
         }]
     }],
     ['Yeah, and the second place has parking, but it’s next to a busy street.', {
-        assemblyChunks: ['Yeah,', 'and the second place has parking,', 'but it’s next to a busy street.'],
-        orderGlosses: ['그래,', '그리고 두 번째 곳은 주차가 되지만,', '하지만 붐비는 거리 바로 옆이야.'],
+        assemblyChunks: ['Yeah,', 'and the second place', 'has parking,', 'but it’s', 'next to', 'a busy street.'],
+        orderGlosses: ['그래,', '그리고 두 번째 곳은', '주차장이 있어,', '하지만 그곳은', '바로 옆이야', '붐비는 거리의.'],
         corePatterns: ['have parking', 'be next to + 장소', 'a busy + 명사'],
         errorPoints: [{
             type: 'article',
@@ -57,14 +100,14 @@ const REVIEWED_OVERRIDES = new Map([
         }]
     }],
     ['Hello, may I speak with Yuna Kim?', {
-        assemblyChunks: ['Hello,', 'may I speak with Yuna Kim?'],
-        orderGlosses: ['안녕하세요,', '제가 김유나 님과 통화해도 될까요?'],
+        assemblyChunks: ['Hello,', 'may I', 'speak with Yuna Kim?'],
+        orderGlosses: ['안녕하세요,', '제가 해도 될까요?', '김유나 님과 통화하는 것을?'],
         corePatterns: ['May I speak with + 사람?', 'speak with + 사람'],
         errorPoints: []
     }],
     ['I’m moving to the U.S. I got a job there.', {
-        assemblyChunks: ['I’m moving to the U.S.', 'I got a job there.'],
-        orderGlosses: ['나는 미국으로 이주해.', '나는 거기서 일자리를 구했거든.'],
+        assemblyChunks: ['I’m moving', 'to the U.S.', 'I got', 'a job there.'],
+        orderGlosses: ['나는 이주해.', '미국으로.', '나는 얻었어', '일자리를 거기서.'],
         corePatterns: ['move to + 장소', 'get a job'],
         errorPoints: [{
             type: 'article',
@@ -74,8 +117,8 @@ const REVIEWED_OVERRIDES = new Map([
         }]
     }],
     ['That’s good, but you should keep in mind that it gets a bit noisy at night with all the bars nearby.', {
-        assemblyChunks: ['That’s good,', 'but you should keep in mind', 'that it gets a bit noisy', 'at night', 'with all the bars nearby.'],
-        orderGlosses: ['그건 좋지만,', '하지만 염두에 두셔야 해요', '그곳이 조금 시끄러워진다는 것을', '밤에는', '근처의 많은 술집 때문에.'],
+        assemblyChunks: ['That’s good,', 'but you should', 'keep in mind', 'that it gets', 'a bit noisy', 'at night', 'with all the bars nearby.'],
+        orderGlosses: ['그건 좋지만,', '하지만 당신은 해야 해요', '염두에 두기를', '그곳이 된다는 것을', '조금 시끄럽게', '밤에는', '근처의 모든 술집 때문에.'],
         corePatterns: ['keep in mind that + 문장', 'get a bit + 형용사', 'at night', 'with + 명사'],
         errorPoints: [{
             type: 'preposition',
@@ -85,8 +128,8 @@ const REVIEWED_OVERRIDES = new Map([
         }]
     }],
     ['I know, but I don’t want to make a big deal out of it.', {
-        assemblyChunks: ['I know,', 'but I don’t want to', 'make a big deal out of it.'],
-        orderGlosses: ['알아,', '하지만 나는 원하지 않아', '그걸 큰일로 만들기를.'],
+        assemblyChunks: ['I know,', 'but I don’t', 'want to', 'make a big deal', 'out of it.'],
+        orderGlosses: ['알아,', '하지만 나는 하지 않아', '원하기를', '큰일로 만들기를', '그것을 두고.'],
         corePatterns: ['don’t want to + 동사원형', 'make a big deal out of + 명사'],
         errorPoints: [{
             type: 'article',
@@ -96,8 +139,8 @@ const REVIEWED_OVERRIDES = new Map([
         }]
     }],
     ['True, but the battery life makes it a better choice for me.', {
-        assemblyChunks: ['True,', 'but the battery life', 'makes it a better choice for me.'],
-        orderGlosses: ['맞아,', '하지만 배터리 수명이', '그걸 나에게 더 나은 선택으로 만들어.'],
+        assemblyChunks: ['True,', 'but the battery life', 'makes it', 'a better choice', 'for me.'],
+        orderGlosses: ['맞아,', '하지만 배터리 수명이', '그걸 만들어', '더 나은 선택으로', '나에게.'],
         corePatterns: ['make + 목적어 + 보어', 'a better choice for + 사람', 'battery life'],
         errorPoints: [{
             type: 'article',
@@ -107,8 +150,8 @@ const REVIEWED_OVERRIDES = new Map([
         }]
     }],
     ['Back when we were kids, my brother made me clean his room—for ten years!', {
-        assemblyChunks: ['Back when we were kids,', 'my brother', 'made me clean his room—', 'for ten years!'],
-        orderGlosses: ['우리가 어렸을 때,', '우리 형은', '나에게 자기 방 청소를 시켰어—', '무려 10년 동안이나!'],
+        assemblyChunks: ['Back when', 'we were kids,', 'my brother', 'made me clean', 'his room—', 'for ten years!'],
+        orderGlosses: ['예전에 ~했을 때', '우리가 아이들이었을 때,', '우리 형은', '나에게 청소를 시켰어', '자기 방을—', '무려 10년 동안이나!'],
         corePatterns: ['Back when + 문장', 'make + 사람 + 동사원형', 'for + 기간'],
         errorPoints: [{
             type: 'koreanism',
@@ -129,8 +172,8 @@ const REVIEWED_OVERRIDES = new Map([
         }]
     }],
     ['Right, but they’re taking the move better than me. They already have new friends.', {
-        assemblyChunks: ['Right,', 'but they’re taking the move', 'better than me.', 'They already have new friends.'],
-        orderGlosses: ['맞아요,', '하지만 아이들은 이사를 받아들이고 있어요', '나보다 더 잘.', '아이들은 벌써 새 친구들이 있어요.'],
+        assemblyChunks: ['Right,', 'but they’re taking', 'the move', 'better than me.', 'They already have', 'new friends.'],
+        orderGlosses: ['맞아요,', '하지만 아이들은 받아들이고 있어요', '그 이사를', '나보다 더 잘.', '아이들은 벌써 있어요', '새 친구들이.'],
         corePatterns: ['take + 명사 + well/better', 'better than + 사람', 'have new friends'],
         errorPoints: [{
             type: 'article',
@@ -151,8 +194,8 @@ const REVIEWED_OVERRIDES = new Map([
         }]
     }],
     ['We can meet in Gangnam or Yongsan—wherever works best for you.', {
-        assemblyChunks: ['We can meet', 'in Gangnam or Yongsan—', 'wherever works best for you.'],
-        orderGlosses: ['우리는 만날 수 있어', '강남이나 용산에서—', '네게 가장 편한 곳이면 어디든.'],
+        assemblyChunks: ['We can meet', 'in Gangnam or Yongsan—', 'wherever works best', 'for you.'],
+        orderGlosses: ['우리는 만날 수 있어', '강남이나 용산에서—', '어디든 가장 편한 곳이면', '너에게.'],
         corePatterns: ['meet in + 장소', 'wherever works best for + 사람'],
         errorPoints: [{
             type: 'preposition',
@@ -162,20 +205,20 @@ const REVIEWED_OVERRIDES = new Map([
         }]
     }],
     ['Life doesn’t really work that way. Things change, but they don’t get easier.', {
-        assemblyChunks: ['Life doesn’t really work that way.', 'Things change,', 'but they don’t get easier.'],
-        orderGlosses: ['삶은 실제로 그런 식으로 흘러가지 않아.', '상황은 변하지만,', '그렇다고 더 쉬워지지는 않아.'],
+        assemblyChunks: ['Life doesn’t really', 'work that way.', 'Things change,', 'but they don’t', 'get easier.'],
+        orderGlosses: ['삶은 실제로는 그렇지 않아', '그런 식으로 흘러가지.', '상황은 변하지만,', '하지만 그것들이 그렇지는 않아', '더 쉬워지지는.'],
         corePatterns: ['work that way', 'get + 비교급'],
         errorPoints: []
     }],
     ['I have tons of work to do.', {
-        assemblyChunks: ['I have', 'tons of work to do.'],
-        orderGlosses: ['나는 있어', '해야 할 일이 아주 많이.'],
+        assemblyChunks: ['I have', 'tons of work', 'to do.'],
+        orderGlosses: ['나는 있어', '아주 많은 일이', '해야 할.'],
         corePatterns: ['have tons of + 명사', 'work to do'],
         errorPoints: []
     }],
     ['I hate doing my taxes. I can’t believe it’s May already.', {
-        assemblyChunks: ['I hate doing my taxes.', 'I can’t believe it’s May already.'],
-        orderGlosses: ['나는 세금 신고하는 게 싫어.', '벌써 5월이라니 믿을 수가 없어.'],
+        assemblyChunks: ['I hate', 'doing my taxes.', 'I can’t believe', 'it’s May already.'],
+        orderGlosses: ['나는 싫어해', '내 세금 신고하는 것을.', '나는 믿을 수 없어', '벌써 5월이라는 것을.'],
         corePatterns: ["do one's taxes", 'hate + 동명사', 'can’t believe + 문장'],
         errorPoints: [{
             type: 'koreanism',
@@ -197,8 +240,8 @@ const REVIEWED_OVERRIDES = new Map([
         errorPoints: []
     }],
     ['Yes, we’re sorry about that, but we don’t take reservations for those tables.', {
-        assemblyChunks: ['Yes, we’re sorry about that,', 'but we don’t take reservations', 'for those tables.'],
-        orderGlosses: ['네, 그 점은 죄송하지만,', '하지만 저희는 예약을 받지 않아요', '그 테이블들은.'],
+        assemblyChunks: ['Yes,', 'we’re sorry about that,', 'but we don’t', 'take reservations', 'for those tables.'],
+        orderGlosses: ['네,', '그 점은 죄송하지만,', '하지만 저희는 하지 않아요', '예약을 받기를', '그 테이블들은.'],
         corePatterns: ['be sorry about + 명사', 'take reservations', 'those + 복수명사'],
         errorPoints: [{
             type: 'plural',
@@ -214,8 +257,8 @@ const REVIEWED_OVERRIDES = new Map([
         errorPoints: []
     }],
     ['Yeah, but he likes to spend most of the session talking about politics, and I can’t stand it anymore.', {
-        assemblyChunks: ['Yeah,', 'but he likes to spend', 'most of the session', 'talking about politics,', 'and I can’t stand it anymore.'],
-        orderGlosses: ['응,', '하지만 그는 보내기를 좋아해', '수업 시간 대부분을', '정치 이야기를 하면서,', '그래서 나는 더는 못 참겠어.'],
+        assemblyChunks: ['Yeah,', 'but he likes', 'to spend', 'most of the session', 'talking about politics,', 'and I can’t', 'stand it anymore.'],
+        orderGlosses: ['응,', '하지만 그는 좋아해', '보내기를', '수업 시간 대부분을', '정치 이야기를 하면서,', '그래서 나는 할 수 없어', '그걸 더는 참을 수.'],
         corePatterns: ['spend + 시간 + 동명사', 'talk about + 주제', 'can’t stand + 명사'],
         errorPoints: [{
             type: 'article',
@@ -268,21 +311,60 @@ const OUTPUT_SCHEMA = {
     required: ['items']
 };
 
+const GLOSS_SCHEMA = {
+    type: 'object',
+    properties: {
+        items: {
+            type: 'array',
+            items: {
+                type: 'object',
+                properties: {
+                    id: { type: 'string' },
+                    orderGlosses: { type: 'array', items: { type: 'string' } }
+                },
+                required: ['id', 'orderGlosses']
+            }
+        }
+    },
+    required: ['items']
+};
+
+const QUALITY_REVIEW_SCHEMA = {
+    type: 'object',
+    properties: {
+        items: {
+            type: 'array',
+            items: {
+                type: 'object',
+                properties: {
+                    id: { type: 'string' },
+                    assemblyChunks: { type: 'array', items: { type: 'string' } },
+                    orderGlosses: { type: 'array', items: { type: 'string' } }
+                },
+                required: ['id', 'assemblyChunks', 'orderGlosses']
+            }
+        }
+    },
+    required: ['items']
+};
+
 const SYSTEM_PROMPT = `당신은 한국인 성인 학습자를 위한 미국 영어 코퍼스 편집자다.
 입력된 각 문장의 암기용 자료를 JSON으로 만든다.
 
 assemblyChunks 규칙:
-- 원어민이 한 번에 처리하고 말하는 의미·문법·운율 단위로 보통 2~6개를 만든다. 기계적으로 같은 길이로 자르지 않는다. 6단어 이하의 짧은 고정 표현은 자연스러우면 1개도 가능하다.
-- 구동사, 연어, 관용구, 문형은 가급적 같은 덩어리에 둔다. 예: make it to + 장소 / on time / only to + 동사.
-- 한 덩어리는 보통 2~7단어로 간결하게 만들고 절대로 10단어를 넘기지 않는다. 긴 문장은 주어부·동사구·전치사구·절의 자연스러운 경계에서 나눈다.
+- 원어민이 한 번에 처리하고 말하는 의미·문법·운율 단위로 나눈다. 문장이 길면 10개까지 만들 수 있으며, 기계적으로 같은 길이로 자르지 않는다.
+- 한 덩어리는 보통 1~4단어이며, 자연스러운 결합 표현에 필요한 경우에만 5단어까지 허용한다. 주어, 조동사 틀, 동사구, 목적어, 전치사구, 시간·장소 부사구가 눈에 보이도록 짧게 나눈다.
+- 구동사, 연어, 관용구는 5단어 안에서 가급적 같은 덩어리에 둔다. 영어 어순을 더 잘 드러내기 위해 경계를 가로지르면 corePatterns에는 전체 재사용 문형을 보존한다. 예: make it to / the airport, May I take / a message, make a big deal / out of it.
 - 쉼표, 세미콜론, 콜론, 문장 끝(.?!)에서는 원칙적으로 덩어리를 끝낸다. 문장부호는 앞 덩어리 끝에 붙인다. 다만 "Oh, me too!", "Hey, Billy," 같은 4단어 이하의 짧은 감탄·호칭은 하나의 말덩어리로 둘 수 있다.
 - 덩어리를 공백 하나로 연결하면 원문 영어와 글자·순서·문장부호가 정확히 같아야 한다. 단, 앞 덩어리가 em dash(—/–)로 끝나면 다음 덩어리는 공백 없이 이어진다. 단어를 고치거나 생략하거나 추가하지 않는다.
-- 의미 없는 한 단어 덩어리는 피한다. 다만 Did/Do처럼 학습상 독립 비교가 필요한 조동사는 단독 덩어리가 가능하다.
+- 의미 없는 한 단어 남발은 피한다. 다만 주어·조동사·담화표지처럼 영어 어순이나 오류 확인에 중요한 단어는 단독 덩어리가 가능하다.
 
 orderGlosses 규칙:
-- assemblyChunks와 정확히 같은 개수이며, 각 영어 덩어리의 뜻을 영어 어순 그대로 짧은 한국어 덩어리로 쓴다.
-- 자연스러운 완성 번역이 아니라 영어 어순을 느끼게 하는 발판이다. 한국어 조사와 생략을 최소한 보완하되 앞뒤 뜻을 바꾸지 않는다.
-- 각 덩어리 자체는 한국인이 바로 이해할 수 있게 쓴다. '~에 있었다 서두름 속에서'처럼 단어를 기계 번역한 문장은 금지한다.
+- assemblyChunks와 정확히 같은 개수이며, 영어가 앞에서부터 새로 펼치는 의미나 문법 기능을 짧은 한국어 단서로 쓴다.
+- 자연스러운 완성 번역을 잘라 놓거나 한국어 문장을 거꾸로 뒤집지 않는다. 각 단서를 순서대로 읽으면 의미가 계속 누적되어야 한다.
+- 조동사처럼 한국어로 따로 옮기기 어려운 청크는 '(과거 질문으로 시작)'처럼 기능을 알려도 된다.
+- '나는 하지 않아 / 원하기를'처럼 단어를 기계적으로 대응한 문장과, 뒤 단서를 먼저 읽어야 이해되는 문장은 금지한다.
+- 자연스러운 완성 뜻은 입력의 naturalKo에 따로 있으므로 그대로 복제하지 않는다.
 
 corePatterns 규칙:
 - 실제 회화에서 덩어리로 재사용할 가치가 큰 표현만 1~4개 뽑는다.
@@ -303,13 +385,13 @@ errorPoints 규칙:
 
 중요 예시:
 입력: I barely made it to the airport on time, only to have my flight delayed.
-assemblyChunks: ["I barely", "made it to the airport", "on time,", "only to have my flight delayed."]
-orderGlosses: ["나는 간신히", "공항에 도착했는데", "제시간에,", "결국 비행기가 지연되는 일을 겪었다."]
+assemblyChunks: ["I barely", "made it to", "the airport", "on time,", "only to", "have my flight delayed."]
+orderGlosses: ["나는 가까스로", "도착했어요", "공항에", "제시간에,", "그런데 결국", "내 항공편이 지연됐죠."]
 corePatterns: ["make it to + 장소", "on time", "only to + 동사원형", "have + 목적어 + 과거분사"]
 
 입력: Did you leave work yet?
 assemblyChunks: ["Did", "you leave work yet?"]
-orderGlosses: ["과거에 그랬어?", "너 아직 퇴근 안 했어?"]
+orderGlosses: ["(과거 질문으로 시작)", "너는 벌써 퇴근했어?"]
 errorPoints: [{"type":"tense_auxiliary","correct":"Did","distractor":"Do","tip":"오늘의 한 번뿐인 퇴근 여부를 묻는 과거 상황이므로 Did를 씁니다."}]
 
 설명이나 마크다운 없이 스키마에 맞는 JSON만 반환한다.`;
@@ -380,6 +462,85 @@ function inputForModel(rows) {
     return rows.map(({ id, day, verb, naturalKo, english }) => ({ id, day, verb, naturalKo, english }));
 }
 
+function stableSeed(text) {
+    let hash = 0;
+    for (const character of String(text || '')) hash = ((hash * 31) + character.charCodeAt(0)) >>> 0;
+    return 20260819 + (hash % 100000);
+}
+
+function chunkQualityReasons(item) {
+    const chunks = Array.isArray(item?.assemblyChunks) ? item.assemblyChunks : [];
+    const glosses = Array.isArray(item?.orderGlosses) ? item.orderGlosses : [];
+    const determiners = new Set(['a', 'an', 'the', 'my', 'your', 'his', 'our', 'their', 'this', 'these', 'those']);
+    const connectors = new Set(['and', 'but', 'or']);
+    const prepositions = new Set(['to', 'at', 'in', 'on', 'for', 'with', 'from', 'by', 'of', 'about', 'after', 'before', 'into', 'over', 'under', 'through', 'without']);
+    const reasons = [];
+
+    chunks.slice(0, -1).forEach((chunk, index) => {
+        const words = String(chunk || '').toLowerCase().replace(/[^a-z'\s]/g, ' ').trim().split(/\s+/).filter(Boolean);
+        const last = words.at(-1);
+        if (determiners.has(last)) reasons.push(`${index + 1}번 청크가 한정사 ${last}에서 끝남`);
+        if (connectors.has(last) && !/^(yeah|yes|no|well|okay|ok|right)\s+(and|but|or)$/i.test(words.join(' '))) {
+            reasons.push(`${index + 1}번 청크가 연결어 ${last}에서 끝남`);
+        }
+        if (words.length === 1 && prepositions.has(words[0])) reasons.push(`${index + 1}번 청크가 전치사 하나뿐임`);
+        if (/^(yeah|yes|no|well|okay|ok|right|honestly|actually|sorry),\s+\S/i.test(chunk) && !/[.!?]["']?$/.test(chunk)) {
+            reasons.push(`${index + 1}번 청크가 담화표지와 뒤 구를 어색하게 합침`);
+        }
+    });
+    glosses.forEach((gloss, index) => {
+        const value = String(gloss || '').trim();
+        if (/^(뜻 확인|이어서|확인 필요|번역 필요)$/.test(value)) reasons.push(`${index + 1}번 어순 한국어가 임시 문구임`);
+        if (/살아있다\s+내|사람들로부터/.test(value)) reasons.push(`${index + 1}번 어순 한국어의 의미가 문맥과 어긋날 가능성이 큼`);
+    });
+    return reasons;
+}
+
+async function askQualityReview(items, repairContext = '') {
+    const input = items.map(item => ({
+        id: item.id,
+        naturalKo: item.naturalKo,
+        english: item.english,
+        assemblyChunks: item.assemblyChunks,
+        orderGlosses: item.orderGlosses,
+        reviewReasons: chunkQualityReasons(item)
+    }));
+    const response = await fetch(OLLAMA_URL, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+            model,
+            stream: false,
+            think: false,
+            keep_alive: '30m',
+            format: QUALITY_REVIEW_SCHEMA,
+            messages: [{
+                role: 'system',
+                content: `당신은 한국인 학습자를 위한 미국 영어 청크의 최종 교정자다.
+각 영어 원문은 절대로 고치지 말고 assemblyChunks만 다시 나눈다. 청크를 공백 하나로 연결하면 원문과 글자·문장부호가 정확히 같아야 한다.
+청크는 원어민이 처리하는 짧은 의미·문법·운율 단위로 보통 1~4단어, 자연스러운 결합 표현만 최대 5단어다.
+관사·소유한정사는 뒤 명사와, 전치사는 가능하면 목적어와, and/but/or는 뒤 병렬 요소나 절과 묶는다. 담화표지 뒤 쉼표는 경계로 삼는다. 구동사와 고정 표현은 최대한 보존한다.
+orderGlosses는 영어 청크와 정확히 1:1이며, 영어가 앞에서부터 펼치는 의미나 문법 기능을 짧고 이해 가능한 한국어로 쓴다. 한국어를 거꾸로 뒤집거나 단어를 기계적으로 대응하지 말고, 순서대로 읽을 때 의미가 계속 누적되게 한다. 직역 때문에 뜻이 바뀌면 안 되며 임시 문구를 쓰지 않는다.
+입력의 reviewReasons를 모두 해소하고 모든 입력 id를 한 번씩 반환한다. JSON만 반환한다.`
+            }, {
+                role: 'user',
+                content: `${repairContext ? `${repairContext}\n\n` : ''}${JSON.stringify(input)}`
+            }],
+            options: {
+                temperature: 0.1,
+                top_p: 0.9,
+                seed: stableSeed(`quality:${repairContext}:${JSON.stringify(input)}`),
+                num_ctx: 32768,
+                num_predict: 8000
+            }
+        })
+    });
+    if (!response.ok) throw new Error(`청크 품질 검토 실패: ${response.status} ${await response.text()}`);
+    const payload = await response.json();
+    const parsed = JSON.parse(payload.message?.content || '{}');
+    return parsed.items || [];
+}
+
 async function askModel(rows, repairContext = '') {
     const userContent = repairContext
         ? `${repairContext}\n\n아래 입력 전체를 규칙에 맞게 다시 반환하세요.\n${JSON.stringify(inputForModel(rows))}`
@@ -392,12 +553,19 @@ async function askModel(rows, repairContext = '') {
             model,
             stream: false,
             think: false,
+            keep_alive: '30m',
             format: OUTPUT_SCHEMA,
             messages: [
                 { role: 'system', content: SYSTEM_PROMPT },
                 { role: 'user', content: userContent }
             ],
-            options: { temperature: 0.15, top_p: 0.9, seed: 20260819 }
+            options: {
+                temperature: 0.2,
+                top_p: 0.9,
+                seed: stableSeed(userContent),
+                num_ctx: 32768,
+                num_predict: 12000
+            }
         })
     });
     if (!response.ok) throw new Error(`Ollama 요청 실패: ${response.status} ${await response.text()}`);
@@ -405,7 +573,174 @@ async function askModel(rows, repairContext = '') {
     const parsed = JSON.parse(payload.message?.content || '{}');
     process.stdout.write(`AI ${rows.length}문장: ${((Date.now() - startedAt) / 1000).toFixed(1)}초\n`);
     const sourcesById = new Map(rows.map(row => [row.id, row]));
-    return (parsed.items || []).map(item => normalizeGeneratedItem(sourcesById.get(item.id), item));
+    const normalized = (parsed.items || []).map(item => normalizeGeneratedItem(sourcesById.get(item.id), item));
+    return repairOverlongChunks(rows, normalized);
+}
+
+function splitGlossFallback(gloss, count) {
+    const words = String(gloss || '').trim().split(/\s+/).filter(Boolean);
+    if (count <= 1) return [String(gloss || '').trim() || '뜻 확인'];
+    if (words.length < count) {
+        return Array.from({ length: count }, (_, index) => index === 0 ? (String(gloss || '').trim() || '뜻 확인') : '이어서');
+    }
+
+    const result = [];
+    let cursor = 0;
+    for (let index = 0; index < count; index++) {
+        const remainingWords = words.length - cursor;
+        const remainingGroups = count - index;
+        const size = Math.ceil(remainingWords / remainingGroups);
+        result.push(words.slice(cursor, cursor + size).join(' '));
+        cursor += size;
+    }
+    return result;
+}
+
+function chooseChunkCut(words, remainingGroups) {
+    const maximumCut = Math.min(5, words.length - (remainingGroups - 1));
+    const minimumCut = Math.max(1, words.length - ((remainingGroups - 1) * 5));
+    const target = Math.round(words.length / remainingGroups);
+    const strongStarts = new Set(['and', 'but', 'or', 'because', 'if', 'when', 'while', 'although', 'though', 'that', 'what', 'which', 'who', 'where', 'only']);
+    const phraseStarts = new Set(['to', 'at', 'in', 'on', 'for', 'with', 'from', 'by', 'of', 'about', 'after', 'before', 'into', 'over', 'under', 'a', 'an', 'the', 'my', 'your', 'his', 'her', 'our', 'their', 'this', 'that', 'these', 'those']);
+    let best = minimumCut;
+    let bestScore = Number.NEGATIVE_INFINITY;
+
+    for (let cut = minimumCut; cut <= maximumCut; cut++) {
+        const next = String(words[cut] || '').toLowerCase().replace(/[^a-z']/g, '');
+        const previous = String(words[cut - 1] || '');
+        let score = -Math.abs(cut - target) * 2;
+        if (strongStarts.has(next)) score += 9;
+        else if (phraseStarts.has(next)) score += 5;
+        if (/[,:;.!?]["']?$/.test(previous)) score += 10;
+        if (cut >= 2 && cut <= 4) score += 2;
+        if (score > bestScore) {
+            best = cut;
+            bestScore = score;
+        }
+    }
+    return best;
+}
+
+function splitLongChunk(chunk, maximumWords = 5) {
+    const words = String(chunk || '').trim().split(/\s+/).filter(Boolean);
+    if (words.length <= maximumWords) return [String(chunk || '').trim()];
+    const groupCount = Math.ceil(words.length / maximumWords);
+    const result = [];
+    let remaining = [...words];
+
+    for (let group = groupCount; group > 1; group--) {
+        const cut = chooseChunkCut(remaining, group);
+        result.push(remaining.slice(0, cut).join(' '));
+        remaining = remaining.slice(cut);
+    }
+    result.push(remaining.join(' '));
+    return result;
+}
+
+function splitMandatoryBoundaries(chunk) {
+    const words = String(chunk || '').trim().split(/\s+/).filter(Boolean);
+    const commaStarters = new Set(['but', 'so', 'because', 'only', 'although', 'though', 'while', 'when', 'if', 'which', 'who']);
+    const parts = [];
+    let start = 0;
+
+    for (let index = 1; index < words.length; index++) {
+        const previous = words[index - 1];
+        const next = String(words[index] || '').toLowerCase().replace(/[^a-z']/g, '');
+        const sentenceEnded = /[.!?]["']?$/.test(previous);
+        const hardBoundary = /[;:]["']?$/.test(previous);
+        const commaClause = /,["']?$/.test(previous) && commaStarters.has(next);
+        if (sentenceEnded || hardBoundary || commaClause) {
+            parts.push(words.slice(start, index).join(' '));
+            start = index;
+        }
+    }
+    parts.push(words.slice(start).join(' '));
+    return parts.filter(Boolean);
+}
+
+function enforceChunkLimit(source, item) {
+    if (!source || !item || !Array.isArray(item.assemblyChunks)) return { item, changed: false };
+    const fixed = structuredClone(item);
+    const chunks = [];
+    const glosses = [];
+    let changed = false;
+
+    fixed.assemblyChunks.forEach((chunk, index) => {
+        const boundaryChunks = splitMandatoryBoundaries(chunk);
+        const splitChunks = boundaryChunks.flatMap(part => splitLongChunk(part, 5));
+        const splitGlosses = splitGlossFallback(fixed.orderGlosses?.[index], splitChunks.length);
+        if (splitChunks.length > 1) changed = true;
+        chunks.push(...splitChunks);
+        glosses.push(...splitGlosses);
+    });
+
+    fixed.assemblyChunks = chunks;
+    fixed.orderGlosses = glosses;
+    if (!Array.isArray(item.orderGlosses) || item.orderGlosses.length !== item.assemblyChunks.length) changed = true;
+    if (joinEnglishChunks(chunks) !== source.english) return { item, changed: false };
+    return { item: fixed, changed };
+}
+
+async function askFixedGlosses(rows, items) {
+    if (!items.length) return new Map();
+    const sourcesById = new Map(rows.map(row => [row.id, row]));
+    const input = items.map(item => ({
+        id: item.id,
+        naturalKo: sourcesById.get(item.id)?.naturalKo || '',
+        english: sourcesById.get(item.id)?.english || '',
+        assemblyChunks: item.assemblyChunks
+    }));
+    const userContent = JSON.stringify(input);
+    const response = await fetch(OLLAMA_URL, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+            model,
+            stream: false,
+            think: false,
+            keep_alive: '30m',
+            format: GLOSS_SCHEMA,
+            messages: [{
+                role: 'system',
+                content: '고정된 영어 청크마다 영어가 앞에서부터 펼치는 의미나 문법 기능을 한국어 단서로 1개씩 쓴다. 영어 청크를 바꾸거나 합치지 않는다. 자연스러운 한국어를 잘라 놓거나 거꾸로 뒤집지 말고, 단서를 순서대로 읽으면 의미가 계속 누적되게 한다. orderGlosses 개수는 assemblyChunks 개수와 반드시 같아야 한다. JSON만 반환한다.'
+            }, {
+                role: 'user',
+                content: userContent
+            }],
+            options: {
+                temperature: 0.1,
+                top_p: 0.9,
+                seed: stableSeed(`gloss:${userContent}`),
+                num_ctx: 32768,
+                num_predict: 6000
+            }
+        })
+    });
+    if (!response.ok) throw new Error(`한국어 어순 재작성 실패: ${response.status} ${await response.text()}`);
+    const payload = await response.json();
+    const parsed = JSON.parse(payload.message?.content || '{}');
+    return new Map((parsed.items || []).map(item => [item.id, item.orderGlosses]));
+}
+
+async function repairOverlongChunks(rows, items) {
+    const sourcesById = new Map(rows.map(row => [row.id, row]));
+    const fixedItems = items.map(item => enforceChunkLimit(sourcesById.get(item.id), item));
+    const changedItems = fixedItems.filter(result => result.changed).map(result => result.item);
+    if (!changedItems.length) return fixedItems.map(result => result.item);
+
+    try {
+        const glossesById = await askFixedGlosses(rows, changedItems);
+        changedItems.forEach(item => {
+            const glosses = glossesById.get(item.id);
+            if (Array.isArray(glosses) && glosses.length === item.assemblyChunks.length && glosses.every(Boolean)) {
+                item.orderGlosses = glosses.map(value => String(value).trim());
+            }
+        });
+        process.stdout.write(`긴 청크 자동 분할·의미 전개 단서 ${changedItems.length}문장\n`);
+    } catch (error) {
+        process.stdout.write(`긴 청크 의미 전개 단서는 임시 분할값 사용: ${error.message}\n`);
+    }
+    return fixedItems.map(result => result.item);
 }
 
 function normalizeGeneratedItem(source, item) {
@@ -413,6 +748,39 @@ function normalizeGeneratedItem(source, item) {
     const normalized = structuredClone(item);
     const chunks = normalized.assemblyChunks;
     const glosses = Array.isArray(normalized.orderGlosses) ? normalized.orderGlosses : [];
+    const patterns = Array.isArray(normalized.corePatterns)
+        ? normalized.corePatterns.map(value => String(value || '').trim()).filter(value => value && !/오늘|내일|어제/.test(value))
+        : [];
+    normalized.corePatterns = [...new Set(patterns)].slice(0, 4);
+    if (!normalized.corePatterns.length) {
+        const reusableChunk = chunks.find(chunk => chunk.split(/\s+/).filter(Boolean).length >= 2)
+            || chunks.slice(0, 2).join(' ')
+            || source.verb.toLowerCase();
+        normalized.corePatterns = [String(reusableChunk).replace(/[,.!?;:—–]+$/g, '').trim()];
+    }
+    const sourceWordCount = source.english.split(/\s+/).filter(Boolean).length;
+    if (sourceWordCount > 4 && normalized.corePatterns.every(pattern => !/[\s+/?]/.test(pattern))) {
+        const reusableChunk = chunks.find(chunk => chunk.split(/\s+/).filter(Boolean).length >= 2)
+            || chunks.slice(0, 2).join(' ');
+        if (reusableChunk) normalized.corePatterns.unshift(String(reusableChunk).replace(/[,.!?;:—–]+$/g, '').trim());
+        normalized.corePatterns = [...new Set(normalized.corePatterns)].slice(0, 4);
+    }
+
+    if (Array.isArray(normalized.errorPoints)) {
+        normalized.errorPoints = normalized.errorPoints.filter(point => {
+            if (!point || !ERROR_TYPES.includes(point.type)) return false;
+            if (!point.correct || !source.english.includes(point.correct)) return false;
+            if (!point.distractor || point.distractor === point.correct || !point.tip) return false;
+            const correct = String(point.correct).toLowerCase().replace(/[’‘]/g, "'");
+            if (point.type === 'article' && !/\b(a|an|the)\b/.test(correct)) return false;
+            if (point.type === 'plural' && !/\b(any|some|many|several|few|these|those|two|three|four|five|six|seven|eight|nine|ten)\b|\b[a-z]+s\b/.test(correct)) return false;
+            if (point.type === 'preposition' && !/\b(about|at|by|for|from|in|into|of|on|to|with|without)\b/.test(correct)) return false;
+            if (point.type === 'tense_auxiliary' && !/\b(am|is|are|was|were|be|been|being|do|does|did|have|has|had|can|could|will|would|should|may|might|must)(?:n't|'ve|'d|'ll|'re|'s)?\b/.test(correct)) return false;
+            return true;
+        }).slice(0, 3);
+    } else {
+        normalized.errorPoints = [];
+    }
 
     for (let index = chunks.length - 1; index > 0; index--) {
         if (!/^[.!?]$/.test(chunks[index])) continue;
@@ -443,14 +811,14 @@ function validateItem(source, generated) {
     const glosses = generated?.orderGlosses;
     const sourceWordCount = source.english.split(/\s+/).filter(Boolean).length;
     const minimumChunkCount = sourceWordCount <= 6 ? 1 : 2;
-    if (!Array.isArray(chunks) || chunks.length < minimumChunkCount || chunks.length > 6) {
-        errors.push(`assemblyChunks는 ${minimumChunkCount}~6개여야 함`);
+    if (!Array.isArray(chunks) || chunks.length < minimumChunkCount || chunks.length > 10) {
+        errors.push(`assemblyChunks는 ${minimumChunkCount}~10개여야 함`);
     } else {
         if (joinEnglishChunks(chunks) !== source.english) errors.push('청크 연결 결과가 영어 원문과 다름');
         chunks.forEach((chunk, index) => {
             if (!chunk || chunk.trim() !== chunk || /\s{2,}/.test(chunk)) errors.push(`${index + 1}번 청크 공백 오류`);
             const wordCount = chunk.split(/\s+/).filter(Boolean).length;
-            if (wordCount > 10) errors.push(`${index + 1}번 청크가 10단어를 넘음`);
+            if (wordCount > 5) errors.push(`${index + 1}번 청크가 5단어를 넘음`);
             const shortDiscourseChunk = wordCount <= 4 && /^(oh|hey|hi|hello|yes|no|yeah|well|okay|ok|please|sorry|thanks|thank you|good morning|good afternoon|good evening),/i.test(chunk);
             const shortParentheticalChunk = (wordCount <= 6 && /,\s+(though|however),["']?$/i.test(chunk))
                 || (wordCount <= 8 && /,\s+(though|however)[.!?]["']?$/i.test(chunk));
@@ -464,6 +832,8 @@ function validateItem(source, generated) {
     }
     if (!Array.isArray(glosses) || glosses.length !== chunks?.length || glosses.some(value => !String(value || '').trim())) {
         errors.push('orderGlosses가 영어 청크와 1:1로 대응하지 않음');
+    } else if (glosses.some(value => /^(뜻 확인|이어서|확인 필요|번역 필요)$/.test(String(value).trim()))) {
+        errors.push('orderGlosses에 임시 문구가 남아 있음');
     }
     if (!Array.isArray(generated?.corePatterns) || generated.corePatterns.length < 1 || generated.corePatterns.length > 4) {
         errors.push('corePatterns는 1~4개여야 함');
@@ -478,9 +848,6 @@ function validateItem(source, generated) {
         generated.errorPoints.forEach((point, index) => {
             if (!ERROR_TYPES.includes(point.type)) errors.push(`${index + 1}번 오류 유형이 잘못됨`);
             if (!point.correct || !source.english.includes(point.correct)) errors.push(`${index + 1}번 correct가 원문에 없음`);
-            if (point.correct && Array.isArray(chunks) && !chunks.some(chunk => chunk.includes(point.correct))) {
-                errors.push(`${index + 1}번 correct가 한 청크 안에 들어 있지 않음`);
-            }
             if (!point.distractor || point.distractor === point.correct) errors.push(`${index + 1}번 distractor가 잘못됨`);
             if (!point.tip) errors.push(`${index + 1}번 tip이 비어 있음`);
             const normalizedCorrect = String(point.correct || '').toLowerCase().replace(/[’‘]/g, "'");
@@ -509,7 +876,7 @@ async function generateBatch(rows) {
         if (!failures.length) return generated;
         const summary = failures.map(item => `${item.source.id}: ${item.errors.join(', ')}`).join('\n');
         process.stdout.write(`재생성 ${attempt}/4: ${failures.length}문장\n${summary}\n`);
-        const repaired = await askModel(failures.map(item => item.source), `직전 결과에 다음 검증 오류가 있었습니다.\n${summary}`);
+        const repaired = await askModel(failures.map(item => item.source), `교정 시도 ${attempt}. 직전 결과에 다음 검증 오류가 있었습니다.\n${summary}`);
         const repairedById = new Map(repaired.map(item => [item.id, item]));
         generated = rows.map(source => repairedById.get(source.id) || byId.get(source.id)).filter(Boolean);
     }
@@ -520,7 +887,7 @@ async function generateBatch(rows) {
         for (let attempt = 1; attempt <= 4 && validateItem(source, item).length; attempt++) {
             const errors = validateItem(source, item);
             process.stdout.write(`개별 교정 ${source.id} ${attempt}/4: ${errors.join(', ')}\n`);
-            const repaired = await askModel([source], `이 한 문장의 오류만 정확히 고치세요.\n${errors.join('\n')}`);
+            const repaired = await askModel([source], `개별 교정 시도 ${attempt}. 이 한 문장의 오류만 정확히 고치세요.\n${errors.join('\n')}`);
             item = repaired.find(candidate => candidate.id === source.id) || item;
         }
         if (item) finalById.set(source.id, item);
@@ -535,9 +902,75 @@ async function writeJsonAtomic(target, value) {
     await rename(temporary, target);
 }
 
+async function readMeaningFlowOverrides() {
+    const document = JSON.parse(await readFile(MEANING_FLOW_OVERRIDES_PATH, 'utf8'));
+    const failures = [];
+    const ids = new Set();
+
+    if (document.rulesVersion !== MEANING_FLOW_RULES_VERSION) {
+        failures.push(`의미 전개 규칙 버전 불일치: ${document.rulesVersion}/${MEANING_FLOW_RULES_VERSION}`);
+    }
+    if (!Array.isArray(document.items) || document.items.length !== 30) {
+        failures.push(`의미 전개 파일럿은 정확히 30문장이어야 함: ${document.items?.length || 0}`);
+    }
+
+    for (const item of document.items || []) {
+        if (!item?.id || ids.has(item.id)) failures.push(`${item?.id || 'id 없음'}: id 누락 또는 중복`);
+        ids.add(item?.id);
+        if (!item?.english) failures.push(`${item?.id}: 영어 원문 누락`);
+        if (!Array.isArray(item?.assemblyChunks) || !item.assemblyChunks.length) {
+            failures.push(`${item?.id}: 영어 청크 누락`);
+        }
+        if (!Array.isArray(item?.orderGlosses) || item.orderGlosses.length !== item.assemblyChunks?.length) {
+            failures.push(`${item?.id}: 의미 전개 단서가 영어 청크와 1:1이 아님`);
+        } else if (item.orderGlosses.some(value => !String(value || '').trim() || /^(뜻 확인|이어서|확인 필요|번역 필요)$/.test(String(value).trim()))) {
+            failures.push(`${item?.id}: 비어 있거나 임시 의미 전개 단서가 있음`);
+        }
+    }
+
+    if (failures.length) throw new Error(`의미 전개 편집 원본 검증 실패\n${failures.join('\n')}`);
+    return document;
+}
+
+async function applyMeaningFlowOverrides(content) {
+    const document = await readMeaningFlowOverrides();
+    const contentById = new Map(content.items.map(item => [item.id, item]));
+    const failures = [];
+    let applied = 0;
+
+    for (const override of document.items) {
+        const item = contentById.get(override.id);
+        if (!item) {
+            failures.push(`${override.id}: 전체 자료에서 문장을 찾을 수 없음`);
+            continue;
+        }
+        if (item.english !== override.english) {
+            failures.push(`${override.id}: 영어 원문이 편집 원본과 다름`);
+            continue;
+        }
+        if (JSON.stringify(item.assemblyChunks) !== JSON.stringify(override.assemblyChunks)) {
+            failures.push(`${override.id}: 영어 청크가 편집 원본과 다름`);
+            continue;
+        }
+
+        item.orderGlosses = override.orderGlosses.map(value => String(value).trim());
+        item.meaningFlow = {
+            rulesVersion: document.rulesVersion,
+            reviewStatus: document.reviewStatus || 'reviewed'
+        };
+        applied += 1;
+    }
+
+    if (failures.length) throw new Error(`의미 전개 병합 실패\n${failures.join('\n')}`);
+    content.meaningFlowRulesVersion = document.rulesVersion;
+    content.meaningFlowReviewCount = applied;
+    return content;
+}
+
 function assembleContent(rows, generatedById) {
     return {
         schemaVersion: 1,
+        chunkRulesVersion: CHUNK_RULES_VERSION,
         source: 'Core Verbs 50-day sentence set',
         generatorModel: model,
         reviewStatus: 'ai_draft',
@@ -562,8 +995,23 @@ function validateContent(content) {
         ids.add(item.id);
         const errors = validateItem(item, item);
         if (errors.length) failures.push(`${item.id}: ${errors.join(', ')}`);
+        if (item.meaningFlow) {
+            if (item.meaningFlow.rulesVersion !== content.meaningFlowRulesVersion) {
+                failures.push(`${item.id}: 의미 전개 규칙 버전 불일치`);
+            }
+            if (item.meaningFlow.reviewStatus !== 'reviewed') {
+                failures.push(`${item.id}: 의미 전개 검수 상태가 reviewed가 아님`);
+            }
+        }
     });
     if (content.total !== content.items.length) failures.push(`total 불일치: ${content.total}/${content.items.length}`);
+    const meaningFlowCount = content.items.filter(item => item.meaningFlow).length;
+    if (content.meaningFlowRulesVersion !== undefined && content.meaningFlowRulesVersion !== MEANING_FLOW_RULES_VERSION) {
+        failures.push(`전체 의미 전개 규칙 버전 불일치: ${content.meaningFlowRulesVersion}/${MEANING_FLOW_RULES_VERSION}`);
+    }
+    if (content.meaningFlowReviewCount !== undefined && content.meaningFlowReviewCount !== meaningFlowCount) {
+        failures.push(`의미 전개 검수 문장 수 불일치: ${content.meaningFlowReviewCount}/${meaningFlowCount}`);
+    }
     return failures;
 }
 
@@ -579,8 +1027,11 @@ async function runPilot(rows) {
 }
 
 async function runGenerate(rows) {
-    let cache = { model, items: [] };
+    let cache = { model, chunkRulesVersion: CHUNK_RULES_VERSION, items: [] };
     if (existsSync(CACHE_PATH)) cache = JSON.parse(await readFile(CACHE_PATH, 'utf8'));
+    if (cache.model !== model || cache.chunkRulesVersion !== CHUNK_RULES_VERSION) {
+        cache = { model, chunkRulesVersion: CHUNK_RULES_VERSION, items: [] };
+    }
     const sourcesById = new Map(rows.map(row => [row.id, row]));
     const normalizedCached = (cache.items || []).map(item => {
         const source = sourcesById.get(item.id);
@@ -604,16 +1055,64 @@ async function runGenerate(rows) {
         const batch = pending.slice(index, index + batchSize);
         const generated = await generateBatch(batch);
         generated.forEach(item => generatedById.set(item.id, item));
-        cache = { model, items: [...generatedById.values()] };
+        cache = { model, chunkRulesVersion: CHUNK_RULES_VERSION, items: [...generatedById.values()] };
         await writeJsonAtomic(CACHE_PATH, cache);
         process.stdout.write(`진행 ${Math.min(index + batch.length, pending.length)}/${pending.length} (전체 ${generatedById.size}/${rows.length})\n`);
     }
 
-    const content = assembleContent(rows, generatedById);
+    const content = await applyMeaningFlowOverrides(assembleContent(rows, generatedById));
     const failures = validateContent(content);
     if (failures.length) throw new Error(`전체 자료 검증 실패 ${failures.length}건\n${failures.slice(0, 30).join('\n')}`);
     await writeJsonAtomic(OUTPUT_PATH, content);
     process.stdout.write(`완료: ${content.items.length}문장 저장, 자동 검사 통과\n`);
+}
+
+async function runQualityReview() {
+    const content = JSON.parse(await readFile(OUTPUT_PATH, 'utf8'));
+    const candidates = content.items.filter(item => item.reviewStatus !== 'reviewed' && chunkQualityReasons(item).length > 0);
+    const reviewedById = new Map();
+    process.stdout.write(`청크 품질 2차 검토 대상: ${candidates.length}문장\n`);
+
+    for (let index = 0; index < candidates.length; index += batchSize) {
+        const batch = candidates.slice(index, index + batchSize);
+        let accepted = null;
+        let failureSummary = '';
+
+        for (let attempt = 1; attempt <= 3 && !accepted; attempt++) {
+            const returned = await askQualityReview(batch, failureSummary && `직전 결과의 문제를 모두 고치세요.\n${failureSummary}`);
+            const returnedById = new Map(returned.map(item => [item.id, item]));
+            const failures = [];
+            const merged = batch.map(source => {
+                const candidate = returnedById.get(source.id);
+                if (!candidate) {
+                    failures.push(`${source.id}: 결과 누락`);
+                    return source;
+                }
+                const next = {
+                    ...source,
+                    assemblyChunks: candidate.assemblyChunks,
+                    orderGlosses: candidate.orderGlosses
+                };
+                const errors = [...validateItem(source, next), ...chunkQualityReasons(next)];
+                if (errors.length) failures.push(`${source.id}: ${errors.join(', ')}`);
+                return next;
+            });
+            if (!failures.length && returnedById.size === batch.length) accepted = merged;
+            else failureSummary = failures.join('\n');
+        }
+
+        if (!accepted) throw new Error(`청크 품질 2차 검토 실패\n${failureSummary}`);
+        accepted.forEach(item => reviewedById.set(item.id, item));
+        process.stdout.write(`청크 품질 진행 ${Math.min(index + batch.length, candidates.length)}/${candidates.length}\n`);
+    }
+
+    content.items = content.items.map(item => reviewedById.get(item.id) || item);
+    content.qualityReviewModel = model;
+    await applyMeaningFlowOverrides(content);
+    const failures = validateContent(content);
+    if (failures.length) throw new Error(`2차 검토 후 전체 자료 검증 실패\n${failures.join('\n')}`);
+    await writeJsonAtomic(OUTPUT_PATH, content);
+    process.stdout.write(`청크 품질 2차 검토 완료: ${reviewedById.size}문장 교정\n`);
 }
 
 async function runValidate() {
@@ -623,8 +1122,19 @@ async function runValidate() {
     process.stdout.write(`검증 통과: ${content.items.length}문장\n`);
 }
 
-const rows = mode === 'validate' ? [] : await loadSourceRows();
+async function runApplyMeaningFlow() {
+    const content = JSON.parse(await readFile(OUTPUT_PATH, 'utf8'));
+    await applyMeaningFlowOverrides(content);
+    const failures = validateContent(content);
+    if (failures.length) throw new Error(`의미 전개 병합 후 검증 실패\n${failures.join('\n')}`);
+    await writeJsonAtomic(OUTPUT_PATH, content);
+    process.stdout.write(`의미 전개 파일럿 적용 완료: ${content.meaningFlowReviewCount}문장\n`);
+}
+
+const rows = ['pilot', 'generate'].includes(mode) ? await loadSourceRows() : [];
 if (mode === 'pilot') await runPilot(rows);
 else if (mode === 'generate') await runGenerate(rows);
+else if (mode === 'quality') await runQualityReview();
+else if (mode === 'apply-meaning-flow') await runApplyMeaningFlow();
 else if (mode === 'validate') await runValidate();
 else throw new Error(`지원하지 않는 mode: ${mode}`);

@@ -4,6 +4,7 @@
 
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSR1wby3k5QhlAL8f8MeH-Ni1qjGgRMu8ROHDoPCKci-GYrbpx1DzTsAvcr_l5qBcemui93D4cqMLa0/pub?output=tsv";
 const CONTENT_URL = './data/learning-content.json';
+const meaningFlowPilotMode = new URLSearchParams(window.location.search).get('pilot') === 'meaning-flow';
 const STORAGE_KEY = 'coreVerbs_Memory_v1';
 const Learning = window.CoreVerbsLearning;
 
@@ -18,8 +19,13 @@ let currentIndex = 0;
 let availableVoices = [];
 let iosResumeTimer = null; // iOS Speech Synthesis 중간 무음 버그 방지 타이머
 let currentPractice = null;
+let selectedPracticeIds = [];
+let currentPracticeResult = null;
+let practiceUsedHint = false;
 let selectedMistakeIndexes = [];
 let wordOrderMistake = false;
+let selectedErrorTypes = [];
+let errorTypesManuallyEdited = false;
 let currentAssessmentRecorded = false;
 let sessionRetryCounts = {};
 
@@ -460,6 +466,7 @@ function mapStoredContent(item) {
         en: item.english || '',
         assemblyChunks: Array.isArray(item.assemblyChunks) ? item.assemblyChunks : [],
         orderGlosses: Array.isArray(item.orderGlosses) ? item.orderGlosses : [],
+        meaningFlow: item.meaningFlow && typeof item.meaningFlow === 'object' ? { ...item.meaningFlow } : null,
         corePatterns: Array.isArray(item.corePatterns) ? item.corePatterns : [],
         errorPoints: Array.isArray(item.errorPoints) ? item.errorPoints : [],
         reviewStatus: item.reviewStatus || 'ai_draft',
@@ -526,9 +533,22 @@ async function fetchDatabase() {
         if (!Array.isArray(content.items) || content.items.length === 0) throw new Error('학습 자료가 비어 있습니다.');
         db = content.items.map(mapStoredContent).filter(card => card.en && card.ko);
         if (db.length !== content.items.length) throw new Error('일부 학습 자료의 영어 또는 한국어가 비어 있습니다.');
+        if (meaningFlowPilotMode) {
+            db = db.filter(card => card.meaningFlow?.reviewStatus === 'reviewed');
+            if (db.length !== 30) throw new Error(`의미 전개 파일럿 문장 수가 잘못되었습니다: ${db.length}/30`);
+        }
         init();
     } catch (error) {
         console.warn('저장된 학습 자료를 불러오지 못해 시트 자료를 사용합니다.', error);
+        if (meaningFlowPilotMode) {
+            console.error('의미 전개 파일럿은 검수된 정적 자료가 필요합니다.', error);
+            document.getElementById('verb-badge').innerText = '파일럿 오류';
+            document.getElementById('korean').innerText = '검수된 30문장 파일럿을 불러오지 못했습니다.\n잠시 후 새로고침해 주세요.';
+            document.getElementById('order-guide').style.display = 'none';
+            document.getElementById('natural-answer').style.display = 'block';
+            document.getElementById('hint').style.display = 'none';
+            return;
+        }
         try {
             await fetchSheetFallback();
             init();
@@ -651,7 +671,7 @@ function init() {
         selectedReview.push(...remainingDue.slice(0, targetReview - selectedReview.length));
     }
 
-    todayCards = [...selectedNew, ...selectedReview];
+    todayCards = meaningFlowPilotMode ? [...db] : [...selectedNew, ...selectedReview];
 
     if (todayCards.length === 0) {
         showCompletionScreen();
@@ -738,8 +758,13 @@ function updateDashboardStats() {
  */
 function loadCard() {
     currentPractice = null;
+    selectedPracticeIds = [];
+    currentPracticeResult = null;
+    practiceUsedHint = false;
     selectedMistakeIndexes = [];
     wordOrderMistake = false;
+    selectedErrorTypes = [];
+    errorTypesManuallyEdited = false;
     currentAssessmentRecorded = false;
 
     const currentIdxEl = document.getElementById('current-idx');
@@ -784,6 +809,7 @@ function loadCard() {
     const orderGuide = document.getElementById('order-guide');
     const orderGlosses = document.getElementById('order-glosses');
     const englishEl = document.getElementById('english');
+    const englishAnswerLabel = document.getElementById('english-answer-label');
     const hintEl = document.getElementById('hint');
     const cardActionRow = document.getElementById('card-action-row');
     const actionBtnEl = document.getElementById('action-buttons');
@@ -793,6 +819,12 @@ function loadCard() {
     const showAnswerBtn = document.getElementById('btn-show-answer');
     const nextBtn = document.getElementById('btn-next');
     const cardEl = document.getElementById('card');
+    const practiceTitle = document.querySelector('#practice-panel .practice-title');
+    const practiceSubtitle = document.getElementById('practice-subtitle');
+    const practiceWorkspace = document.getElementById('practice-workspace');
+    const practiceSlots = document.getElementById('practice-slots');
+    const practiceBank = document.getElementById('practice-bank');
+    const practiceSlotsLabel = document.getElementById('practice-slots-label');
 
     if (koreanEl) koreanEl.innerText = card.ko;
     if (naturalAnswer) naturalAnswer.style.display = 'none';
@@ -802,10 +834,9 @@ function loadCard() {
         const glosses = Array.isArray(card.orderGlosses) && card.orderGlosses.length
             ? card.orderGlosses
             : [card.ko];
-        glosses.forEach((gloss, index) => {
+        glosses.forEach(gloss => {
             const chip = document.createElement('span');
             chip.className = 'order-gloss-chip';
-            chip.dataset.chunk = String(index + 1);
             chip.innerText = gloss;
             orderGlosses.appendChild(chip);
         });
@@ -814,22 +845,35 @@ function loadCard() {
         englishEl.innerHTML = '';
         englishEl.style.display = 'none';
     }
+    if (englishAnswerLabel) englishAnswerLabel.style.display = 'none';
     
     if (hintEl) {
-        hintEl.innerText = '한국어 덩어리를 영어 어순으로 읽고 화면을 터치하세요';
-        hintEl.style.display = 'block';
+        hintEl.style.display = 'none';
     }
-    if (practicePanel) practicePanel.style.display = 'none';
+    if (practicePanel) practicePanel.style.display = 'block';
+    if (practiceTitle) practiceTitle.innerText = '🧠 영어 문장을 먼저 떠올려 보세요';
+    if (practiceSubtitle) practiceSubtitle.innerText = '의미 단서를 앞에서부터 따라가며 영어 문장을 먼저 말해 보세요.';
+    if (practiceWorkspace) practiceWorkspace.style.display = 'none';
+    if (practiceSlots) practiceSlots.innerHTML = '';
+    if (practiceBank) practiceBank.innerHTML = '';
+    if (practiceSlotsLabel) practiceSlotsLabel.innerText = '내가 만든 문장 · 청크를 고르면 단어별로 펼쳐져요';
     if (mistakeReview) mistakeReview.style.display = 'none';
     if (corePhraseBox) corePhraseBox.style.display = 'none';
     if (cardActionRow) cardActionRow.style.display = 'none';
-    if (actionBtnEl) actionBtnEl.style.display = 'none';
-    if (showAnswerBtn) showAnswerBtn.style.display = 'none';
+    if (actionBtnEl) actionBtnEl.style.display = 'flex';
+    if (showAnswerBtn) {
+        showAnswerBtn.innerText = '영어 청크로 확인';
+        showAnswerBtn.style.display = 'inline-flex';
+    }
     if (nextBtn) nextBtn.style.display = 'none';
-    if (cardEl) cardEl.onclick = startPractice;
+    if (cardEl) cardEl.onclick = null;
+    document.querySelectorAll('.self-check-btn').forEach(button => {
+        button.disabled = button.id === 'btn-save-mistakes';
+    });
 }
 /**
- * 🧠 한국어 어순 청크를 단서로 먼저 회상하고, 준비되면 정답을 확인한다.
+ * 🧩 한국어 어순대로 떠올린 뒤, 영어 청크를 골라 빈칸에 조립한다.
+ * 선택된 청크는 즉시 단어별 버튼으로 펼쳐져 실제로 틀린 단어를 표시할 수 있다.
  */
 function startPractice() {
     if (currentPractice || currentAssessmentRecorded) return;
@@ -838,23 +882,33 @@ function startPractice() {
 
     if (availableVoices.length === 0) populateVoiceList();
     currentPractice = Learning.buildPracticeQuestion(card);
-    currentPractice.reviewChunks = Learning.buildReviewTokens(card);
+    currentPractice.reviewChunks = Learning.buildReviewTokens(card, currentPractice.targetChunks);
+    selectedPracticeIds = [];
+    currentPracticeResult = null;
+    practiceUsedHint = false;
     selectedMistakeIndexes = [];
     wordOrderMistake = false;
+    selectedErrorTypes = [];
+    errorTypesManuallyEdited = false;
 
     const hintEl = document.getElementById('hint');
     const practicePanel = document.getElementById('practice-panel');
+    const practiceWorkspace = document.getElementById('practice-workspace');
     const practiceSubtitle = document.getElementById('practice-subtitle');
+    const practiceSlotsLabel = document.getElementById('practice-slots-label');
     const actionButtons = document.getElementById('action-buttons');
     const showAnswerBtn = document.getElementById('btn-show-answer');
+    const practiceTitle = document.querySelector('#practice-panel .practice-title');
 
     if (hintEl) hintEl.style.display = 'none';
     if (practicePanel) practicePanel.style.display = 'block';
-    const practiceTitle = document.querySelector('#practice-panel .practice-title');
-    if (practiceTitle) practiceTitle.innerText = '🧠 영어 문장을 먼저 떠올려 보세요';
-    if (practiceSubtitle) practiceSubtitle.innerText = '머릿속으로 말해 본 뒤 정답을 열고, 실제로 틀린 부분만 직접 체크합니다.';
-    if (actionButtons) actionButtons.style.display = 'flex';
-    if (showAnswerBtn) showAnswerBtn.style.display = 'inline-flex';
+    if (practiceWorkspace) practiceWorkspace.style.display = 'block';
+    if (practiceTitle) practiceTitle.innerText = '🧩 영어 덩어리를 어순대로 고르세요';
+    if (practiceSubtitle) practiceSubtitle.innerText = '청크를 누르면 빈칸에서 단어별 칸으로 펼쳐집니다. 떠올렸던 것과 다른 단어는 다시 누르세요.';
+    if (practiceSlotsLabel) practiceSlotsLabel.innerText = '내가 만든 문장 · 단어를 누르면 틀린 부분으로 표시돼요';
+    if (actionButtons) actionButtons.style.display = 'none';
+    if (showAnswerBtn) showAnswerBtn.style.display = 'none';
+    renderPracticeSelection();
 }
 
 // 기존 인라인 호출이나 저장된 화면과의 호환을 유지한다.
@@ -862,10 +916,164 @@ function showAnswer() {
     startPractice();
 }
 
+function createMistakeWordButton(token, className) {
+    const word = document.createElement('button');
+    const selected = selectedMistakeIndexes.includes(token.index);
+    word.type = 'button';
+    word.className = className;
+    word.innerText = token.text;
+    word.setAttribute('aria-pressed', selected ? 'true' : 'false');
+    word.setAttribute('aria-label', `${token.text}, 틀렸던 단어로 표시`);
+    if (selected) word.classList.add('selected');
+    word.disabled = currentAssessmentRecorded;
+    word.onclick = (event) => {
+        event.stopPropagation();
+        toggleMistakeWord(token.index);
+    };
+    return word;
+}
+
+function renderPracticeSelection() {
+    if (!currentPractice) return;
+    const slotsEl = document.getElementById('practice-slots');
+    const bankEl = document.getElementById('practice-bank');
+    const bankLabel = document.getElementById('practice-bank-label');
+    const controlsEl = document.querySelector('#practice-workspace .practice-controls');
+    const checkBtn = document.getElementById('btn-practice-check');
+    const resetBtn = document.getElementById('btn-practice-reset');
+    const revealBtn = document.getElementById('btn-practice-reveal');
+    if (!slotsEl || !bankEl) return;
+
+    const answerVisible = Boolean(currentPracticeResult);
+    slotsEl.innerHTML = '';
+    const practiceSlots = Learning.buildPracticeSlots(
+        currentPractice,
+        currentPractice.reviewChunks,
+        selectedPracticeIds
+    );
+    const selectedSlots = practiceSlots.filter(slot => slot.id);
+    if (selectedSlots.length === 0) {
+        const emptyGuide = document.createElement('span');
+        emptyGuide.className = 'practice-empty-guide';
+        emptyGuide.innerText = '청크를 고르면 여기에 문장이 만들어져요';
+        slotsEl.appendChild(emptyGuide);
+    }
+    selectedSlots.forEach(slot => {
+
+        const chunkEl = document.createElement('div');
+        chunkEl.className = 'practice-selected-chunk';
+        if (answerVisible) {
+            chunkEl.classList.add(currentPracticeResult.correct ? 'correct' : 'corrected');
+        }
+
+        slot.tokens.forEach(token => {
+            chunkEl.appendChild(createMistakeWordButton(token, 'practice-slot-word'));
+        });
+
+        if (!answerVisible && !currentAssessmentRecorded) {
+            const removeButton = document.createElement('button');
+            removeButton.type = 'button';
+            removeButton.className = 'practice-chunk-remove';
+            removeButton.innerText = '×';
+            removeButton.setAttribute('aria-label', '이 청크 되돌리기');
+            removeButton.onclick = (event) => {
+                event.stopPropagation();
+                removePracticeChunk(slot.slotIndex);
+            };
+            chunkEl.appendChild(removeButton);
+        }
+        slotsEl.appendChild(chunkEl);
+    });
+
+    bankEl.innerHTML = '';
+    currentPractice.bank
+        .filter(entry => !entry.isDistractor && !selectedPracticeIds.includes(entry.id))
+        .forEach(entry => {
+            const chip = document.createElement('button');
+            chip.type = 'button';
+            chip.className = 'practice-chip';
+            chip.innerText = entry.text;
+            chip.disabled = answerVisible || selectedPracticeIds.length >= currentPractice.targetIds.length;
+            chip.onclick = (event) => {
+                event.stopPropagation();
+                selectPracticeChunk(entry.id);
+            };
+            bankEl.appendChild(chip);
+        });
+
+    if (bankLabel) bankLabel.style.display = answerVisible ? 'none' : 'block';
+    bankEl.style.display = answerVisible ? 'none' : 'flex';
+    if (controlsEl) controlsEl.style.display = answerVisible ? 'none' : 'flex';
+    if (checkBtn) checkBtn.disabled = selectedPracticeIds.length !== currentPractice.targetIds.length;
+    if (resetBtn) resetBtn.disabled = selectedPracticeIds.length === 0;
+    if (revealBtn) revealBtn.disabled = answerVisible;
+}
+
+function selectPracticeChunk(id) {
+    if (!currentPractice || currentPracticeResult || currentAssessmentRecorded) return;
+    if (selectedPracticeIds.length >= currentPractice.targetIds.length) return;
+    if (selectedPracticeIds.includes(id)) return;
+    const entry = currentPractice.bank.find(item => item.id === id && !item.isDistractor);
+    if (!entry) return;
+    selectedPracticeIds.push(id);
+    renderPracticeSelection();
+}
+
+function clearMistakesForPracticeChunks(ids) {
+    if (!currentPractice || !Array.isArray(ids) || ids.length === 0) return;
+    const removedIndexes = new Set();
+    ids.forEach(id => {
+        const entry = currentPractice.bank.find(item => item.id === id && !item.isDistractor);
+        const reviewChunk = Number.isInteger(entry?.targetIndex)
+            ? currentPractice.reviewChunks?.[entry.targetIndex]
+            : null;
+        (reviewChunk?.tokens || []).forEach(token => removedIndexes.add(token.index));
+    });
+    selectedMistakeIndexes = selectedMistakeIndexes.filter(index => !removedIndexes.has(index));
+    selectedErrorTypes = [];
+    errorTypesManuallyEdited = false;
+}
+
+function removePracticeChunk(slotIndex) {
+    if (!currentPractice || currentPracticeResult || currentAssessmentRecorded) return;
+    const [removedId] = selectedPracticeIds.splice(slotIndex, 1);
+    clearMistakesForPracticeChunks([removedId]);
+    renderPracticeSelection();
+}
+
+function resetPracticeSelection() {
+    if (!currentPractice || currentPracticeResult || currentAssessmentRecorded) return;
+    clearMistakesForPracticeChunks(selectedPracticeIds);
+    selectedPracticeIds = [];
+    renderPracticeSelection();
+}
+
+function checkPracticeAnswer() {
+    if (!currentPractice || currentPracticeResult || currentAssessmentRecorded) return;
+    if (selectedPracticeIds.length !== currentPractice.targetIds.length) return;
+    currentPracticeResult = Learning.evaluatePractice(currentPractice, selectedPracticeIds);
+    if (!currentPracticeResult.correct) {
+        wordOrderMistake = true;
+        selectedPracticeIds = [...currentPractice.targetIds];
+    }
+    renderPracticeSelection();
+    revealPracticeAnswer();
+}
+
 function revealAnswerAsReview() {
     if (currentAssessmentRecorded) return;
     if (!currentPractice) startPractice();
-    if (!currentPractice) return;
+    if (!currentPractice || currentPracticeResult) return;
+    practiceUsedHint = true;
+    currentPracticeResult = {
+        correct: false,
+        skipped: true,
+        errorTypes: ['recall'],
+        errorLabel: Learning.ERROR_LABELS.recall,
+        tip: '정답을 먼저 확인했습니다.'
+    };
+    selectedPracticeIds = [...currentPractice.targetIds];
+    renderPracticeSelection();
     revealPracticeAnswer();
 }
 
@@ -880,20 +1088,8 @@ function renderEnglishReview() {
         const chunkEl = document.createElement('span');
         chunkEl.className = 'english-chunk';
         chunkEl.dataset.chunk = String(chunkIndex + 1);
-
         chunk.tokens.forEach(token => {
-            const word = document.createElement('button');
-            word.type = 'button';
-            word.className = 'mistake-word';
-            word.innerText = token.text;
-            word.setAttribute('aria-pressed', selectedMistakeIndexes.includes(token.index) ? 'true' : 'false');
-            if (selectedMistakeIndexes.includes(token.index)) word.classList.add('selected');
-            word.disabled = currentAssessmentRecorded;
-            word.onclick = (event) => {
-                event.stopPropagation();
-                toggleMistakeWord(token.index);
-            };
-            chunkEl.appendChild(word);
+            chunkEl.appendChild(createMistakeWordButton(token, 'mistake-word'));
         });
         englishEl.appendChild(chunkEl);
     });
@@ -907,6 +1103,9 @@ function toggleMistakeWord(index) {
         selectedMistakeIndexes.push(index);
     }
     selectedMistakeIndexes.sort((a, b) => a - b);
+    selectedErrorTypes = [];
+    errorTypesManuallyEdited = false;
+    renderPracticeSelection();
     renderEnglishReview();
     updateMistakeReview();
 }
@@ -914,6 +1113,28 @@ function toggleMistakeWord(index) {
 function toggleWordOrderMistake() {
     if (currentAssessmentRecorded) return;
     wordOrderMistake = !wordOrderMistake;
+    updateMistakeReview();
+}
+
+function getReportedErrorTypes(classification = getCurrentMistakeClassification()) {
+    const automaticTypes = classification.errorTypes.filter(type => type !== 'word_order');
+    const reported = errorTypesManuallyEdited ? [...selectedErrorTypes] : automaticTypes;
+    if (wordOrderMistake && !reported.includes('word_order')) reported.push('word_order');
+    return [...new Set(reported)];
+}
+
+function toggleReportedErrorType(type) {
+    if (currentAssessmentRecorded || selectedMistakeIndexes.length === 0) return;
+    const classification = getCurrentMistakeClassification();
+    if (!errorTypesManuallyEdited) {
+        selectedErrorTypes = classification.errorTypes.filter(value => value !== 'word_order');
+        errorTypesManuallyEdited = true;
+    }
+    if (selectedErrorTypes.includes(type)) {
+        selectedErrorTypes = selectedErrorTypes.filter(value => value !== type);
+    } else {
+        selectedErrorTypes.push(type);
+    }
     updateMistakeReview();
 }
 
@@ -928,6 +1149,8 @@ function updateMistakeReview() {
     const saveButton = document.getElementById('btn-save-mistakes');
     const orderButton = document.getElementById('btn-word-order');
     const classification = getCurrentMistakeClassification();
+    const reportedTypes = getReportedErrorTypes(classification);
+    const reportedWordTypes = reportedTypes.filter(type => type !== 'word_order');
 
     if (summary) {
         summary.innerHTML = '';
@@ -939,53 +1162,102 @@ function updateMistakeReview() {
             classification.mistakes.forEach(mistake => {
                 const chip = document.createElement('span');
                 chip.className = 'mistake-summary-chip';
-                chip.innerText = `${mistake.text} · ${Learning.ERROR_LABELS[mistake.type]}`;
+                chip.innerText = mistake.type === 'word_order'
+                    ? `${mistake.text} · ${Learning.ERROR_LABELS.word_order}`
+                    : `${mistake.text} · 자동 제안: ${Learning.ERROR_LABELS[mistake.type]}`;
                 summary.appendChild(chip);
             });
+            const reportedChip = document.createElement('span');
+            reportedChip.className = 'mistake-summary-chip reported-types';
+            const reportedLabel = reportedTypes.length
+                ? reportedTypes.map(type => Learning.ERROR_LABELS[type]).join(' · ')
+                : '오류 종류를 선택하세요';
+            reportedChip.innerText = `선택한 오류 전체 유형: ${reportedLabel}`;
+            summary.appendChild(reportedChip);
         }
     }
-    if (saveButton) saveButton.disabled = currentAssessmentRecorded || classification.mistakes.length === 0;
+    const selectedWordsNeedType = selectedMistakeIndexes.length > 0 && reportedWordTypes.length === 0;
+    if (saveButton) saveButton.disabled = currentAssessmentRecorded
+        || classification.mistakes.length === 0
+        || reportedTypes.length === 0
+        || selectedWordsNeedType;
     if (orderButton) {
         orderButton.classList.toggle('selected', wordOrderMistake);
         orderButton.setAttribute('aria-pressed', wordOrderMistake ? 'true' : 'false');
         orderButton.disabled = currentAssessmentRecorded;
     }
+    document.querySelectorAll('[data-error-type]').forEach(button => {
+        const type = button.dataset.errorType;
+        button.classList.toggle('selected', reportedTypes.includes(type));
+        button.setAttribute('aria-pressed', reportedTypes.includes(type) ? 'true' : 'false');
+        button.disabled = currentAssessmentRecorded || selectedMistakeIndexes.length === 0;
+    });
 }
 
-function finishSelfAssessment(result, errorTypes, details, headline, usedHint = false) {
+function finishSelfAssessment(result, errorTypes, details, headline, usedHint = practiceUsedHint) {
     if (currentAssessmentRecorded) return;
     const scheduleMessage = recordAssessment(result, errorTypes, usedHint, null, details);
+    renderPracticeSelection();
     renderEnglishReview();
     updateMistakeReview();
 
     const resultTip = document.getElementById('practice-result-tip');
     const nextBtn = document.getElementById('btn-next');
+    const actionButtons = document.getElementById('action-buttons');
     const selfCheckButtons = document.querySelectorAll('.self-check-btn');
     selfCheckButtons.forEach(button => { button.disabled = true; });
     if (resultTip) resultTip.innerText = `${headline} ${scheduleMessage}`;
+    if (actionButtons) actionButtons.style.display = 'flex';
     if (nextBtn) nextBtn.style.display = 'inline-flex';
 }
 
 function saveSelectedMistakes() {
     const classification = getCurrentMistakeClassification();
-    if (!classification.mistakes.length) return;
+    const reportedTypes = getReportedErrorTypes(classification);
+    const reportedWordTypes = reportedTypes.filter(type => type !== 'word_order');
+    if (!classification.mistakes.length || !reportedTypes.length) return;
+    if (selectedMistakeIndexes.length > 0 && reportedWordTypes.length === 0) return;
+    const wordMistakeCount = classification.mistakes.filter(mistake => mistake.type !== 'word_order').length;
+    const details = classification.mistakes.map(mistake => {
+        const reportedDetailTypes = mistake.type === 'word_order'
+            ? ['word_order']
+            : (errorTypesManuallyEdited ? reportedWordTypes : [mistake.type]);
+        const hasSingleManualMapping = errorTypesManuallyEdited
+            && wordMistakeCount === 1
+            && reportedWordTypes.length === 1
+            && mistake.type !== 'word_order';
+        return {
+            ...mistake,
+            suggestedType: mistake.type,
+            type: hasSingleManualMapping ? reportedWordTypes[0] : mistake.type,
+            reportedTypes: reportedDetailTypes
+        };
+    });
     finishSelfAssessment(
         'X',
-        classification.errorTypes,
-        classification.mistakes,
-        `${classification.errorTypes.map(type => Learning.ERROR_LABELS[type]).join(' · ')} 오류로 기록했습니다.`
+        reportedTypes,
+        details,
+        `${reportedTypes.map(type => Learning.ERROR_LABELS[type]).join(' · ')} 오류로 기록했습니다.`
     );
 }
 
 function markNoMistakes() {
     selectedMistakeIndexes = [];
-    wordOrderMistake = false;
-    finishSelfAssessment('O', [], [], '틀린 곳 없음으로 기록했습니다.');
+    selectedErrorTypes = [];
+    errorTypesManuallyEdited = false;
+    if (wordOrderMistake) {
+        const details = [{ start: null, end: null, text: '문장 어순', type: 'word_order' }];
+        finishSelfAssessment('X', ['word_order'], details, '단어 오류는 없지만 어순 오류는 기록했습니다.');
+        return;
+    }
+    finishSelfAssessment('O', [], [], '단어 오류 없음으로 기록했습니다.');
 }
 
 function markRecallFailure() {
     selectedMistakeIndexes = [];
     wordOrderMistake = false;
+    selectedErrorTypes = [];
+    errorTypesManuallyEdited = false;
     const details = [{ start: null, end: null, text: '문장 전체', type: 'recall' }];
     finishSelfAssessment('X', ['recall'], details, '문장 전체 회상 실패로 기록했습니다.', true);
 }
@@ -994,6 +1266,7 @@ function revealPracticeAnswer() {
     const card = todayCards[currentIndex];
     if (!card || !currentPractice) return;
     const englishEl = document.getElementById('english');
+    const englishAnswerLabel = document.getElementById('english-answer-label');
     const naturalAnswer = document.getElementById('natural-answer');
     const mistakeReview = document.getElementById('mistake-review');
     const corePhraseBox = document.getElementById('core-phrase-box');
@@ -1006,9 +1279,18 @@ function revealPracticeAnswer() {
     const cardEl = document.getElementById('card');
     const practiceTitle = document.querySelector('#practice-panel .practice-title');
     const practiceSubtitle = document.getElementById('practice-subtitle');
+    const practiceSlotsLabel = document.getElementById('practice-slots-label');
 
+    if (selectedPracticeIds.length !== currentPractice.targetIds.length) {
+        selectedPracticeIds = [...currentPractice.targetIds];
+    }
+    renderPracticeSelection();
     renderEnglishReview();
-    if (englishEl) englishEl.style.display = 'flex';
+    if (englishAnswerLabel) {
+        englishAnswerLabel.innerText = '영어 정답 · 위 단어 칸에서 실제로 틀린 단어를 다시 누르세요';
+        englishAnswerLabel.style.display = 'block';
+    }
+    if (englishEl) englishEl.style.display = 'none';
     if (naturalAnswer) naturalAnswer.style.display = 'block';
     if (mistakeReview) mistakeReview.style.display = 'block';
     if (corePhraseText) {
@@ -1023,12 +1305,21 @@ function revealPracticeAnswer() {
             corePhraseText.appendChild(chip);
         });
     }
-    if (practiceTitle) practiceTitle.innerText = '👆 실제로 틀린 단어나 구문을 누르세요';
-    if (practiceSubtitle) practiceSubtitle.innerText = '같은 청크 안에서 이어서 누른 단어는 하나의 구문 오류로 묶습니다.';
-    if (resultTip) resultTip.innerText = '선택한 부분은 관사·단복수·시제·전치사·핵심 구문으로 자동 분류됩니다.';
+    if (practiceTitle) practiceTitle.innerText = '👆 위 단어 칸에서 틀린 부분을 누르세요';
+    if (practiceSlotsLabel) practiceSlotsLabel.innerText = '영어 정답 · 청크 안에서 단어별로 오답을 표시하세요';
+    if (practiceSubtitle) {
+        if (currentPracticeResult?.skipped) {
+            practiceSubtitle.innerText = '정답 청크를 펼쳤습니다. 떠올리지 못했거나 다르게 말한 단어를 표시하세요.';
+        } else if (currentPracticeResult?.correct) {
+            practiceSubtitle.innerText = '청크 어순이 맞습니다. 다르게 생각하거나 말했던 단어가 있으면 표시하세요.';
+        } else {
+            practiceSubtitle.innerText = '올바른 청크 어순으로 다시 놓았습니다. 어순 오류는 자동으로 표시했습니다.';
+        }
+    }
+    if (resultTip) resultTip.innerText = '이어진 단어는 청크 경계를 넘어도 한 구문으로 묶이며, 오류 종류는 직접 바꿀 수 있습니다.';
     if (corePhraseBox) corePhraseBox.style.display = 'block';
     if (cardActionRow) cardActionRow.style.display = 'flex';
-    if (actionButtons) actionButtons.style.display = 'flex';
+    if (actionButtons) actionButtons.style.display = 'none';
     if (showAnswerBtn) showAnswerBtn.style.display = 'none';
     if (nextBtn) nextBtn.style.display = 'none';
     if (cardEl) cardEl.onclick = null;
@@ -1150,7 +1441,7 @@ function showCompletionScreen() {
     if (completionMsg) completionMsg.style.display = 'block';
     
     const elementsToHide = [
-        'order-guide', 'natural-answer', 'korean', 'english', 'hint', 'practice-panel', 'core-phrase-box', 'card-action-row',
+        'order-guide', 'natural-answer', 'korean', 'english-answer-label', 'english', 'hint', 'practice-panel', 'core-phrase-box', 'card-action-row',
         'action-buttons', 'progress-container',
         'verb-badge', 'new-badge', 'wrong-badge'
     ];
@@ -1619,6 +1910,12 @@ function importBackup(inputEl) {
    📲 서비스 워커 등록 (PWA 설치 / 오프라인 실행)
    ========================================================================== */
 if ('serviceWorker' in navigator) {
+    let refreshingForNewVersion = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshingForNewVersion) return;
+        refreshingForNewVersion = true;
+        window.location.reload();
+    });
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('sw.js').catch((err) => {
             console.warn('서비스 워커 등록 실패(앱 기능에는 영향 없음):', err);

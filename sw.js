@@ -4,7 +4,7 @@
    ※ 저장된 학습 자료(JSON)는 앱 셸과 함께 캐시하고, 구글 시트·폰트 등 외부 리소스는 네트워크로 요청한다.
    ========================================================================== */
 
-const CACHE_NAME = 'core-verbs-shell-v5';
+const CACHE_NAME = 'core-verbs-shell-v9';
 
 // 앱 셸(자체 호스팅 파일)만 사전 캐시한다.
 const APP_SHELL = [
@@ -46,18 +46,15 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // 같은 출처의 앱 셸은 캐시 우선(없으면 네트워크 후 캐시 갱신)으로 제공한다.
+    // 온라인에서는 최신 자료를 먼저 받고, 연결이 없을 때만 캐시를 사용한다.
     event.respondWith(
-        caches.match(req).then((cached) => {
-            const network = fetch(req).then((res) => {
+        fetch(req).then((res) => {
                 if (res && res.status === 200 && res.type === 'basic') {
                     const copy = res.clone();
                     caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
                 }
                 return res;
-            }).catch(() => cached);
-
-            return cached || network;
-        })
+            })
+            .catch(() => caches.match(req))
     );
 });

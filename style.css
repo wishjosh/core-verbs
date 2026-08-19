@@ -199,7 +199,7 @@ body {
 }
 
 /* 🃏 메인 학습 카드 */
-#card { 
+#card {
     background: var(--card-bg); 
     width: 92%; 
     max-width: 450px; 
@@ -209,7 +209,7 @@ body {
     border-radius: 20px; 
     box-shadow: var(--shadow-card), var(--shadow-soft); 
     text-align: center; 
-    cursor: pointer; 
+    cursor: default;
     display: flex; 
     flex-direction: column; 
     justify-content: center; 
@@ -220,7 +220,7 @@ body {
 }
 
 #card:active {
-    transform: scale(0.995);
+    transform: none;
 }
 
 #verb-badge {
@@ -303,7 +303,7 @@ body {
     align-items: center;
     position: relative;
     min-height: 34px;
-    padding: 7px 10px 7px 28px;
+    padding: 7px 10px;
     border-radius: 10px;
     background: #ffffff;
     border: 1px solid #bfdbfe;
@@ -314,7 +314,6 @@ body {
     box-shadow: 0 1px 3px rgba(30, 64, 175, 0.06);
 }
 
-.order-gloss-chip::before,
 .english-chunk::before {
     content: attr(data-chunk);
     position: absolute;
@@ -381,6 +380,186 @@ body {
     margin-bottom: 12px;
 }
 
+.practice-workspace {
+    display: none;
+    width: 100%;
+}
+
+.practice-area-label {
+    display: block;
+    margin: 8px 0 5px;
+    color: #64748b;
+    font-size: 0.7rem;
+    font-weight: 900;
+    text-align: left;
+}
+
+.practice-slots,
+.practice-bank {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 56px;
+    padding: 8px;
+    border-radius: 13px;
+}
+
+.practice-slots {
+    align-items: stretch;
+    margin-bottom: 10px;
+    border: 1px dashed #94a3b8;
+    background: #f1f5f9;
+}
+
+.practice-empty-guide {
+    flex: 1 1 72px;
+    min-width: 72px;
+    min-height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px dashed #cbd5e1;
+    border-radius: 11px;
+    background: rgba(255, 255, 255, 0.75);
+    color: #94a3b8;
+    font-size: 0.74rem;
+    font-weight: 800;
+}
+
+.practice-selected-chunk {
+    position: relative;
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    min-height: 54px;
+    padding: 7px 34px 7px 7px;
+    border: 1.5px solid #7dd3fc;
+    border-radius: 12px;
+    background: #e0f2fe;
+    box-shadow: 0 2px 5px rgba(15, 23, 42, 0.06);
+}
+
+.practice-selected-chunk.correct {
+    border-color: #86efac;
+    background: #dcfce7;
+}
+
+.practice-selected-chunk.corrected {
+    border-color: #fdba74;
+    background: #fff7ed;
+}
+
+.practice-slot-word {
+    min-height: 44px;
+    padding: 8px 7px;
+    border: 1.5px solid #bae6fd;
+    border-radius: 8px;
+    background: #fff;
+    color: #075985;
+    font-family: inherit;
+    font-size: clamp(0.94rem, 4vw, 1.08rem);
+    font-weight: 850;
+    line-height: 1.15;
+    cursor: pointer;
+}
+
+.practice-slot-word.selected {
+    border-color: #ef4444;
+    background: #fee2e2;
+    color: #991b1b;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+}
+
+.practice-slot-word:disabled {
+    cursor: default;
+}
+
+.practice-chunk-remove {
+    position: absolute;
+    top: 7px;
+    right: 6px;
+    width: 25px;
+    height: 25px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.88);
+    color: #64748b;
+    font-size: 0.88rem;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.practice-bank {
+    border: 1px solid #fde68a;
+    background: #fffaf0;
+}
+
+.practice-chip {
+    min-height: 44px;
+    padding: 9px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 11px;
+    background: #fff;
+    color: #1e293b;
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 800;
+    line-height: 1.2;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(15, 23, 42, 0.06);
+}
+
+.practice-chip:disabled {
+    cursor: default;
+}
+
+.practice-controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.practice-small-btn,
+.practice-check-btn {
+    min-height: 42px;
+    padding: 9px 13px;
+    border: none;
+    border-radius: 11px;
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.practice-small-btn {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+.practice-small-btn.reveal {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.practice-check-btn {
+    background: #2563eb;
+    color: #fff;
+}
+
+.practice-small-btn:disabled,
+.practice-check-btn:disabled {
+    opacity: 0.42;
+    cursor: not-allowed;
+}
+
 #english {
     width: 100%;
     display: none;
@@ -389,6 +568,16 @@ body {
     gap: 8px;
     margin-top: 13px;
     animation: fadeIn 0.3s ease-out;
+}
+
+.english-answer-label {
+    display: none;
+    width: 100%;
+    margin-top: 15px;
+    color: #1d4ed8;
+    font-size: 0.74rem;
+    font-weight: 900;
+    text-align: left;
 }
 
 .english-chunk {
@@ -411,11 +600,11 @@ body {
 }
 
 .mistake-word {
-    min-height: 34px;
-    padding: 5px 4px;
-    border: 1.5px solid transparent;
+    min-height: 44px;
+    padding: 8px 7px;
+    border: 1.5px solid #bfdbfe;
     border-radius: 7px;
-    background: transparent;
+    background: rgba(255, 255, 255, 0.82);
     color: #1d4f7a;
     font-family: inherit;
     font-size: clamp(1.02rem, 4.4vw, 1.22rem);
@@ -510,6 +699,52 @@ body {
     background: #fff;
     color: #9a3412;
     font-weight: 800;
+}
+
+.mistake-summary-chip.reported-types {
+    width: 100%;
+    border-color: #93c5fd;
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+.error-type-picker > span {
+    display: block;
+    margin-bottom: 6px;
+    color: #64748b;
+    font-size: 0.7rem;
+    font-weight: 800;
+}
+
+.error-type-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 11px;
+}
+
+.error-type-buttons button {
+    min-height: 36px;
+    padding: 7px 9px;
+    border: 1px solid #cbd5e1;
+    border-radius: 9px;
+    background: #fff;
+    color: #64748b;
+    font-family: inherit;
+    font-size: 0.72rem;
+    font-weight: 850;
+    cursor: pointer;
+}
+
+.error-type-buttons button.selected {
+    border-color: #f97316;
+    background: #ffedd5;
+    color: #9a3412;
+}
+
+.error-type-buttons button:disabled {
+    opacity: 0.42;
+    cursor: not-allowed;
 }
 
 .self-check-controls {

@@ -117,15 +117,72 @@ test('classifies a tapped Did as a tense and auxiliary error', () => {
     });
 });
 
-test('groups adjacent selected words inside a chunk as one expression error', () => {
+test('groups adjacent selected words across a visual chunk boundary as one expression error', () => {
     const card = {
         en: 'I barely made it to the airport on time.',
-        assemblyChunks: ['I barely', 'made it to the airport', 'on time.']
+        assemblyChunks: ['I barely', 'made it', 'to the airport', 'on time.']
     };
     const result = engine.classifyMistakeSelections(card, [2, 3, 4]);
     assert.equal(result.mistakes.length, 1);
     assert.equal(result.mistakes[0].text, 'made it to');
     assert.equal(result.mistakes[0].type, 'expression');
+});
+
+test('does not classify a noun as an article error unless the article itself is selected', () => {
+    const card = {
+        en: 'She is with a client.',
+        assemblyChunks: ['She', 'is', 'with a client.'],
+        errorPoints: [{ type: 'article', correct: 'a client', distractor: 'client' }]
+    };
+    assert.deepEqual(engine.classifyMistakeSelections(card, [4]).errorTypes, ['expression']);
+    assert.deepEqual(engine.classifyMistakeSelections(card, [3]).errorTypes, ['article']);
+});
+
+test('expands a selected chunk into word-level error boxes without losing chunk order', () => {
+    const card = {
+        verb: 'GET',
+        en: 'How did you get this designer bag?',
+        assemblyChunks: ['How did you get', 'this designer bag?'],
+        orderGlosses: ['어떻게 얻었니', '이 디자이너 가방을?']
+    };
+    const question = engine.buildPracticeQuestion(card, fixedRandom);
+    const reviewChunks = engine.buildReviewTokens(card);
+    const targetBank = question.bank.filter(entry => !entry.isDistractor).sort((a, b) => a.targetIndex - b.targetIndex);
+    const emptySlots = engine.buildPracticeSlots(question, reviewChunks, []);
+    const oneChunkSelected = engine.buildPracticeSlots(question, reviewChunks, ['target-0']);
+
+    assert.deepEqual(question.targetChunks, card.assemblyChunks);
+    assert.deepEqual(targetBank.map(entry => entry.targetIndex), [0, 1]);
+    assert.notDeepEqual(
+        question.bank.filter(entry => !entry.isDistractor).map(entry => entry.id),
+        question.targetIds
+    );
+    assert.deepEqual(reviewChunks[0].tokens.map(token => token.text), ['How', 'did', 'you', 'get']);
+    assert.deepEqual(reviewChunks[0].tokens.map(token => token.index), [0, 1, 2, 3]);
+    assert.deepEqual(reviewChunks[1].tokens.map(token => token.index), [4, 5, 6]);
+    assert.deepEqual(emptySlots.map(slot => ({ id: slot.id, text: slot.text, tokens: slot.tokens })), [
+        { id: null, text: '', tokens: [] },
+        { id: null, text: '', tokens: [] }
+    ]);
+    assert.deepEqual(oneChunkSelected[0].tokens.map(token => token.text), ['How', 'did', 'you', 'get']);
+    assert.equal(oneChunkSelected[1].id, null);
+    assert.deepEqual(engine.classifyMistakeSelections(card, [1]).errorTypes, ['tense_auxiliary']);
+    assert.equal(engine.evaluatePractice(question, ['target-0', 'target-1']).correct, true);
+    assert.deepEqual(engine.evaluatePractice(question, ['target-1', 'target-0']).errorTypes, ['word_order']);
+});
+
+test('does not expose the answer order when a shuffle leaves chunk candidates unchanged', () => {
+    const question = engine.buildPracticeQuestion({
+        verb: 'GET',
+        en: 'How did you get this designer bag?',
+        assemblyChunks: ['How did you get', 'this designer bag?']
+    }, () => 0.999999);
+    const visibleIds = question.bank
+        .filter(entry => !entry.isDistractor)
+        .map(entry => entry.id);
+
+    assert.deepEqual(question.targetIds, ['target-0', 'target-1']);
+    assert.deepEqual(visibleIds, ['target-1', 'target-0']);
 });
 
 test('adds an explicit word-order error without requiring word selection', () => {
@@ -135,12 +192,16 @@ test('adds an explicit word-order error without requiring word selection', () =>
     assert.equal(result.mistakes[0].text, '문장 어순');
 });
 
-test('avoids a one-button exercise for a short sentence without a contrast', () => {
-    const question = engine.buildPracticeQuestion(
-        { verb: 'GO', en: 'May I come in?' },
-        fixedRandom
-    );
-    assert.deepEqual(question.targetChunks, ['May I', 'come in?']);
+test('keeps a stored short chunk while exposing every word inside it', () => {
+    const card = {
+        verb: 'SEE',
+        en: 'May I see your ID?',
+        assemblyChunks: ['May I see your ID?']
+    };
+    const question = engine.buildPracticeQuestion(card, fixedRandom);
+    const review = engine.buildReviewTokens(card, question.targetChunks);
+    assert.deepEqual(question.targetChunks, ['May I see your ID?']);
+    assert.deepEqual(review[0].tokens.map(token => token.text), ['May', 'I', 'see', 'your', 'ID?']);
 });
 
 test('builds a mobile chunk question with a plural or Koreanism contrast', () => {
