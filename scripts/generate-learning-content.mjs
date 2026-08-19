@@ -1,5 +1,6 @@
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import path from 'node:path';
 import process from 'node:process';
 
@@ -7,6 +8,7 @@ const ROOT = path.resolve(import.meta.dirname, '..');
 const DATA_DIR = path.join(ROOT, 'data');
 const OUTPUT_PATH = path.join(DATA_DIR, 'learning-content.json');
 const CACHE_PATH = path.join(DATA_DIR, '.learning-content-cache.json');
+const MEANING_FLOW_CACHE_PATH = path.join(DATA_DIR, '.meaning-flow-cache.json');
 const PILOT_PATH = path.join(DATA_DIR, 'learning-content-pilot.json');
 const MEANING_FLOW_OVERRIDES_PATH = path.join(DATA_DIR, 'meaning-flow-overrides.json');
 const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSR1wby3k5QhlAL8f8MeH-Ni1qjGgRMu8ROHDoPCKci-GYrbpx1DzTsAvcr_l5qBcemui93D4cqMLa0/pub?output=tsv';
@@ -277,6 +279,7 @@ const mode = String(args.mode || 'pilot');
 const model = String(args.model || 'gemma4:26b');
 const batchSize = Math.max(1, Number(args.batch || 8));
 const pilotCount = Math.max(1, Number(args.count || 10));
+const retryCount = Math.max(1, Number(args.retries || 4));
 
 const OUTPUT_SCHEMA = {
     type: 'object',
@@ -328,6 +331,22 @@ const GLOSS_SCHEMA = {
     },
     required: ['items']
 };
+
+const MEANING_FLOW_SYSTEM_PROMPT = `당신은 한국인 성인 학습자를 위한 영어 의미 전개 편집자다.
+영어 원문과 확정된 assemblyChunks는 절대로 수정하지 않는다. 출력에는 id와 orderGlosses만 넣는다.
+
+각 orderGlosses 규칙:
+- assemblyChunks와 정확히 같은 개수로 쓴다.
+- 해당 영어 청크가 그 지점에서 새로 펼치는 의미나 문법 기능을 짧은 한국어 단서로 쓴다.
+- 첫 단서부터 순서대로 읽을 때 의미가 계속 누적되어야 한다. 뒤 단서를 먼저 읽고 거꾸로 해석해야 하는 문장은 금지한다.
+- 자연스러운 완성 번역을 청크 수에 맞춰 기계적으로 자르지 않는다.
+- 조동사처럼 따로 번역하기 어려운 청크는 '(과거 질문으로 시작)'처럼 기능을 설명할 수 있다.
+- '나는 하지 않아 / 원하기를', '그것을 만들어 / 더 나은 선택으로' 같은 기계적 직역은 금지한다.
+- 각 단서는 한국인이 바로 이해할 수 있어야 하지만, 입력의 naturalKo 전체를 그대로 반복하지 않는다.
+- 영어 고유명사·시제·부정·질문·조건·인과·예상 밖 결과를 빠뜨리지 않는다.
+- '뜻 확인', '이어서', '확인 필요', '번역 필요' 같은 임시 문구를 쓰지 않는다.
+
+입력 배열의 모든 id를 정확히 한 번씩 반환한다. 설명이나 마크다운 없이 JSON만 반환한다.`;
 
 const QUALITY_REVIEW_SCHEMA = {
     type: 'object',
@@ -466,6 +485,136 @@ function stableSeed(text) {
     let hash = 0;
     for (const character of String(text || '')) hash = ((hash * 31) + character.charCodeAt(0)) >>> 0;
     return 20260819 + (hash % 100000);
+}
+
+function meaningFlowSourceFingerprint(item) {
+    const source = {
+        id: item?.id || '',
+        naturalKo: item?.naturalKo || '',
+        english: item?.english || '',
+        assemblyChunks: Array.isArray(item?.assemblyChunks) ? item.assemblyChunks : []
+    };
+    return createHash('sha256').update(JSON.stringify(source)).digest('hex');
+}
+
+function normalizeMeaningFlowItem(item) {
+    return {
+        id: String(item?.id || '').trim(),
+        orderGlosses: Array.isArray(item?.orderGlosses)
+            ? item.orderGlosses.map(value => String(value || '').trim())
+            : []
+    };
+}
+
+function validateMeaningFlowItem(source, generated) {
+    const errors = [];
+    if (!source || !generated || generated.id !== source.id) errors.push('id 불일치 또는 결과 누락');
+    const glosses = generated?.orderGlosses;
+    const chunkCount = Array.isArray(source?.assemblyChunks) ? source.assemblyChunks.length : 0;
+    if (!Array.isArray(glosses) || glosses.length !== chunkCount) {
+        errors.push(`의미 전개 단서는 영어 청크 ${chunkCount}개와 1:1이어야 함`);
+    } else {
+        glosses.forEach((value, index) => {
+            if (typeof value !== 'string' || !value.trim()) errors.push(`${index + 1}번 의미 전개 단서가 비어 있음`);
+            if (typeof value === 'string' && value !== value.trim()) errors.push(`${index + 1}번 의미 전개 단서 앞뒤 공백 오류`);
+            if (/^(뜻 확인|이어서|확인 필요|번역 필요)$/.test(String(value || '').trim())) {
+                errors.push(`${index + 1}번 의미 전개 단서가 임시 문구임`);
+            }
+        });
+    }
+    return errors;
+}
+
+async function askMeaningFlowModel(items, repairContext = '') {
+    const input = items.map(item => ({
+        id: item.id,
+        naturalKo: item.naturalKo,
+        english: item.english,
+        assemblyChunks: item.assemblyChunks
+    }));
+    const userContent = repairContext
+        ? `${repairContext}\n\n아래 입력 전체의 id와 orderGlosses만 다시 반환하세요.\n${JSON.stringify(input)}`
+        : JSON.stringify(input);
+    const startedAt = Date.now();
+    const response = await fetch(OLLAMA_URL, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+            model,
+            stream: false,
+            think: false,
+            keep_alive: '30m',
+            format: GLOSS_SCHEMA,
+            messages: [
+                { role: 'system', content: MEANING_FLOW_SYSTEM_PROMPT },
+                { role: 'user', content: userContent }
+            ],
+            options: {
+                temperature: 0.15,
+                top_p: 0.9,
+                seed: stableSeed(`meaning-flow:${userContent}`),
+                num_ctx: 32768,
+                num_predict: 8000
+            }
+        })
+    });
+    if (!response.ok) throw new Error(`의미 전개 생성 실패: ${response.status} ${await response.text()}`);
+    const payload = await response.json();
+    const parsed = JSON.parse(payload.message?.content || '{}');
+    process.stdout.write(`의미 전개 AI ${items.length}문장: ${((Date.now() - startedAt) / 1000).toFixed(1)}초\n`);
+    return (parsed.items || []).map(normalizeMeaningFlowItem);
+}
+
+async function generateMeaningFlowBatch(items) {
+    const acceptedById = new Map();
+    let pending = [...items];
+    let repairContext = '';
+
+    for (let attempt = 1; attempt <= retryCount && pending.length; attempt++) {
+        let returned = [];
+        let requestError = null;
+        try {
+            returned = await askMeaningFlowModel(pending, repairContext);
+        } catch (error) {
+            requestError = error;
+        }
+
+        const returnedById = new Map();
+        const duplicateIds = new Set();
+        returned.forEach(item => {
+            if (returnedById.has(item.id)) duplicateIds.add(item.id);
+            returnedById.set(item.id, item);
+        });
+
+        const failures = [];
+        const nextPending = [];
+        for (const source of pending) {
+            const candidate = returnedById.get(source.id);
+            const errors = requestError
+                ? [requestError.message]
+                : [
+                    ...(duplicateIds.has(source.id) ? ['같은 id가 중복 반환됨'] : []),
+                    ...validateMeaningFlowItem(source, candidate)
+                ];
+            if (errors.length) {
+                failures.push(`${source.id}: ${errors.join(', ')}`);
+                nextPending.push(source);
+            } else {
+                acceptedById.set(source.id, candidate);
+            }
+        }
+
+        if (!nextPending.length) break;
+        repairContext = `교정 시도 ${attempt}. 직전 결과의 다음 오류를 모두 고치세요. 영어 원문과 assemblyChunks는 출력하지 마세요.\n${failures.join('\n')}`;
+        process.stdout.write(`의미 전개 재시도 ${attempt}/${retryCount}: ${nextPending.length}문장\n`);
+        pending = nextPending;
+    }
+
+    if (pending.length) {
+        const unresolved = pending.filter(item => !acceptedById.has(item.id));
+        if (unresolved.length) throw new Error(`의미 전개 생성 실패: ${unresolved.map(item => item.id).join(', ')}`);
+    }
+    return items.map(item => acceptedById.get(item.id)).filter(Boolean);
 }
 
 function chunkQualityReasons(item) {
@@ -902,6 +1051,72 @@ async function writeJsonAtomic(target, value) {
     await rename(temporary, target);
 }
 
+async function loadMeaningFlowCache() {
+    const empty = {
+        model,
+        rulesVersion: MEANING_FLOW_RULES_VERSION,
+        items: []
+    };
+    if (!existsSync(MEANING_FLOW_CACHE_PATH)) return empty;
+    try {
+        const cache = JSON.parse(await readFile(MEANING_FLOW_CACHE_PATH, 'utf8'));
+        if (cache.model !== model || cache.rulesVersion !== MEANING_FLOW_RULES_VERSION || !Array.isArray(cache.items)) {
+            return empty;
+        }
+        return cache;
+    } catch (error) {
+        process.stdout.write(`의미 전개 캐시를 읽지 못해 새로 시작합니다: ${error.message}\n`);
+        return empty;
+    }
+}
+
+function meaningFlowCacheEntry(source, generated) {
+    return {
+        id: source.id,
+        sourceFingerprint: meaningFlowSourceFingerprint(source),
+        orderGlosses: [...generated.orderGlosses]
+    };
+}
+
+function captureImmutableEnglishAndChunks(content) {
+    return content.items.map(item => ({
+        id: item.id,
+        english: item.english,
+        assemblyChunks: JSON.stringify(item.assemblyChunks)
+    }));
+}
+
+function assertEnglishAndChunksUnchanged(before, content) {
+    if (before.length !== content.items.length) {
+        throw new Error(`의미 전개 생성 중 문장 수가 바뀜: ${before.length}/${content.items.length}`);
+    }
+    const afterById = new Map(content.items.map(item => [item.id, item]));
+    const failures = [];
+    for (const snapshot of before) {
+        const item = afterById.get(snapshot.id);
+        if (!item) {
+            failures.push(`${snapshot.id}: 문장 누락`);
+            continue;
+        }
+        if (item.english !== snapshot.english) failures.push(`${snapshot.id}: 영어 원문 변경`);
+        if (JSON.stringify(item.assemblyChunks) !== snapshot.assemblyChunks) failures.push(`${snapshot.id}: 영어 청크 변경`);
+    }
+    if (failures.length) throw new Error(`의미 전개 생성 불변 조건 위반\n${failures.join('\n')}`);
+}
+
+function refreshMeaningFlowMetadata(content) {
+    const items = content.items.filter(item => item.meaningFlow);
+    const reviewed = items.filter(item => item.meaningFlow.reviewStatus === 'reviewed').length;
+    const aiChecked = items.filter(item => item.meaningFlow.reviewStatus === 'ai_checked').length;
+    const drafts = items.filter(item => item.meaningFlow.reviewStatus === 'ai_draft').length;
+    if (items.length) content.meaningFlowRulesVersion = MEANING_FLOW_RULES_VERSION;
+    content.meaningFlowReviewCount = reviewed;
+    content.meaningFlowAiCheckedCount = aiChecked;
+    content.meaningFlowDraftCount = drafts;
+    content.meaningFlowTotal = items.length;
+    return content;
+}
+
 async function readMeaningFlowOverrides() {
     const document = JSON.parse(await readFile(MEANING_FLOW_OVERRIDES_PATH, 'utf8'));
     const failures = [];
@@ -932,8 +1147,8 @@ async function readMeaningFlowOverrides() {
     return document;
 }
 
-async function applyMeaningFlowOverrides(content) {
-    const document = await readMeaningFlowOverrides();
+async function applyMeaningFlowOverrides(content, suppliedDocument = null) {
+    const document = suppliedDocument || await readMeaningFlowOverrides();
     const contentById = new Map(content.items.map(item => [item.id, item]));
     const failures = [];
     let applied = 0;
@@ -963,7 +1178,10 @@ async function applyMeaningFlowOverrides(content) {
 
     if (failures.length) throw new Error(`의미 전개 병합 실패\n${failures.join('\n')}`);
     content.meaningFlowRulesVersion = document.rulesVersion;
-    content.meaningFlowReviewCount = applied;
+    refreshMeaningFlowMetadata(content);
+    if (content.meaningFlowReviewCount !== applied) {
+        throw new Error(`검수된 의미 전개 문장 수가 편집 원본과 다름: ${content.meaningFlowReviewCount}/${applied}`);
+    }
     return content;
 }
 
@@ -999,18 +1217,33 @@ function validateContent(content) {
             if (item.meaningFlow.rulesVersion !== content.meaningFlowRulesVersion) {
                 failures.push(`${item.id}: 의미 전개 규칙 버전 불일치`);
             }
-            if (item.meaningFlow.reviewStatus !== 'reviewed') {
-                failures.push(`${item.id}: 의미 전개 검수 상태가 reviewed가 아님`);
+            if (!['reviewed', 'ai_checked', 'ai_draft'].includes(item.meaningFlow.reviewStatus)) {
+                failures.push(`${item.id}: 의미 전개 검수 상태가 잘못됨`);
             }
+            const meaningErrors = validateMeaningFlowItem(item, { id: item.id, orderGlosses: item.orderGlosses });
+            if (meaningErrors.length) failures.push(`${item.id}: ${meaningErrors.join(', ')}`);
         }
     });
     if (content.total !== content.items.length) failures.push(`total 불일치: ${content.total}/${content.items.length}`);
-    const meaningFlowCount = content.items.filter(item => item.meaningFlow).length;
+    const meaningFlowItems = content.items.filter(item => item.meaningFlow);
+    const meaningFlowCount = meaningFlowItems.length;
+    const reviewedCount = meaningFlowItems.filter(item => item.meaningFlow.reviewStatus === 'reviewed').length;
+    const aiCheckedCount = meaningFlowItems.filter(item => item.meaningFlow.reviewStatus === 'ai_checked').length;
+    const draftCount = meaningFlowItems.filter(item => item.meaningFlow.reviewStatus === 'ai_draft').length;
     if (content.meaningFlowRulesVersion !== undefined && content.meaningFlowRulesVersion !== MEANING_FLOW_RULES_VERSION) {
         failures.push(`전체 의미 전개 규칙 버전 불일치: ${content.meaningFlowRulesVersion}/${MEANING_FLOW_RULES_VERSION}`);
     }
-    if (content.meaningFlowReviewCount !== undefined && content.meaningFlowReviewCount !== meaningFlowCount) {
-        failures.push(`의미 전개 검수 문장 수 불일치: ${content.meaningFlowReviewCount}/${meaningFlowCount}`);
+    if (content.meaningFlowReviewCount !== undefined && content.meaningFlowReviewCount !== reviewedCount) {
+        failures.push(`의미 전개 검수 문장 수 불일치: ${content.meaningFlowReviewCount}/${reviewedCount}`);
+    }
+    if (content.meaningFlowAiCheckedCount !== undefined && content.meaningFlowAiCheckedCount !== aiCheckedCount) {
+        failures.push(`의미 전개 AI 교차검수 문장 수 불일치: ${content.meaningFlowAiCheckedCount}/${aiCheckedCount}`);
+    }
+    if (content.meaningFlowDraftCount !== undefined && content.meaningFlowDraftCount !== draftCount) {
+        failures.push(`의미 전개 초안 문장 수 불일치: ${content.meaningFlowDraftCount}/${draftCount}`);
+    }
+    if (content.meaningFlowTotal !== undefined && content.meaningFlowTotal !== meaningFlowCount) {
+        failures.push(`의미 전개 전체 문장 수 불일치: ${content.meaningFlowTotal}/${meaningFlowCount}`);
     }
     return failures;
 }
@@ -1131,10 +1364,97 @@ async function runApplyMeaningFlow() {
     process.stdout.write(`의미 전개 파일럿 적용 완료: ${content.meaningFlowReviewCount}문장\n`);
 }
 
+async function runGenerateMeaningFlow() {
+    const content = JSON.parse(await readFile(OUTPUT_PATH, 'utf8'));
+    const immutableSnapshot = captureImmutableEnglishAndChunks(content);
+    const overrides = await readMeaningFlowOverrides();
+    const reviewedIds = new Set(overrides.items.map(item => item.id));
+    const generationSources = content.items.filter(item => !reviewedIds.has(item.id));
+    const sourcesById = new Map(generationSources.map(item => [item.id, item]));
+    const cache = await loadMeaningFlowCache();
+    const generatedById = new Map();
+    let invalidCacheCount = 0;
+
+    for (const cached of cache.items) {
+        const source = sourcesById.get(cached.id);
+        const candidate = normalizeMeaningFlowItem(cached);
+        const valid = source
+            && cached.sourceFingerprint === meaningFlowSourceFingerprint(source)
+            && validateMeaningFlowItem(source, candidate).length === 0;
+        if (valid) generatedById.set(source.id, candidate);
+        else invalidCacheCount += 1;
+    }
+
+    if (content.meaningFlowModel === model && content.meaningFlowRulesVersion === MEANING_FLOW_RULES_VERSION) {
+        for (const source of generationSources) {
+            if (generatedById.has(source.id)) continue;
+            if (source.meaningFlow?.reviewStatus !== 'ai_draft' || source.meaningFlow.rulesVersion !== MEANING_FLOW_RULES_VERSION) continue;
+            const candidate = normalizeMeaningFlowItem({ id: source.id, orderGlosses: source.orderGlosses });
+            if (validateMeaningFlowItem(source, candidate).length === 0) generatedById.set(source.id, candidate);
+        }
+    }
+
+    const pending = generationSources.filter(item => !generatedById.has(item.id));
+    process.stdout.write(
+        `의미 전개 전체 ${content.items.length}문장, 검수본 ${reviewedIds.size}문장, `
+        + `재사용 ${generatedById.size}문장, 무효 캐시 ${invalidCacheCount}문장, 생성 대기 ${pending.length}문장\n`
+    );
+
+    for (let index = 0; index < pending.length; index += batchSize) {
+        const batch = pending.slice(index, index + batchSize);
+        const generated = await generateMeaningFlowBatch(batch);
+        generated.forEach(item => generatedById.set(item.id, item));
+        const cacheItems = generationSources
+            .filter(source => generatedById.has(source.id))
+            .map(source => meaningFlowCacheEntry(source, generatedById.get(source.id)));
+        await writeJsonAtomic(MEANING_FLOW_CACHE_PATH, {
+            model,
+            rulesVersion: MEANING_FLOW_RULES_VERSION,
+            items: cacheItems
+        });
+        process.stdout.write(
+            `의미 전개 진행 ${Math.min(index + batch.length, pending.length)}/${pending.length} `
+            + `(전체 ${generatedById.size + reviewedIds.size}/${content.items.length})\n`
+        );
+    }
+
+    const missing = generationSources.filter(item => !generatedById.has(item.id));
+    if (missing.length) throw new Error(`의미 전개 결과 누락 ${missing.length}문장: ${missing.slice(0, 20).map(item => item.id).join(', ')}`);
+
+    for (const item of generationSources) {
+        const generated = generatedById.get(item.id);
+        item.orderGlosses = [...generated.orderGlosses];
+        item.meaningFlow = {
+            rulesVersion: MEANING_FLOW_RULES_VERSION,
+            reviewStatus: 'ai_draft'
+        };
+    }
+    content.meaningFlowModel = model;
+    await applyMeaningFlowOverrides(content, overrides);
+    refreshMeaningFlowMetadata(content);
+    assertEnglishAndChunksUnchanged(immutableSnapshot, content);
+
+    if (content.meaningFlowTotal !== content.items.length) {
+        throw new Error(`전체 의미 전개 문장 수가 부족함: ${content.meaningFlowTotal}/${content.items.length}`);
+    }
+    if (content.meaningFlowReviewCount !== overrides.items.length) {
+        throw new Error(`검수본 보존 실패: ${content.meaningFlowReviewCount}/${overrides.items.length}`);
+    }
+    const failures = validateContent(content);
+    if (failures.length) throw new Error(`전체 의미 전개 생성 후 검증 실패 ${failures.length}건\n${failures.slice(0, 50).join('\n')}`);
+
+    await writeJsonAtomic(OUTPUT_PATH, content);
+    process.stdout.write(
+        `의미 전개 완료: 검수본 ${content.meaningFlowReviewCount}문장 보존, `
+        + `AI 초안 ${content.meaningFlowDraftCount}문장, 영어 원문·청크 불변 검사 통과\n`
+    );
+}
+
 const rows = ['pilot', 'generate'].includes(mode) ? await loadSourceRows() : [];
 if (mode === 'pilot') await runPilot(rows);
 else if (mode === 'generate') await runGenerate(rows);
 else if (mode === 'quality') await runQualityReview();
 else if (mode === 'apply-meaning-flow') await runApplyMeaningFlow();
+else if (mode === 'meaning-flow') await runGenerateMeaningFlow();
 else if (mode === 'validate') await runValidate();
 else throw new Error(`지원하지 않는 mode: ${mode}`);

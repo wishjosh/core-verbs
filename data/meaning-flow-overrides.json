@@ -49,7 +49,7 @@
       "id": "cv-0246",
       "english": "The area got really popular after that Netflix show was filmed there.",
       "assemblyChunks": ["The area got really popular", "after that Netflix show", "was filmed there."],
-      "orderGlosses": ["그 지역은 정말 인기 있어졌어요", "그 넷플릭스 드라마가", "그곳에서 촬영된 뒤로."]
+      "orderGlosses": ["그 지역은 정말 인기 있어졌어요", "그 넷플릭스 드라마 이후로—", "그곳에서 촬영되고 나서요."]
     },
     {
       "id": "cv-0328",
@@ -73,7 +73,7 @@
       "id": "cv-0421",
       "english": "Working for myself made me realize that unreliable income can make you feel insecure.",
       "assemblyChunks": ["Working for myself", "made me realize", "that unreliable income can", "make you feel insecure."],
-      "orderGlosses": ["혼자 일해 본 것이", "내가 깨닫게 했어요", "불안정한 수입은", "사람을 불안하게 할 수 있다는 걸."]
+      "orderGlosses": ["혼자 일해 본 경험이", "내게 깨닫게 했어요", "깨달은 내용은—불안정한 수입이 사람에게 줄 수 있는 영향,", "바로 불안감을 느끼게 한다는 걸."]
     },
     {
       "id": "cv-0430",
@@ -151,7 +151,7 @@
       "id": "cv-0793",
       "english": "He let us stay, even though it was past their closing time.",
       "assemblyChunks": ["He let us stay,", "even though it was past", "their closing time."],
-      "orderGlosses": ["그는 우리가 더 머물게 해줬어요,", "이미 넘겼는데도", "그 가게의 영업 종료 시간을."]
+      "orderGlosses": ["그는 우리가 더 머물게 해줬어요,", "비록 이미 시간이 지났지만—", "그 가게의 영업 종료 시간이요."]
     },
     {
       "id": "cv-0811",
@@ -181,7 +181,7 @@
       "id": "cv-0868",
       "english": "I hope the incoming president can turn the economy around.",
       "assemblyChunks": ["I hope the incoming president", "can turn the economy around."],
-      "orderGlosses": ["나는 바라요, 새 대통령이", "경제를 다시 살릴 수 있기를."]
+      "orderGlosses": ["새 대통령에게 바라는 건", "경제를 다시 살릴 수 있는 거예요."]
     }
   ]
 }

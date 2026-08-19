@@ -1,0 +1,588 @@
+{
+  "rulesVersion": 1,
+  "reviewStatus": "ai_checked",
+  "items": [
+    {
+      "id": "cv-0701",
+      "english": "My father went bald in his thirties.",
+      "assemblyChunks": ["My father went bald", "in his thirties."],
+      "orderGlosses": ["우리 아버지는 대머리가 되셨어", "30대에."]
+    },
+    {
+      "id": "cv-0702",
+      "english": "Are we out of milk?",
+      "assemblyChunks": ["Are we out of milk?"],
+      "orderGlosses": ["우리 우유가 다 떨어졌어?"]
+    },
+    {
+      "id": "cv-0703",
+      "english": "Yeah, it went bad, so I had to throw it away this morning.",
+      "assemblyChunks": ["Yeah,", "it went bad,", "so I had to", "throw it away", "this morning."],
+      "orderGlosses": ["응,", "그게 상했더라,", "그래서 어쩔 수 없이", "버렸어", "오늘 아침에."]
+    },
+    {
+      "id": "cv-0704",
+      "english": "What are those people doing? It looks dangerous.",
+      "assemblyChunks": ["What are those people doing?", "It looks dangerous."],
+      "orderGlosses": ["저 사람들 뭐 하는 거야?", "위험해 보여."]
+    },
+    {
+      "id": "cv-0705",
+      "english": "It’s that TikTok challenge that went viral last month.",
+      "assemblyChunks": ["It’s that TikTok challenge", "that went viral", "last month."],
+      "orderGlosses": ["그게 바로 그 틱톡 챌린지야", "입소문이 난", "지난달에."]
+    },
+    {
+      "id": "cv-0706",
+      "english": "People go to parks to go viral these days? That’s sad.",
+      "assemblyChunks": ["People go to parks", "to go viral these days?", "That’s sad."],
+      "orderGlosses": ["사람들이 공원에 가", "요즘 화제가 되려고?", "그건 슬프다."]
+    },
+    {
+      "id": "cv-0707",
+      "english": "So true. I miss when people just went to parks to get some fresh air.",
+      "assemblyChunks": ["So true.", "I miss", "when people just went", "to parks", "to get some fresh air."],
+      "orderGlosses": ["정말 그래.", "나는 그리워", "사람들이 그냥 갔던 때가", "공원에", "맑은 공기를 좀 쐬러."]
+    },
+    {
+      "id": "cv-0708",
+      "english": "I have new aches and pains all the time these days. We’re getting old.",
+      "assemblyChunks": ["I have new aches", "and pains", "all the time these days.", "We’re getting old."],
+      "orderGlosses": ["나에게 새롭게 쑤시는 곳들이 생겨", "그리고 아픈 곳들도", "요즘 늘.", "우리 늙어가네."]
+    },
+    {
+      "id": "cv-0709",
+      "english": "So true.",
+      "assemblyChunks": ["So true."],
+      "orderGlosses": ["완전 공감해."]
+    },
+    {
+      "id": "cv-0710",
+      "english": "Getting ready for work in the morning is such a pain during winter.",
+      "assemblyChunks": ["Getting ready for work", "in the morning", "is such", "a pain during winter."],
+      "orderGlosses": ["출근 준비하는 게", "아침에", "정말", "겨울에는 고역이야."]
+    },
+    {
+      "id": "cv-0711",
+      "english": "That’s so true. It’s really dark, too.",
+      "assemblyChunks": ["That’s so true.", "It’s really dark, too."],
+      "orderGlosses": ["정말 맞아.", "아침에는 아주 어둡기도 해."]
+    },
+    {
+      "id": "cv-0712",
+      "english": "Korea wasn’t this hot when I was a kid.",
+      "assemblyChunks": ["Korea wasn’t this hot", "when I was a kid."],
+      "orderGlosses": ["한국이 이렇게 덥지는 않았어", "내가 어렸을 때는."]
+    },
+    {
+      "id": "cv-0713",
+      "english": "That’s so true!",
+      "assemblyChunks": ["That’s so true!"],
+      "orderGlosses": ["정말 내 말이야!"]
+    },
+    {
+      "id": "cv-0714",
+      "english": "Food trash goes in this yellow bag.",
+      "assemblyChunks": ["Food trash goes in", "this yellow bag."],
+      "orderGlosses": ["음식물 쓰레기는 넣으면 돼요", "이 노란 봉투에."]
+    },
+    {
+      "id": "cv-0715",
+      "english": "Should these flowers go here?",
+      "assemblyChunks": ["Should these flowers go here?"],
+      "orderGlosses": ["이 꽃들은 여기에 두면 되나요?"]
+    },
+    {
+      "id": "cv-0716",
+      "english": "Korean citizens go in this line.",
+      "assemblyChunks": ["Korean citizens go", "in this line."],
+      "orderGlosses": ["한국 국적자는 서면 돼요", "이 줄에."]
+    },
+    {
+      "id": "cv-0717",
+      "english": "Excuse me, where should these expense reports go when I’m done?",
+      "assemblyChunks": ["Excuse me, where should", "these expense reports go", "when I’m done?"],
+      "orderGlosses": ["실례합니다, 어디에 둬야 하나요", "이 경비 보고서들을", "제가 끝낸 뒤에?"]
+    },
+    {
+      "id": "cv-0718",
+      "english": "Insurance papers go in the blue folder.",
+      "assemblyChunks": ["Insurance papers go in", "the blue folder."],
+      "orderGlosses": ["보험 서류는 넣으면 됩니다", "파란색 폴더에."]
+    },
+    {
+      "id": "cv-0719",
+      "english": "The forks go to the left of the plates.",
+      "assemblyChunks": ["The forks go", "to the left", "of the plates."],
+      "orderGlosses": ["포크는 놓여요", "왼쪽에", "접시를 기준으로."]
+    },
+    {
+      "id": "cv-0720",
+      "english": "Do these dumbbells go here?",
+      "assemblyChunks": ["Do these dumbbells go here?"],
+      "orderGlosses": ["이 덤벨들은 여기에 두나요?"]
+    },
+    {
+      "id": "cv-0721",
+      "english": "The lighter dumbbells go on the top rack.",
+      "assemblyChunks": ["The lighter dumbbells go on", "the top rack."],
+      "orderGlosses": ["가벼운 덤벨은 올려놓아요", "맨 위 선반에."]
+    },
+    {
+      "id": "cv-0722",
+      "english": "I told you not to do the dishes.",
+      "assemblyChunks": ["I told you not", "to do", "the dishes."],
+      "orderGlosses": ["내가 하지 말라고 했잖아", "그 일을—", "설거지를."]
+    },
+    {
+      "id": "cv-0723",
+      "english": "And I told you—I like doing the dishes.",
+      "assemblyChunks": ["And I told you—", "I like doing the dishes."],
+      "orderGlosses": ["그리고 내가 말했잖아—", "나는 설거지하는 걸 좋아한다고."]
+    },
+    {
+      "id": "cv-0724",
+      "english": "OK, well, I’ll pick a movie for us to watch.",
+      "assemblyChunks": ["OK,", "well,", "I’ll pick", "a movie", "for us", "to watch."],
+      "orderGlosses": ["좋아,", "그러면,", "내가 고를게", "영화 한 편을", "우리 둘이", "볼."]
+    },
+    {
+      "id": "cv-0725",
+      "english": "Good idea. By the way, do these wine glasses go in this cupboard?",
+      "assemblyChunks": ["Good idea.", "By the way,", "do these wine glasses", "go in", "this cupboard?"],
+      "orderGlosses": ["좋은 생각이야.", "그런데,", "이 와인 잔은", "넣는 거야", "이 찬장에?"]
+    },
+    {
+      "id": "cv-0726",
+      "english": "He picked a red apple from the basket.",
+      "assemblyChunks": ["He picked", "a red apple", "from the basket."],
+      "orderGlosses": ["그는 골랐어", "빨간 사과 하나를", "바구니에서."]
+    },
+    {
+      "id": "cv-0727",
+      "english": "Pick a topic that interests you.",
+      "assemblyChunks": ["Pick a topic", "that interests you."],
+      "orderGlosses": ["주제를 골라", "네가 흥미를 느끼는."]
+    },
+    {
+      "id": "cv-0728",
+      "english": "I can’t choose between mint chocolate and red bean.",
+      "assemblyChunks": ["I can’t choose", "between mint chocolate", "and red bean."],
+      "orderGlosses": ["나는 고를 수가 없어", "민트 초콜릿과", "팥 중에서."]
+    },
+    {
+      "id": "cv-0729",
+      "english": "I eventually chose to study math.",
+      "assemblyChunks": ["I eventually chose", "to study math."],
+      "orderGlosses": ["나는 결국 선택했어", "수학을 공부하기로."]
+    },
+    {
+      "id": "cv-0730",
+      "english": "Jeff was selected for the scholarship out of 500 applicants.",
+      "assemblyChunks": ["Jeff was selected", "for the scholarship", "out of 500 applicants."],
+      "orderGlosses": ["제프가 선발됐어", "장학금 수혜자로", "지원자 500명 중에서."]
+    },
+    {
+      "id": "cv-0731",
+      "english": "The user must select a delivery option before checkout.",
+      "assemblyChunks": ["The user must select", "a delivery option", "before checkout."],
+      "orderGlosses": ["이용자는 반드시 선택해야 해", "배송 옵션을", "결제 전에."]
+    },
+    {
+      "id": "cv-0732",
+      "english": "Do you want a ride to the station?",
+      "assemblyChunks": ["Do you want", "a ride to the station?"],
+      "orderGlosses": ["필요해", "역까지 태워 주는 게?"]
+    },
+    {
+      "id": "cv-0733",
+      "english": "I want pizza for dinner.",
+      "assemblyChunks": ["I want pizza", "for dinner."],
+      "orderGlosses": ["나는 피자를 먹고 싶어", "저녁으로."]
+    },
+    {
+      "id": "cv-0734",
+      "english": "You want a piece of this cake?",
+      "assemblyChunks": ["You want", "a piece of this cake?"],
+      "orderGlosses": ["너 먹고 싶어", "이 케이크 한 조각?"]
+    },
+    {
+      "id": "cv-0735",
+      "english": "They want ice cream.",
+      "assemblyChunks": ["They want ice cream."],
+      "orderGlosses": ["애들이 아이스크림 먹고 싶대."]
+    },
+    {
+      "id": "cv-0736",
+      "english": "We want a new car.",
+      "assemblyChunks": ["We want a new car."],
+      "orderGlosses": ["우리는 새 차를 사고 싶어요."]
+    },
+    {
+      "id": "cv-0737",
+      "english": "I want that robotic vacuum.",
+      "assemblyChunks": ["I want that robotic vacuum."],
+      "orderGlosses": ["나 저 로봇 청소기 사고 싶어."]
+    },
+    {
+      "id": "cv-0738",
+      "english": "Excuse me, we wanted a table by the window and mentioned that when I made a reservation.",
+      "assemblyChunks": ["Excuse me,", "we wanted a table", "by the window", "and mentioned that", "when I made a reservation."],
+      "orderGlosses": ["실례합니다,", "저희는 자리를 원했어요", "창가 쪽으로", "그리고 그 점을 말씀드렸어요", "제가 예약할 때."]
+    },
+    {
+      "id": "cv-0739",
+      "english": "Yes, we’re sorry about that, but we don’t take reservations for those tables.",
+      "assemblyChunks": ["Yes,", "we’re sorry about that,", "but we don’t", "take reservations", "for those tables."],
+      "orderGlosses": ["네,", "그 점은 죄송하지만,", "하지만 저희는 받지 않아요", "예약을", "그 자리들에 대해서는."]
+    },
+    {
+      "id": "cv-0740",
+      "english": "I signed up for a Pilates class at the gym.",
+      "assemblyChunks": ["I signed up", "for a Pilates class", "at the gym."],
+      "orderGlosses": ["나는 신청했어", "필라테스 수업을", "헬스장에서 하는."]
+    },
+    {
+      "id": "cv-0742",
+      "english": "She’s super chill and knows her stuff.",
+      "assemblyChunks": ["She’s super chill", "and knows her stuff."],
+      "orderGlosses": ["그녀는 정말 느긋하고", "실력도 확실해."]
+    },
+    {
+      "id": "cv-0743",
+      "english": "That’s it, then! I’m booking a spot.",
+      "assemblyChunks": ["That’s it, then!", "I’m booking a spot."],
+      "orderGlosses": ["그럼 그걸로 결정했어!", "나 자리 예약할게."]
+    },
+    {
+      "id": "cv-0744",
+      "english": "My mom has been wanting to meet you.",
+      "assemblyChunks": ["My mom has been wanting", "to meet you."],
+      "orderGlosses": ["우리 엄마는 계속 원해 오셨어", "너를 만나기를."]
+    },
+    {
+      "id": "cv-0745",
+      "english": "I’ve been wanting to try that new cafe next to the palace.",
+      "assemblyChunks": ["I’ve been wanting", "to try that new cafe", "next to the palace."],
+      "orderGlosses": ["나는 계속 가 보고 싶었어", "그 새로 생긴 카페에", "궁 바로 옆의."]
+    },
+    {
+      "id": "cv-0746",
+      "english": "The website says the item is out of stock.",
+      "assemblyChunks": ["The website says", "the item is out", "of stock."],
+      "orderGlosses": ["웹사이트에 나와 있어", "그 상품이 없다고", "재고에."]
+    },
+    {
+      "id": "cv-0747",
+      "english": "My health check results say I need to exercise more.",
+      "assemblyChunks": ["My health check results say", "I need to exercise more."],
+      "orderGlosses": ["건강 검진 결과에 나와 있어", "내가 운동을 더 해야 한다고."]
+    },
+    {
+      "id": "cv-0748",
+      "english": "The app says I need to update my password.",
+      "assemblyChunks": ["The app says", "I need", "to update my password."],
+      "orderGlosses": ["앱에서 알려 줘", "내가 해야 한다고", "비밀번호를 바꾸는 걸."]
+    },
+    {
+      "id": "cv-0749",
+      "english": "The message says your payment didn’t go through.",
+      "assemblyChunks": ["The message says", "your payment didn’t go through."],
+      "orderGlosses": ["메시지에 나와", "네 결제가 처리되지 않았다고."]
+    },
+    {
+      "id": "cv-0751",
+      "english": "What does it say on the back of the book?",
+      "assemblyChunks": ["What does it say", "on the back", "of the book?"],
+      "orderGlosses": ["뭐라고 적혀 있어", "뒤쪽에", "책의?"]
+    },
+    {
+      "id": "cv-0752",
+      "english": "How much longer do we have?",
+      "assemblyChunks": ["How much longer", "do we have?"],
+      "orderGlosses": ["얼마나 더", "남았어?"]
+    },
+    {
+      "id": "cv-0753",
+      "english": "The GPS says we’ll be arriving in, like, 10 minutes.",
+      "assemblyChunks": ["The GPS says", "we’ll be arriving", "in, like, 10 minutes."],
+      "orderGlosses": ["내비게이션에 따르면", "우리가 도착할 거래", "한 10분 뒤에."]
+    },
+    {
+      "id": "cv-0754",
+      "english": "Did you find the phone case you liked?",
+      "assemblyChunks": ["Did you find", "the phone case", "you liked?"],
+      "orderGlosses": ["찾았어", "그 핸드폰 케이스", "네가 마음에 들어 했던?"]
+    },
+    {
+      "id": "cv-0755",
+      "english": "Yeah, but the website says it’s out of stock.",
+      "assemblyChunks": ["Yeah,", "but the website says", "it’s out of stock."],
+      "orderGlosses": ["응,", "그런데 웹사이트에 나와", "그게 품절이라고."]
+    },
+    {
+      "id": "cv-0756",
+      "english": "Ugh, again?",
+      "assemblyChunks": ["Ugh, again?"],
+      "orderGlosses": ["하아, 또?"]
+    },
+    {
+      "id": "cv-0757",
+      "english": "Further down, it says they should have it back in stock next week.",
+      "assemblyChunks": ["Further down,", "it says they should have", "it back", "in stock next week."],
+      "orderGlosses": ["더 아래쪽에는,", "그들이 다시 갖출 거래", "그 상품을", "다음 주에 재고로."]
+    },
+    {
+      "id": "cv-0758",
+      "english": "The weather should clear up by this weekend.",
+      "assemblyChunks": ["The weather should clear up", "by this weekend."],
+      "orderGlosses": ["날씨가 갤 것 같아", "이번 주말까지는."]
+    },
+    {
+      "id": "cv-0759",
+      "english": "The food should be here any minute.",
+      "assemblyChunks": ["The food should be here", "any minute."],
+      "orderGlosses": ["음식이 여기 도착할 것 같아", "금방이라도."]
+    },
+    {
+      "id": "cv-0760",
+      "english": "There shouldn’t be any traffic around that time.",
+      "assemblyChunks": ["There shouldn’t be any traffic", "around that time."],
+      "orderGlosses": ["차가 거의 없을 거예요", "그 시간쯤에는."]
+    },
+    {
+      "id": "cv-0761",
+      "english": "It shouldn’t take me long to get home.",
+      "assemblyChunks": ["It shouldn’t take me long", "to get home."],
+      "orderGlosses": ["내게 오래 걸리진 않을 거야", "집에 가는 데."]
+    },
+    {
+      "id": "cv-0762",
+      "english": "Do you think I can reschedule the meeting for tomorrow afternoon?",
+      "assemblyChunks": ["Do you think", "I can reschedule", "the meeting for tomorrow afternoon?"],
+      "orderGlosses": ["당신 생각에는", "제가 다시 잡을 수 있을까요", "회의를 내일 오후로?"]
+    },
+    {
+      "id": "cv-0763",
+      "english": "Sure, that shouldn’t be a problem.",
+      "assemblyChunks": ["Sure,", "that shouldn’t be", "a problem."],
+      "orderGlosses": ["물론이죠,", "그건 아마 걱정 안 해도 돼요—", "문제가 될 일은 아니니까요."]
+    },
+    {
+      "id": "cv-0764",
+      "english": "How long will it take to update the software?",
+      "assemblyChunks": ["How long will it take", "to update the software?"],
+      "orderGlosses": ["얼마나 오래 걸릴까요", "소프트웨어를 업데이트하는 데?"]
+    },
+    {
+      "id": "cv-0765",
+      "english": "It shouldn’t take long; just a few minutes or so.",
+      "assemblyChunks": ["It shouldn’t take long;", "just a few minutes", "or so."],
+      "orderGlosses": ["오래 걸리진 않을 거예요;", "몇 분이면 돼요", "그 정도."]
+    },
+    {
+      "id": "cv-0766",
+      "english": "Let me walk you out.",
+      "assemblyChunks": ["Let me walk you out."],
+      "orderGlosses": ["제가 문까지 바래다드릴게요."]
+    },
+    {
+      "id": "cv-0767",
+      "english": "Let me buy you a drink.",
+      "assemblyChunks": ["Let me buy you", "a drink."],
+      "orderGlosses": ["내가 사 줄게", "한잔."]
+    },
+    {
+      "id": "cv-0768",
+      "english": "Let me go with you.",
+      "assemblyChunks": ["Let me go with you."],
+      "orderGlosses": ["내가 같이 가 줄게."]
+    },
+    {
+      "id": "cv-0769",
+      "english": "Let me take a look.",
+      "assemblyChunks": ["Let me take a look."],
+      "orderGlosses": ["내가 한번 볼게요."]
+    },
+    {
+      "id": "cv-0770",
+      "english": "Let me carry that box for you.",
+      "assemblyChunks": ["Let me carry", "that box for you."],
+      "orderGlosses": ["내가 옮겨 줄게", "그 상자를 너 대신."]
+    },
+    {
+      "id": "cv-0771",
+      "english": "Let me pour you another glass of wine.",
+      "assemblyChunks": ["Let me pour", "you another glass of wine."],
+      "orderGlosses": ["내가 따라 줄게", "당신께 와인 한 잔 더."]
+    },
+    {
+      "id": "cv-0772",
+      "english": "I think I can carry it all to the car by myself.",
+      "assemblyChunks": ["I think I can carry", "it all to the car", "by myself."],
+      "orderGlosses": ["내 생각엔 내가 옮길 수 있어", "그걸 전부 차까지", "나 혼자서."]
+    },
+    {
+      "id": "cv-0773",
+      "english": "OK, well, let me get the door for you.",
+      "assemblyChunks": ["OK,", "well,", "let me get the door", "for you."],
+      "orderGlosses": ["좋아,", "그럼,", "내가 문을 열어 줄게", "너를 위해."]
+    },
+    {
+      "id": "cv-0774",
+      "english": "It’s going to take five hours to get back to the city.",
+      "assemblyChunks": ["It’s going to take", "five hours", "to get back", "to the city."],
+      "orderGlosses": ["걸릴 거야", "다섯 시간", "돌아가는 데", "도시로."]
+    },
+    {
+      "id": "cv-0775",
+      "english": "Traffic is always worse going back.",
+      "assemblyChunks": ["Traffic is always worse", "going back."],
+      "orderGlosses": ["교통 체증이 늘 더 심해", "돌아갈 때는."]
+    },
+    {
+      "id": "cv-0776",
+      "english": "Yeah, true. We better get going.",
+      "assemblyChunks": ["Yeah, true.", "We better get going."],
+      "orderGlosses": ["응, 맞아.", "우리 이제 출발하는 게 낫겠다."]
+    },
+    {
+      "id": "cv-0777",
+      "english": "Let me drive. You can rest.",
+      "assemblyChunks": ["Let me drive.", "You can rest."],
+      "orderGlosses": ["운전은 내가 할게.", "당신은 쉬어."]
+    },
+    {
+      "id": "cv-0778",
+      "english": "I need to head home.",
+      "assemblyChunks": ["I need to head home."],
+      "orderGlosses": ["나 이제 집으로 가 봐야 해."]
+    },
+    {
+      "id": "cv-0779",
+      "english": "It’s time to head home.",
+      "assemblyChunks": ["It’s time to head home."],
+      "orderGlosses": ["이제 집으로 가 봐야 할 시간이야."]
+    },
+    {
+      "id": "cv-0780",
+      "english": "It’s getting late. Let’s call it a night.",
+      "assemblyChunks": ["It’s getting late.", "Let’s call it a night."],
+      "orderGlosses": ["시간이 늦어지고 있어.", "오늘은 이쯤에서 마무리하자."]
+    },
+    {
+      "id": "cv-0781",
+      "english": "My wife is calling. I better get going.",
+      "assemblyChunks": ["My wife is calling.", "I better get going."],
+      "orderGlosses": ["아내에게서 전화가 와.", "나 이제 가 보는 게 낫겠다."]
+    },
+    {
+      "id": "cv-0782",
+      "english": "Yeah, let’s call it a night.",
+      "assemblyChunks": ["Yeah,", "let’s call it a night."],
+      "orderGlosses": ["그래,", "오늘은 여기까지 하자."]
+    },
+    {
+      "id": "cv-0783",
+      "english": "Could you let me finish my sentence, please?",
+      "assemblyChunks": ["Could you let me finish", "my sentence, please?"],
+      "orderGlosses": ["제가 말을 끝내도록 해 주시겠어요", "제 문장을요, 부탁드려요?"]
+    },
+    {
+      "id": "cv-0784",
+      "english": "My boss refuses to let me work from home.",
+      "assemblyChunks": ["My boss refuses", "to let me work", "from home."],
+      "orderGlosses": ["내 상사는 거부해", "내가 일하도록 허락하는 걸", "집에서."]
+    },
+    {
+      "id": "cv-0785",
+      "english": "I let my students go on even when they make mistakes.",
+      "assemblyChunks": ["I let", "my students go on", "even when they make mistakes."],
+      "orderGlosses": ["나는 계속하게 해", "학생들이 말을 이어 가도록", "실수할 때조차."]
+    },
+    {
+      "id": "cv-0786",
+      "english": "My wife doesn’t let my friends come over to the house.",
+      "assemblyChunks": ["My wife doesn’t let", "my friends come over", "to the house."],
+      "orderGlosses": ["내 아내는 허락하지 않아", "내 친구들이 놀러 오는 걸", "집에."]
+    },
+    {
+      "id": "cv-0787",
+      "english": "Just let her do what she wants.",
+      "assemblyChunks": ["Just let her do", "what she wants."],
+      "orderGlosses": ["그냥 그녀가 하게 둬", "자기가 원하는 걸."]
+    },
+    {
+      "id": "cv-0788",
+      "english": "Give me your keys. Let me drive.",
+      "assemblyChunks": ["Give me your keys.", "Let me drive."],
+      "orderGlosses": ["네 차 키를 줘.", "운전은 내가 할게."]
+    },
+    {
+      "id": "cv-0789",
+      "english": "Did your parents have any weird rules growing up?",
+      "assemblyChunks": ["Did", "your parents", "have any weird rules", "growing up?"],
+      "orderGlosses": ["과거를 묻고", "너희 부모님은", "이상한 규칙이 있었어", "네가 자랄 때?"]
+    },
+    {
+      "id": "cv-0790",
+      "english": "Well, my dad would never let me stay out after 11 p.m., but that’s pretty typical, I guess.",
+      "assemblyChunks": ["Well,", "my dad would", "never let me", "stay out after 11 p.m.,", "but that’s pretty typical,", "I guess."],
+      "orderGlosses": ["음,", "우리 아빠는 늘", "절대 허락하지 않았어, 내가", "밤 11시 뒤까지 밖에 있는 걸,", "하지만 그건 꽤 흔한 일이잖아,", "내 생각엔."]
+    },
+    {
+      "id": "cv-0791",
+      "english": "That lamb kebab place last night had such a local vibe.",
+      "assemblyChunks": ["That lamb kebab place", "last night", "had such a local vibe."],
+      "orderGlosses": ["그 양고기 케밥집은", "어젯밤", "정말 현지 분위기가 났어."]
+    },
+    {
+      "id": "cv-0792",
+      "english": "I know! I thought they were going to kick us out, though.",
+      "assemblyChunks": ["I know!", "I thought they were going", "to kick us out,", "though."],
+      "orderGlosses": ["알아!", "나는 그들이 그러려는 줄 알았어", "우리를 쫓아내려고,", "그런데 말이야."]
+    },
+    {
+      "id": "cv-0794",
+      "english": "That’s because we kept spending money there. He should thank us!",
+      "assemblyChunks": ["That’s because we kept", "spending money there.", "He should thank us!"],
+      "orderGlosses": ["그건 우리가 계속했기 때문이지", "거기서 돈을 쓰는 걸.", "그가 우리에게 고마워해야 해!"]
+    },
+    {
+      "id": "cv-0795",
+      "english": "The hotel has a great view of the mountains.",
+      "assemblyChunks": ["The hotel has", "a great view of", "the mountains."],
+      "orderGlosses": ["그 호텔에는 있어", "멋진 전망이", "산이 보이는."]
+    },
+    {
+      "id": "cv-0796",
+      "english": "This neighborhood used to have more of a traditional vibe. It feels more touristy now.",
+      "assemblyChunks": ["This neighborhood used to have", "more of a traditional vibe.", "It feels more touristy now."],
+      "orderGlosses": ["이 동네는 예전에 더 풍겼어", "전통적인 분위기를.", "지금은 관광지처럼 더 느껴져."]
+    },
+    {
+      "id": "cv-0797",
+      "english": "That apartment in Banpo has a view of the Hangang River and really good amenities.",
+      "assemblyChunks": ["That apartment in Banpo", "has a view of", "the Hangang River", "and really good amenities."],
+      "orderGlosses": ["반포에 있는 그 아파트는", "전망이 있어", "한강이 보이는", "그리고 편의 시설도 정말 좋아."]
+    },
+    {
+      "id": "cv-0798",
+      "english": "This phone has a 1080p front camera.",
+      "assemblyChunks": ["This phone has", "a 1080p front camera."],
+      "orderGlosses": ["이 핸드폰에는 있어", "1080p 전면 카메라가."]
+    },
+    {
+      "id": "cv-0799",
+      "english": "The gym across the street has three stepmills.",
+      "assemblyChunks": ["The gym across the street", "has three stepmills."],
+      "orderGlosses": ["길 건너편 헬스장에는", "스텝밀이 세 대 있어."]
+    },
+    {
+      "id": "cv-0800",
+      "english": "I can’t let nasty comments discourage me.",
+      "assemblyChunks": ["I can’t let nasty comments", "discourage me."],
+      "orderGlosses": ["나는 허락할 수 없어, 악플이", "나를 기죽이도록."]
+    }
+  ]
+}

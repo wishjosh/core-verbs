@@ -24,20 +24,20 @@
 - `naturalKo`: 정답에서 보여 주는 자연스러운 한국어 뜻
 - `corePatterns`: 다른 문장에도 재사용할 핵심 구문
 - `errorPoints`: 한국인이 혼동하기 쉬운 정답 표현과 자동 분류 기준·설명
-- `reviewStatus`: `ai_draft` 또는 직접 확인한 `reviewed`
-- `meaningFlow`: 새 의미 전개 기준을 적용한 문장의 규칙 버전과 검수 상태
+- `reviewStatus`: 영어 청크 자료의 초안·검수 상태
+- `meaningFlow`: 의미 전개 규칙 버전과 별도 검수 상태(`reviewed` 또는 `ai_checked`)
 
-현재는 15개 기본동사와 주요 문장 형식을 고르게 포함한 30문장에 의미 전개 규칙 1을 적용했습니다. 나머지 문장은 기존 초안을 유지하며, 파일럿 확인 뒤 같은 기준으로 확장합니다. 원본 Google Sheets는 자료를 다시 만들 때의 입력과 이전 배포본의 예비 경로로만 사용합니다. `scripts/generate-learning-content.mjs`는 원문 보존, 청크 재조립, 문장부호 경계, 의미 전개 단서의 1:1 대응과 오류 선택지의 유효성을 검사합니다.
+869문장 모두에 의미 전개 규칙 1을 적용했습니다. 대표 30문장은 직접 검수한 `reviewed`, 나머지 839문장은 Codex가 문장별로 작성한 뒤 고위험 표현과 표본을 다시 확인한 `ai_checked`로 구분합니다. 원본 Google Sheets는 자료를 다시 만들 때의 입력과 이전 배포본의 예비 경로로만 사용합니다. `scripts/generate-learning-content.mjs`는 원문 보존, 청크 재조립, 문장부호 경계, 의미 전개 단서의 1:1 대응과 오류 선택지의 유효성을 검사합니다.
 
 ## 실행과 검사
 
 빌드 과정이 없는 HTML/CSS/JavaScript 앱입니다. `localhost`에서 실행해야 PWA와 서비스 워커를 확인할 수 있습니다.
 
-30문장 의미 전개 파일럿만 연속으로 확인하려면 `http://localhost:8000/?pilot=meaning-flow`로 접속합니다. 일반 주소에서는 기존 학습 일정이 그대로 적용됩니다.
+사람이 직접 검수한 30문장만 연속으로 확인하려면 `http://localhost:8000/?pilot=meaning-flow`로 접속합니다. 일반 주소에서는 869문장 전체와 기존 학습 일정이 적용됩니다.
 
 ```powershell
 python -m http.server 8000
-node --test learning-engine.test.js learning-content.test.js
+node --test learning-engine.test.js learning-content.test.js scripts/audit-meaning-flow.test.mjs
 node --check app.js
 ```
 
@@ -46,8 +46,12 @@ node --check app.js
 ```powershell
 node scripts/generate-learning-content.mjs --mode=generate --model=gemma4:e4b --batch=10
 node scripts/generate-learning-content.mjs --mode=quality --model=gemma4:26b --batch=8
-node scripts/generate-learning-content.mjs --mode=apply-meaning-flow
 node scripts/generate-learning-content.mjs --mode=validate
+node scripts/apply-meaning-flow-batches.mjs --validate-only
+node scripts/audit-meaning-flow.mjs --batches=data/meaning-flow-batches
+node scripts/apply-meaning-flow-batches.mjs
 ```
 
-첫 번째 단계가 869문장의 초안을 만들고, 두 번째 단계는 한정사·접속사·전치사 경계와 임시 번역처럼 명백한 문제만 더 큰 모델로 다시 심사합니다. 두 단계 모두 영어 원문을 출력값으로 받지 않고 원본 행에서 유지합니다.
+첫 번째 단계가 869문장의 청크 초안을 만들고, 두 번째 단계는 한정사·접속사·전치사 경계와 임시 번역처럼 명백한 문제만 더 큰 모델로 다시 심사합니다. 확정한 의미 전개 문구는 9개 배치 원본에 저장하며, 적용 도구는 사람 검수 30문장을 우선 보존한 채 나머지 839문장만 병합합니다.
+
+각 배치에는 `id`, 영어 원문, 고정 청크, 한국어 의미 전개 단서를 함께 저장합니다. 적용 전후에 영어 원문과 `assemblyChunks`를 다시 비교하며, 누락·중복·1:1 불일치가 하나라도 있으면 `data/learning-content.json`을 쓰지 않습니다. 감사 도구는 부정, `only to`, 사역·수동, 기본동사 다의어, 관용구와 고위험 문장 86개를 별도로 검사합니다.

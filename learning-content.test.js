@@ -9,6 +9,12 @@ const contentPath = path.join(__dirname, 'data', 'learning-content.json');
 const content = JSON.parse(fs.readFileSync(contentPath, 'utf8'));
 const meaningFlowOverridesPath = path.join(__dirname, 'data', 'meaning-flow-overrides.json');
 const meaningFlowOverrides = JSON.parse(fs.readFileSync(meaningFlowOverridesPath, 'utf8'));
+const meaningFlowBatchDir = path.join(__dirname, 'data', 'meaning-flow-batches');
+const meaningFlowBatches = fs.readdirSync(meaningFlowBatchDir)
+    .filter(file => /^part-\d{4}-\d{4}\.json$/.test(file))
+    .sort()
+    .map(file => JSON.parse(fs.readFileSync(path.join(meaningFlowBatchDir, file), 'utf8')));
+const generatorSource = fs.readFileSync(path.join(__dirname, 'scripts', 'generate-learning-content.mjs'), 'utf8');
 const joinChunks = chunks => chunks.reduce((sentence, chunk, index) => (
     index === 0 ? chunk : `${sentence}${/[—–]$/.test(sentence) ? '' : ' '}${chunk}`
 ), '');
@@ -73,17 +79,64 @@ test('stores a reviewed 30-sentence English meaning-flow pilot across all 15 ver
     }
 });
 
+test('stores AI-cross-checked meaning flow for every remaining sentence', () => {
+    assert.equal(content.meaningFlowTotal, 869);
+    assert.equal(content.meaningFlowReviewCount, 30);
+    assert.equal(content.meaningFlowAiCheckedCount, 839);
+    assert.equal(content.meaningFlowDraftCount, 0);
+    assert.equal(meaningFlowBatches.length, 9);
+
+    const reviewedIds = new Set(meaningFlowOverrides.items.map(item => item.id));
+    const batchItems = meaningFlowBatches.flatMap(batch => {
+        assert.equal(batch.rulesVersion, 1);
+        assert.equal(batch.reviewStatus, 'ai_checked');
+        return batch.items;
+    });
+    assert.equal(batchItems.length, 839);
+    assert.equal(new Set(batchItems.map(item => item.id)).size, 839);
+
+    const byId = new Map(content.items.map(item => [item.id, item]));
+    for (const candidate of batchItems) {
+        assert.ok(!reviewedIds.has(candidate.id), candidate.id);
+        const item = byId.get(candidate.id);
+        assert.equal(item.english, candidate.english, candidate.id);
+        assert.deepEqual(item.assemblyChunks, candidate.assemblyChunks, candidate.id);
+        assert.deepEqual(item.orderGlosses, candidate.orderGlosses, candidate.id);
+        assert.deepEqual(item.meaningFlow, {
+            rulesVersion: 1,
+            reviewStatus: 'ai_checked',
+            reviewMethod: 'multi_agent_direct'
+        }, candidate.id);
+    }
+});
+
 test('meaning-flow pilot fixes representative reverse-translation traps', () => {
     const byId = new Map(content.items.map(item => [item.id, item]));
     assert.deepEqual(byId.get('cv-0062').orderGlosses, ['(과거 질문으로 시작)', '너는 벌써 퇴근했어?']);
     assert.deepEqual(byId.get('cv-0148').orderGlosses, ['어떻게 구했어요', '이 명품 가방을?']);
     assert.deepEqual(byId.get('cv-0421').orderGlosses, [
-        '혼자 일해 본 것이',
-        '내가 깨닫게 했어요',
-        '불안정한 수입은',
-        '사람을 불안하게 할 수 있다는 걸.'
+        '혼자 일해 본 경험이',
+        '내게 깨닫게 했어요',
+        '깨달은 내용은—불안정한 수입이 사람에게 줄 수 있는 영향,',
+        '바로 불안감을 느끼게 한다는 걸.'
     ]);
     assert.deepEqual(byId.get('cv-0750').orderGlosses, ['포장지에는 적혀 있어요', '이탈리아에서 만들어졌다고.']);
+});
+
+test('dedicated meaning-flow generation is resumable and cannot write English or chunk changes', () => {
+    const functionStart = generatorSource.indexOf('async function runGenerateMeaningFlow()');
+    const functionEnd = generatorSource.indexOf('\nconst rows =', functionStart);
+    assert.ok(functionStart >= 0 && functionEnd > functionStart);
+    const functionBody = generatorSource.slice(functionStart, functionEnd);
+
+    assert.match(generatorSource, /MEANING_FLOW_CACHE_PATH/);
+    assert.match(generatorSource, /else if \(mode === 'meaning-flow'\) await runGenerateMeaningFlow\(\)/);
+    assert.match(functionBody, /loadMeaningFlowCache\(\)/);
+    assert.match(functionBody, /applyMeaningFlowOverrides\(content, overrides\)/);
+    assert.match(functionBody, /assertEnglishAndChunksUnchanged\(immutableSnapshot, content\)/);
+    assert.match(functionBody, /meaningFlowReviewCount !== overrides\.items\.length/);
+    assert.doesNotMatch(functionBody, /\.english\s*=/);
+    assert.doesNotMatch(functionBody, /\.assemblyChunks\s*=/);
 });
 
 test('every English sentence is reconstructed exactly from native chunks', () => {
