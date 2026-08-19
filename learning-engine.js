@@ -59,6 +59,13 @@
         return String(word || '').replace(/^[^A-Za-z0-9'’]+|[^A-Za-z0-9'’]+$/g, '');
     }
 
+    function joinChunks(chunks) {
+        return (chunks || []).reduce((sentence, chunk, index) => {
+            if (index === 0) return chunk;
+            return `${sentence}${/[—–]$/.test(sentence) ? '' : ' '}${chunk}`;
+        }, '');
+    }
+
     function hashText(text) {
         let hash = 0;
         const value = String(text || '');
@@ -235,6 +242,9 @@
     }
 
     function deriveCorePhrase(card) {
+        if (Array.isArray(card?.corePatterns) && card.corePatterns.length) {
+            return String(card.corePatterns[0]).trim();
+        }
         if (card && card.corePhrase) return String(card.corePhrase).trim();
 
         const sentence = String(card?.en || '');
@@ -304,6 +314,26 @@
     function buildErrorCandidates(card) {
         const sentence = String(card?.en || '');
         const candidates = [];
+
+        if (Array.isArray(card?.errorPoints)) {
+            card.errorPoints.forEach(point => {
+                if (!point) return;
+                candidates.push({
+                    type: normalizeErrorType(point.type),
+                    correct: String(point.correct || '').trim(),
+                    wrong: String(point.distractor || '').trim(),
+                    tip: String(point.tip || '이 문장에서 자주 혼동하는 형태를 문장째 확인하세요.').trim(),
+                    separate: String(point.correct || '').trim().split(/\s+/).length === 1
+                });
+            });
+            const storedCandidates = candidates.filter(candidate =>
+                candidate.correct &&
+                candidate.wrong &&
+                normalizeText(candidate.correct) !== normalizeText(candidate.wrong) &&
+                findPhraseRange(sentence.split(/\s+/), candidate.correct)
+            );
+            if (storedCandidates.length) return storedCandidates;
+        }
 
         if (card?.distractor) {
             const core = card.corePhrase && findPhraseRange(sentence.split(/\s+/), card.corePhrase)
@@ -410,10 +440,21 @@
     }
 
     function buildPracticeQuestion(card, rng = Math.random) {
-        const corePhrase = deriveCorePhrase(card);
+        const corePatterns = Array.isArray(card?.corePatterns) && card.corePatterns.length
+            ? card.corePatterns.map(pattern => String(pattern).trim()).filter(Boolean)
+            : [deriveCorePhrase(card)].filter(Boolean);
+        const corePhrase = corePatterns[0] || deriveCorePhrase(card);
         const candidates = buildErrorCandidates(card);
         const error = candidates.length ? candidates[hashText(card?.en) % candidates.length] : null;
-        let chunks = buildChunks(card?.en, corePhrase, error?.separate ? error.correct : '');
+        const storedChunks = Array.isArray(card?.assemblyChunks)
+            ? card.assemblyChunks.map(chunk => String(chunk).trim()).filter(Boolean)
+            : [];
+        const sourceWordCount = String(card?.en || '').trim().split(/\s+/).filter(Boolean).length;
+        const minimumStoredChunks = sourceWordCount <= 6 ? 1 : 2;
+        const hasValidStoredChunks = storedChunks.length >= minimumStoredChunks && joinChunks(storedChunks) === String(card?.en || '').trim();
+        let chunks = hasValidStoredChunks
+            ? storedChunks
+            : buildChunks(card?.en, corePhrase, error?.separate ? error.correct : '');
         if (!error && chunks.length === 1) chunks = splitShortChunkNaturally(chunks[0]);
         const targetIds = chunks.map((_, index) => `target-${index}`);
         const bank = chunks.map((text, index) => ({ id: targetIds[index], text, isDistractor: false }));
@@ -432,6 +473,8 @@
 
         return {
             corePhrase,
+            corePatterns,
+            orderGlosses: Array.isArray(card?.orderGlosses) ? [...card.orderGlosses] : [],
             errorType: error?.type || 'word_order',
             errorLabel: ERROR_LABELS[error?.type || 'word_order'],
             tip: error?.tip || '영어는 단어보다 자주 함께 쓰는 표현 덩어리와 어순으로 기억하세요.',

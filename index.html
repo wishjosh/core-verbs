@@ -78,13 +78,20 @@
             <div id="verb-badge">데이터 불러오는 중...</div>
             <div id="new-badge">🆕 오늘의 새 문장</div>
             <div id="wrong-badge"></div>
-            <div id="korean">잠시만 기다려 주세요!</div>
+            <div id="order-guide" class="order-guide">
+                <span class="order-guide-label">영어 어순 힌트</span>
+                <div id="order-glosses" class="order-glosses">잠시만 기다려 주세요!</div>
+            </div>
+            <div id="natural-answer" class="natural-answer">
+                <span class="natural-answer-label">자연스러운 뜻</span>
+                <div id="korean"></div>
+            </div>
             <div id="hint">영어 문장을 떠올린 뒤 화면을 터치하세요</div>
 
             <!-- 🧩 모바일 핵심 구문 선택·조립 -->
             <div id="practice-panel" class="practice-panel">
-                <div class="practice-title">🧩 방금 떠올린 표현 덩어리를 순서대로 선택하세요</div>
-                <div class="practice-subtitle" id="practice-subtitle">관사·복수·전치사·한국어 직역형도 함께 확인합니다.</div>
+                <div class="practice-title">🧩 위 한국어 어순을 따라 영어 덩어리를 고르세요</div>
+                <div class="practice-subtitle" id="practice-subtitle">원어민 청크와 자주 틀리는 문법을 함께 확인합니다.</div>
                 <div id="practice-slots" class="practice-slots" aria-live="polite"></div>
                 <div id="practice-bank" class="practice-bank"></div>
                 <div class="practice-controls">
@@ -95,8 +102,8 @@
 
             <div id="english">Here is the English sentence</div>
             <div id="core-phrase-box" class="core-phrase-box">
-                <span class="core-phrase-label">오늘의 핵심 표현</span>
-                <strong id="core-phrase-text"></strong>
+                <span class="core-phrase-label">이 문장의 핵심 구문</span>
+                <strong id="core-phrase-text" class="core-pattern-list"></strong>
                 <span id="practice-result-tip"></span>
             </div>
             

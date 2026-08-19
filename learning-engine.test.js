@@ -45,6 +45,50 @@ test('keeps sentence boundaries and native phrases together', () => {
     assert.ok(question.bank.some(item => item.isDistractor && item.text === 'to post office.'));
 });
 
+test('uses reviewed native chunks, English-order glosses, and reusable patterns from stored content', () => {
+    const card = {
+        verb: 'MAKE',
+        en: 'I barely made it to the airport on time, only to have my flight delayed.',
+        assemblyChunks: ['I barely', 'made it to the airport', 'on time,', 'only to have my flight delayed.'],
+        orderGlosses: ['나는 간신히', '공항에 도착했는데', '제시간에,', '결국 비행기가 지연되는 일을 겪었다.'],
+        corePatterns: ['make it to + 장소', 'on time', 'only to + 동사원형']
+    };
+    const question = engine.buildPracticeQuestion(card, fixedRandom);
+    assert.deepEqual(question.targetChunks, card.assemblyChunks);
+    assert.deepEqual(question.orderGlosses, card.orderGlosses);
+    assert.deepEqual(question.corePatterns, card.corePatterns);
+    assert.equal(question.corePhrase, 'make it to + 장소');
+});
+
+test('preserves a no-space em dash as a real chunk boundary', () => {
+    const question = engine.buildPracticeQuestion({
+        verb: 'WORK',
+        en: 'We can meet in Gangnam—wherever works best.',
+        assemblyChunks: ['We can meet', 'in Gangnam—', 'wherever works best.'],
+        orderGlosses: ['우리는 만날 수 있어', '강남에서—', '가장 편한 곳이면 어디든.'],
+        corePatterns: ['wherever works best']
+    }, fixedRandom);
+    assert.deepEqual(question.targetChunks, ['We can meet', 'in Gangnam—', 'wherever works best.']);
+});
+
+test('uses a stored learner error point as a selectable contrast', () => {
+    const question = engine.buildPracticeQuestion({
+        verb: 'HAVE',
+        en: 'Did you leave work yet?',
+        assemblyChunks: ['Did', 'you leave work yet?'],
+        corePatterns: ['Did + 주어 + 동사원형 + yet?'],
+        errorPoints: [{
+            type: 'tense_auxiliary',
+            correct: 'Did',
+            distractor: 'Do',
+            tip: '한 번의 과거 퇴근 여부를 묻기 때문에 Did를 씁니다.'
+        }]
+    }, () => 0);
+    const distractor = question.bank.find(item => item.isDistractor);
+    assert.equal(distractor.text, 'Do');
+    assert.equal(distractor.errorType, 'tense_auxiliary');
+});
+
 test('avoids a one-button exercise for a short sentence without a contrast', () => {
     const question = engine.buildPracticeQuestion(
         { verb: 'GO', en: 'May I come in?' },

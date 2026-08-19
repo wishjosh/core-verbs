@@ -1,10 +1,10 @@
 /* ==========================================================================
    Core Verbs - 서비스 워커 (sw.js)
    앱 셸을 캐시해 홈 화면 설치(PWA) 및 오프라인 실행을 지원한다.
-   ※ 학습 데이터(구글 시트)·폰트 등 외부 리소스는 항상 네트워크를 우선한다.
+   ※ 저장된 학습 자료(JSON)는 앱 셸과 함께 캐시하고, 구글 시트·폰트 등 외부 리소스는 네트워크로 요청한다.
    ========================================================================== */
 
-const CACHE_NAME = 'core-verbs-shell-v3';
+const CACHE_NAME = 'core-verbs-shell-v4';
 
 // 앱 셸(자체 호스팅 파일)만 사전 캐시한다.
 const APP_SHELL = [
@@ -12,6 +12,7 @@ const APP_SHELL = [
     './index.html',
     './style.css',
     './learning-engine.js',
+    './data/learning-content.json',
     './app.js',
     './manifest.webmanifest',
     './icon-192.png',

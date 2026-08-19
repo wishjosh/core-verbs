@@ -3,6 +3,7 @@
    ========================================================================== */
 
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSR1wby3k5QhlAL8f8MeH-Ni1qjGgRMu8ROHDoPCKci-GYrbpx1DzTsAvcr_l5qBcemui93D4cqMLa0/pub?output=tsv";
+const CONTENT_URL = './data/learning-content.json';
 const STORAGE_KEY = 'coreVerbs_Memory_v1';
 const Learning = window.CoreVerbsLearning;
 
@@ -450,12 +451,25 @@ function isTodayNewCard(card) {
     return registry.sentences.includes(card.en);
 }
 
-/**
- * 🌐 구글 스프레드시트(TSV)로부터 데이터 로딩 및 초기 데이터베이스 구성
- */
-async function fetchDatabase() {
-    try {
+function mapStoredContent(item) {
+    return {
+        id: item.id,
+        day: item.day || '?',
+        verb: item.verb || '',
+        ko: item.naturalKo || '',
+        en: item.english || '',
+        assemblyChunks: Array.isArray(item.assemblyChunks) ? item.assemblyChunks : [],
+        orderGlosses: Array.isArray(item.orderGlosses) ? item.orderGlosses : [],
+        corePatterns: Array.isArray(item.corePatterns) ? item.corePatterns : [],
+        errorPoints: Array.isArray(item.errorPoints) ? item.errorPoints : [],
+        reviewStatus: item.reviewStatus || 'ai_draft',
+        priority: Number.isFinite(Number(item.priority)) && Number(item.priority) > 0 ? Number(item.priority) : 1
+    };
+}
+
+async function fetchSheetFallback() {
         const response = await fetch(SHEET_URL);
+        if (!response.ok) throw new Error(`시트 요청 실패: ${response.status}`);
         const data = await response.text();
         const rows = data.split('\n');
         const headers = (rows[0] || '').split('\t').map(header => header.replace(/^\uFEFF/, '').trim().toUpperCase());
@@ -498,12 +512,34 @@ async function fetchDatabase() {
                 }
             }
         }
-        init(); 
+        return db;
+}
+
+/**
+ * 💾 검수 가능한 정적 학습 자료를 우선 사용하고, 이전 배포본과의 호환을 위해 시트를 예비 경로로 둔다.
+ */
+async function fetchDatabase() {
+    try {
+        const response = await fetch(CONTENT_URL, { cache: 'no-cache' });
+        if (!response.ok) throw new Error(`학습 자료 요청 실패: ${response.status}`);
+        const content = await response.json();
+        if (!Array.isArray(content.items) || content.items.length === 0) throw new Error('학습 자료가 비어 있습니다.');
+        db = content.items.map(mapStoredContent).filter(card => card.en && card.ko);
+        if (db.length !== content.items.length) throw new Error('일부 학습 자료의 영어 또는 한국어가 비어 있습니다.');
+        init();
     } catch (error) {
-        console.error("데이터를 불러오지 못했습니다.", error);
-        document.getElementById('verb-badge').innerText = "에러 발생";
-        document.getElementById('korean').innerText = "데이터를 불러오는 데 실패했습니다.\n인터넷 연결을 확인해 주세요.";
-        document.getElementById('hint').style.display = 'none';
+        console.warn('저장된 학습 자료를 불러오지 못해 시트 자료를 사용합니다.', error);
+        try {
+            await fetchSheetFallback();
+            init();
+        } catch (fallbackError) {
+            console.error("데이터를 불러오지 못했습니다.", fallbackError);
+            document.getElementById('verb-badge').innerText = "에러 발생";
+            document.getElementById('korean').innerText = "데이터를 불러오는 데 실패했습니다.\n인터넷 연결을 확인해 주세요.";
+            document.getElementById('order-guide').style.display = 'none';
+            document.getElementById('natural-answer').style.display = 'block';
+            document.getElementById('hint').style.display = 'none';
+        }
     }
 }
 
@@ -744,6 +780,9 @@ function loadCard() {
     }
     
     const koreanEl = document.getElementById('korean');
+    const naturalAnswer = document.getElementById('natural-answer');
+    const orderGuide = document.getElementById('order-guide');
+    const orderGlosses = document.getElementById('order-glosses');
     const englishEl = document.getElementById('english');
     const hintEl = document.getElementById('hint');
     const cardActionRow = document.getElementById('card-action-row');
@@ -755,13 +794,27 @@ function loadCard() {
     const cardEl = document.getElementById('card');
 
     if (koreanEl) koreanEl.innerText = card.ko;
+    if (naturalAnswer) naturalAnswer.style.display = 'none';
+    if (orderGuide) orderGuide.style.display = 'block';
+    if (orderGlosses) {
+        orderGlosses.innerHTML = '';
+        const glosses = Array.isArray(card.orderGlosses) && card.orderGlosses.length
+            ? card.orderGlosses
+            : [card.ko];
+        glosses.forEach(gloss => {
+            const chip = document.createElement('span');
+            chip.className = 'order-gloss-chip';
+            chip.innerText = gloss;
+            orderGlosses.appendChild(chip);
+        });
+    }
     if (englishEl) {
         englishEl.innerText = card.en;
         englishEl.style.display = 'none';
     }
     
     if (hintEl) {
-        hintEl.innerText = '영어 문장을 떠올린 뒤 화면을 터치하세요';
+        hintEl.innerText = '한국어 덩어리를 영어 어순으로 읽고 화면을 터치하세요';
         hintEl.style.display = 'block';
     }
     if (practicePanel) practicePanel.style.display = 'none';
@@ -793,7 +846,7 @@ function startPractice() {
 
     if (hintEl) hintEl.style.display = 'none';
     if (practicePanel) practicePanel.style.display = 'block';
-    if (practiceSubtitle) practiceSubtitle.innerText = `집중 확인: ${currentPractice.errorLabel}`;
+    if (practiceSubtitle) practiceSubtitle.innerText = `영어 어순대로 조립 · 집중 확인: ${currentPractice.errorLabel}`;
     if (actionButtons) actionButtons.style.display = 'flex';
     if (showAnswerBtn) showAnswerBtn.style.display = 'inline-flex';
     renderPracticeSelection();
@@ -911,6 +964,7 @@ function revealPracticeAnswer(headline, detail) {
     const card = todayCards[currentIndex];
     if (!card || !currentPractice) return;
     const englishEl = document.getElementById('english');
+    const naturalAnswer = document.getElementById('natural-answer');
     const corePhraseBox = document.getElementById('core-phrase-box');
     const corePhraseText = document.getElementById('core-phrase-text');
     const resultTip = document.getElementById('practice-result-tip');
@@ -921,7 +975,19 @@ function revealPracticeAnswer(headline, detail) {
     const cardEl = document.getElementById('card');
 
     if (englishEl) englishEl.style.display = 'block';
-    if (corePhraseText) corePhraseText.innerText = currentPractice.corePhrase;
+    if (naturalAnswer) naturalAnswer.style.display = 'block';
+    if (corePhraseText) {
+        corePhraseText.innerHTML = '';
+        const patterns = currentPractice.corePatterns?.length
+            ? currentPractice.corePatterns
+            : [currentPractice.corePhrase];
+        patterns.filter(Boolean).forEach(pattern => {
+            const chip = document.createElement('span');
+            chip.className = 'core-pattern-chip';
+            chip.innerText = pattern;
+            corePhraseText.appendChild(chip);
+        });
+    }
     if (resultTip) resultTip.innerText = `${headline} ${detail}`;
     if (corePhraseBox) corePhraseBox.style.display = 'block';
     if (cardActionRow) cardActionRow.style.display = 'flex';
@@ -1045,7 +1111,7 @@ function showCompletionScreen() {
     if (completionMsg) completionMsg.style.display = 'block';
     
     const elementsToHide = [
-        'korean', 'english', 'hint', 'practice-panel', 'core-phrase-box', 'card-action-row',
+        'order-guide', 'natural-answer', 'korean', 'english', 'hint', 'practice-panel', 'core-phrase-box', 'card-action-row',
         'action-buttons', 'progress-container',
         'verb-badge', 'new-badge', 'wrong-badge'
     ];

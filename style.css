@@ -272,11 +272,61 @@ body {
     border: 1px solid #dcedc8;
 }
 
-#korean { 
-    font-size: clamp(1.2rem, 5.2vw, 1.45rem); 
-    color: var(--text-main); 
-    font-weight: 800; 
-    margin-bottom: 20px; 
+.order-guide {
+    width: 100%;
+    padding: 15px 14px;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #f8fafc, #eef6ff);
+    border: 1px solid #dbeafe;
+    cursor: pointer;
+}
+
+.order-guide-label,
+.natural-answer-label {
+    display: block;
+    margin-bottom: 8px;
+    color: #64748b;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+}
+
+.order-glosses {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 7px;
+}
+
+.order-gloss-chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 34px;
+    padding: 7px 10px;
+    border-radius: 10px;
+    background: #ffffff;
+    border: 1px solid #bfdbfe;
+    color: #334155;
+    font-size: clamp(0.9rem, 3.8vw, 1rem);
+    font-weight: 750;
+    line-height: 1.25;
+    box-shadow: 0 1px 3px rgba(30, 64, 175, 0.06);
+}
+
+.natural-answer {
+    display: none;
+    width: 100%;
+    margin-top: 15px;
+    padding-top: 14px;
+    border-top: 1px solid #e2e8f0;
+    animation: fadeIn 0.3s ease-out;
+}
+
+#korean {
+    font-size: clamp(1.2rem, 5.2vw, 1.45rem);
+    color: var(--text-main);
+    font-weight: 800;
+    margin-bottom: 0;
     word-break: keep-all; 
     line-height: 1.45; 
 }
@@ -459,6 +509,23 @@ body {
 #core-phrase-text {
     display: block;
     font-size: 1rem;
+}
+
+.core-pattern-list {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.core-pattern-chip {
+    display: inline-flex;
+    padding: 5px 9px;
+    border-radius: 9px;
+    background: #ffffff;
+    border: 1px solid #a7f3d0;
+    color: #065f46;
+    font-size: 0.88rem;
+    font-weight: 800;
 }
 
 #practice-result-tip {
