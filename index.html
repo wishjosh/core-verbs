@@ -55,7 +55,7 @@
             </div>
             <div class="error-profile" id="error-profile">
                 <span class="error-profile-title">🔎 나의 오류</span>
-                <span id="error-summary">구문 훈련을 시작하면 자주 틀리는 부분을 보여 드려요.</span>
+                <span id="error-summary">학습을 시작하면 실제로 표시한 오답을 보여 드려요.</span>
             </div>
         </div>
         
@@ -112,27 +112,12 @@
                 <div class="mistake-review-help">틀린 단어를 하나씩 누르세요. 구문 전체를 틀렸다면 이어진 단어를 모두 누르세요.</div>
                 <button id="btn-word-order" class="word-order-btn" type="button" aria-pressed="false" onclick="event.stopPropagation(); toggleWordOrderMistake();">↔ 어순도 틀렸어요</button>
                 <div id="mistake-summary" class="mistake-summary empty" aria-live="polite">선택한 오류가 아직 없습니다.</div>
-                <div class="error-type-picker">
-                    <span>선택한 오류 전체의 종류 · 자동 선택되며, 다르면 직접 바꿀 수 있어요</span>
-                    <div class="error-type-buttons">
-                        <button type="button" data-error-type="article" aria-pressed="false" onclick="event.stopPropagation(); toggleReportedErrorType('article');" disabled>관사</button>
-                        <button type="button" data-error-type="plural" aria-pressed="false" onclick="event.stopPropagation(); toggleReportedErrorType('plural');" disabled>단·복수</button>
-                        <button type="button" data-error-type="tense_auxiliary" aria-pressed="false" onclick="event.stopPropagation(); toggleReportedErrorType('tense_auxiliary');" disabled>시제·조동사</button>
-                        <button type="button" data-error-type="preposition" aria-pressed="false" onclick="event.stopPropagation(); toggleReportedErrorType('preposition');" disabled>전치사</button>
-                        <button type="button" data-error-type="koreanism" aria-pressed="false" onclick="event.stopPropagation(); toggleReportedErrorType('koreanism');" disabled>한국식 표현</button>
-                        <button type="button" data-error-type="expression" aria-pressed="false" onclick="event.stopPropagation(); toggleReportedErrorType('expression');" disabled>핵심 구문</button>
-                    </div>
-                </div>
                 <div class="self-check-controls">
                     <button class="self-check-btn recall-fail" type="button" onclick="event.stopPropagation(); markRecallFailure();">전체 문장 실패</button>
                     <button class="self-check-btn no-mistakes" type="button" onclick="event.stopPropagation(); markNoMistakes();">단어 오류 없음</button>
                     <button id="btn-save-mistakes" class="self-check-btn save-mistakes" type="button" onclick="event.stopPropagation(); saveSelectedMistakes();" disabled>선택한 오류 저장</button>
                 </div>
-            </div>
-            <div id="core-phrase-box" class="core-phrase-box">
-                <span class="core-phrase-label">이 문장의 핵심 구문</span>
-                <strong id="core-phrase-text" class="core-pattern-list"></strong>
-                <span id="practice-result-tip"></span>
+                <p id="practice-result-tip" aria-live="polite"></p>
             </div>
             
             <!-- 🔊 + ❓ 버튼 영역 -->
@@ -252,6 +237,7 @@
             <div class="setting-item backup-section">
                 <label>💾 학습 기록 백업 / 복원</label>
                 <p class="backup-desc">진도·복습 일정·개인 오류·질문 노트를 파일로 저장하고, 새 기기나 재설치 후 그대로 이어서 학습할 수 있어요.</p>
+                <button id="btn-error-export" onclick="exportMistakeHistory()">🧠 오류 기록 파일 내보내기</button>
                 <button id="btn-backup" onclick="exportBackup()">⬇️ 백업 파일 내보내기</button>
                 <button id="btn-restore" onclick="document.getElementById('restore-file').click()">⬆️ 백업 파일 불러오기</button>
                 <input type="file" id="restore-file" accept="application/json,.json" style="display:none" onchange="importBackup(this)">

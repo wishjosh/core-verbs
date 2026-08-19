@@ -659,7 +659,7 @@ body {
 
 .word-order-btn {
     width: 100%;
-    min-height: 40px;
+    min-height: 44px;
     border: 1px solid #cbd5e1;
     border-radius: 10px;
     background: #ffffff;
@@ -701,52 +701,6 @@ body {
     font-weight: 800;
 }
 
-.mistake-summary-chip.reported-types {
-    width: 100%;
-    border-color: #93c5fd;
-    background: #eff6ff;
-    color: #1d4ed8;
-}
-
-.error-type-picker > span {
-    display: block;
-    margin-bottom: 6px;
-    color: #64748b;
-    font-size: 0.7rem;
-    font-weight: 800;
-}
-
-.error-type-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-bottom: 11px;
-}
-
-.error-type-buttons button {
-    min-height: 36px;
-    padding: 7px 9px;
-    border: 1px solid #cbd5e1;
-    border-radius: 9px;
-    background: #fff;
-    color: #64748b;
-    font-family: inherit;
-    font-size: 0.72rem;
-    font-weight: 850;
-    cursor: pointer;
-}
-
-.error-type-buttons button.selected {
-    border-color: #f97316;
-    background: #ffedd5;
-    color: #9a3412;
-}
-
-.error-type-buttons button:disabled {
-    opacity: 0.42;
-    cursor: not-allowed;
-}
-
 .self-check-controls {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -785,55 +739,12 @@ body {
     cursor: not-allowed;
 }
 
-.core-phrase-box {
-    display: none;
-    width: 100%;
-    margin-top: 13px;
-    padding: 12px 14px;
-    border-radius: 13px;
-    background: #ecfdf5;
-    border: 1px solid #a7f3d0;
-    color: #065f46;
-    text-align: left;
-    line-height: 1.45;
-    animation: fadeIn 0.25s ease-out;
-}
-
-.core-phrase-label {
-    display: block;
-    color: #047857;
-    font-size: 0.72rem;
-    font-weight: 800;
-    margin-bottom: 3px;
-}
-
-#core-phrase-text {
-    display: block;
-    font-size: 1rem;
-}
-
-.core-pattern-list {
-    display: flex !important;
-    flex-wrap: wrap;
-    gap: 6px;
-}
-
-.core-pattern-chip {
-    display: inline-flex;
-    padding: 5px 9px;
-    border-radius: 9px;
-    background: #ffffff;
-    border: 1px solid #a7f3d0;
-    color: #065f46;
-    font-size: 0.88rem;
-    font-weight: 800;
-}
-
 #practice-result-tip {
     display: block;
     color: #475569;
     font-size: 0.78rem;
-    margin-top: 6px;
+    line-height: 1.5;
+    margin: 10px 0 0;
 }
 
 /* 🔊 스피커 버튼 */
@@ -1151,6 +1062,7 @@ button.action-btn:active {
     margin: 0 0 4px;
 }
 
+#btn-error-export,
 #btn-backup,
 #btn-restore {
     width: 100%;
@@ -1165,6 +1077,17 @@ button.action-btn:active {
     align-items: center;
     justify-content: center;
     gap: 8px;
+}
+
+#btn-error-export {
+    background-color: #ecfeff;
+    color: #0f766e;
+    border: 1.5px solid #99f6e4;
+}
+
+#btn-error-export:hover {
+    background-color: #ccfbf1;
+    border-color: #5eead4;
 }
 
 #btn-backup {
@@ -1189,6 +1112,7 @@ button.action-btn:active {
     border-color: #c2cdd9;
 }
 
+#btn-error-export:active,
 #btn-backup:active,
 #btn-restore:active {
     transform: scale(0.98);

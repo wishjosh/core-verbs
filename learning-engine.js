@@ -571,7 +571,7 @@
         }));
     }
 
-    function classifyMistakeSelections(card, selectedIndexes, options = {}) {
+    function buildMistakeSelections(card, selectedIndexes) {
         const chunks = buildReviewTokens(card);
         const tokens = chunks.flatMap(chunk => chunk.tokens);
         const selected = [...new Set((selectedIndexes || [])
@@ -588,6 +588,32 @@
             if (continuesGroup) previousGroup.push(index);
             else selectedGroups.push([index]);
         });
+
+        return {
+            chunks,
+            selectedTokenIndexes: selected,
+            selections: selectedGroups.map(group => ({
+                start: group[0],
+                end: group.at(-1) + 1,
+                text: group.map(index => tokens[index].text).join(' '),
+                tokenIndexes: [...group],
+                chunkIndexes: [...new Set(group.map(index => tokens[index].chunkIndex))]
+            }))
+        };
+    }
+
+    function buildAssessmentSignals(options = {}) {
+        const signals = [];
+        if (options.wordOrder) signals.push('word_order');
+        if (options.recall) signals.push('recall');
+        return signals;
+    }
+
+    function classifyMistakeSelections(card, selectedIndexes, options = {}) {
+        const rawSelections = buildMistakeSelections(card, selectedIndexes);
+        const chunks = rawSelections.chunks;
+        const tokens = chunks.flatMap(chunk => chunk.tokens);
+        const selectedGroups = rawSelections.selections.map(selection => selection.tokenIndexes);
 
         const errorRanges = (Array.isArray(card?.errorPoints) ? card.errorPoints : [])
             .map(point => {
@@ -632,11 +658,11 @@
             return 'expression';
         }
 
-        const mistakes = selectedGroups.map(group => ({
-            start: group[0],
-            end: group.at(-1) + 1,
-            text: group.map(index => tokens[index].text).join(' '),
-            type: classifyGroup(group)
+        const mistakes = rawSelections.selections.map((selection, index) => ({
+            start: selection.start,
+            end: selection.end,
+            text: selection.text,
+            type: classifyGroup(selectedGroups[index])
         }));
 
         if (options.wordOrder) {
@@ -711,6 +737,8 @@
         evaluatePractice,
         buildPracticeSlots,
         buildReviewTokens,
+        buildMistakeSelections,
+        buildAssessmentSignals,
         classifyMistakeSelections,
         selectWeightedNewCards,
         getAdaptiveNewLimit

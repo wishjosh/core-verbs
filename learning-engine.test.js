@@ -128,6 +128,59 @@ test('groups adjacent selected words across a visual chunk boundary as one expre
     assert.equal(result.mistakes[0].type, 'expression');
 });
 
+test('preserves raw selected word ranges without assigning grammar categories', () => {
+    const card = {
+        en: 'How did you get this designer bag?',
+        assemblyChunks: ['How did you get', 'this designer bag?']
+    };
+    const result = engine.buildMistakeSelections(card, [1, 2, 3, 5]);
+
+    assert.deepEqual(result.selectedTokenIndexes, [1, 2, 3, 5]);
+    assert.deepEqual(result.selections, [
+        {
+            start: 1,
+            end: 4,
+            text: 'did you get',
+            tokenIndexes: [1, 2, 3],
+            chunkIndexes: [0]
+        },
+        {
+            start: 5,
+            end: 6,
+            text: 'designer',
+            tokenIndexes: [5],
+            chunkIndexes: [1]
+        }
+    ]);
+    assert.equal('type' in result.selections[0], false);
+});
+
+test('keeps adjacent raw selections together across a display chunk boundary', () => {
+    const card = {
+        en: 'How did you get this designer bag?',
+        assemblyChunks: ['How did you get', 'this designer bag?']
+    };
+    const result = engine.buildMistakeSelections(card, [3, 4]);
+
+    assert.deepEqual(result.selections, [{
+        start: 3,
+        end: 5,
+        text: 'get this',
+        tokenIndexes: [3, 4],
+        chunkIndexes: [0, 1]
+    }]);
+});
+
+test('keeps reveal-based recall failure separate from word and order selections', () => {
+    assert.deepEqual(engine.buildAssessmentSignals({ recall: true }), ['recall']);
+    assert.deepEqual(engine.buildAssessmentSignals({ wordOrder: true }), ['word_order']);
+    assert.deepEqual(
+        engine.buildAssessmentSignals({ wordOrder: true, recall: true }),
+        ['word_order', 'recall']
+    );
+    assert.deepEqual(engine.buildAssessmentSignals({}), []);
+});
+
 test('does not classify a noun as an article error unless the article itself is selected', () => {
     const card = {
         en: 'She is with a client.',

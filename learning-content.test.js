@@ -238,7 +238,7 @@ test('all 869 stored items keep one-to-one Korean and English chunk boundaries f
     }
 });
 
-test('the mobile review screen exposes word-level marking and editable error categories', () => {
+test('the mobile review screen keeps word-level marking without error categories or a core phrase panel', () => {
     const html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
     const app = fs.readFileSync(path.join(__dirname, 'app.js'), 'utf8');
     assert.match(html, /영어 청크로 확인/);
@@ -252,11 +252,22 @@ test('the mobile review screen exposes word-level marking and editable error cat
     assert.match(html, /id="practice-bank"/);
     assert.match(app, /practice-empty-guide/);
     assert.match(app, /clearMistakesForPracticeChunks\(\[removedId\]\)/);
-    assert.match(app, /if \(wordOrderMistake\) \{[\s\S]*?finishSelfAssessment\('X', \['word_order'\]/);
+    assert.match(app, /if \(!currentPracticeResult\.correct\) \{[\s\S]{0,180}errorTypes\.includes\('word_order'\)/);
+    assert.match(app, /function markNoMistakes\(\) \{[\s\S]{0,700}finishSelfAssessment\('X', signals/);
     assert.doesNotMatch(app, /function markNoMistakes\(\) \{[\s\S]{0,180}wordOrderMistake = false/);
     assert.match(html, />단어 오류 없음<\/button>/);
     assert.match(app, /createMistakeWordButton\(token, 'practice-slot-word'\)/);
-    for (const type of ['article', 'plural', 'tense_auxiliary', 'preposition', 'koreanism', 'expression']) {
-        assert.match(html, new RegExp(`data-error-type=["']${type}["']`));
+    assert.match(html, /id="mistake-review"/);
+    assert.match(html, /id="mistake-summary"/);
+    assert.match(html, /id="practice-result-tip"/);
+    assert.match(html, /id="btn-error-export"[^>]*onclick="exportMistakeHistory\(\)"/);
+    assert.match(app, /progressData\.mistakeHistory = mistakeHistory\.slice\(-100\)/);
+    assert.match(app, /selectedTokenIndexes/);
+    assert.match(app, /function exportMistakeHistory\(\)/);
+    assert.match(app, /recall: practiceUsedHint \|\| Boolean\(currentPracticeResult\?\.skipped\)/);
+    for (const field of ['sentenceId', 'sentence', 'naturalKo', 'assemblyChunks', 'selectedTokenIndexes', 'selections', 'wordOrder', 'recall']) {
+        assert.match(app, new RegExp(`${field}:`));
     }
+    assert.doesNotMatch(html, /data-error-type|error-type-picker|id="core-phrase-box"|이 문장의 핵심 구문/);
+    assert.doesNotMatch(app, /toggleReportedErrorType|getReportedErrorTypes|selectedErrorTypes|errorTypesManuallyEdited|자동 제안|선택한 오류 전체 유형/);
 });

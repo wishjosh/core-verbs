@@ -24,8 +24,6 @@ let currentPracticeResult = null;
 let practiceUsedHint = false;
 let selectedMistakeIndexes = [];
 let wordOrderMistake = false;
-let selectedErrorTypes = [];
-let errorTypesManuallyEdited = false;
 let currentAssessmentRecorded = false;
 let sessionRetryCounts = {};
 
@@ -734,21 +732,28 @@ function updateDashboardStats() {
 
     const errorSummary = document.getElementById('error-summary');
     if (errorSummary) {
-        const errorStats = progressData.errorStats || {};
-        const ranked = Object.entries(errorStats)
-            .filter(([, value]) => (value.wrong || 0) > 0)
-            .sort((a, b) => (b[1].wrong || 0) - (a[1].wrong || 0))
+        const mistakeHistory = getMistakeHistory();
+        const counts = new Map();
+        mistakeHistory.forEach(entry => {
+            (entry.selections || []).forEach(selection => {
+                const text = String(selection.text || '').trim();
+                if (!text) return;
+                const key = text.toLocaleLowerCase('en-US');
+                const current = counts.get(key) || { text, count: 0 };
+                current.count += 1;
+                counts.set(key, current);
+            });
+        });
+        const ranked = [...counts.values()]
+            .sort((a, b) => (b.count - a.count) || a.text.localeCompare(b.text))
             .slice(0, 3);
 
-        if (ranked.length === 0) {
-            const attempts = Object.values(errorStats).reduce((sum, value) => sum + (value.attempts || 0), 0);
-            errorSummary.innerText = attempts > 0
-                ? '현재 뚜렷하게 반복되는 오류가 없습니다.'
-                : '구문 훈련을 시작하면 자주 틀리는 부분을 보여 드려요.';
+        if (ranked.length) {
+            errorSummary.innerText = ranked.map(item => `“${item.text}” ${item.count}회`).join(' · ');
+        } else if (mistakeHistory.length) {
+            errorSummary.innerText = `최근 오류 ${mistakeHistory.length}건을 기록했습니다.`;
         } else {
-            errorSummary.innerText = ranked
-                .map(([type, value]) => `${Learning.ERROR_LABELS[type] || type} ${value.wrong}회`)
-                .join(' · ');
+            errorSummary.innerText = '학습을 시작하면 실제로 표시한 오답을 보여 드려요.';
         }
     }
 }
@@ -763,8 +768,6 @@ function loadCard() {
     practiceUsedHint = false;
     selectedMistakeIndexes = [];
     wordOrderMistake = false;
-    selectedErrorTypes = [];
-    errorTypesManuallyEdited = false;
     currentAssessmentRecorded = false;
 
     const currentIdxEl = document.getElementById('current-idx');
@@ -815,7 +818,6 @@ function loadCard() {
     const actionBtnEl = document.getElementById('action-buttons');
     const practicePanel = document.getElementById('practice-panel');
     const mistakeReview = document.getElementById('mistake-review');
-    const corePhraseBox = document.getElementById('core-phrase-box');
     const showAnswerBtn = document.getElementById('btn-show-answer');
     const nextBtn = document.getElementById('btn-next');
     const cardEl = document.getElementById('card');
@@ -858,7 +860,6 @@ function loadCard() {
     if (practiceBank) practiceBank.innerHTML = '';
     if (practiceSlotsLabel) practiceSlotsLabel.innerText = '내가 만든 문장 · 청크를 고르면 단어별로 펼쳐져요';
     if (mistakeReview) mistakeReview.style.display = 'none';
-    if (corePhraseBox) corePhraseBox.style.display = 'none';
     if (cardActionRow) cardActionRow.style.display = 'none';
     if (actionBtnEl) actionBtnEl.style.display = 'flex';
     if (showAnswerBtn) {
@@ -888,8 +889,6 @@ function startPractice() {
     practiceUsedHint = false;
     selectedMistakeIndexes = [];
     wordOrderMistake = false;
-    selectedErrorTypes = [];
-    errorTypesManuallyEdited = false;
 
     const hintEl = document.getElementById('hint');
     const practicePanel = document.getElementById('practice-panel');
@@ -923,7 +922,9 @@ function createMistakeWordButton(token, className) {
     word.className = className;
     word.innerText = token.text;
     word.setAttribute('aria-pressed', selected ? 'true' : 'false');
-    word.setAttribute('aria-label', `${token.text}, 틀렸던 단어로 표시`);
+    word.setAttribute('aria-label', selected
+        ? `${token.text}, 오류 표시 해제`
+        : `${token.text}, 틀렸던 단어로 표시`);
     if (selected) word.classList.add('selected');
     word.disabled = currentAssessmentRecorded;
     word.onclick = (event) => {
@@ -1030,8 +1031,6 @@ function clearMistakesForPracticeChunks(ids) {
         (reviewChunk?.tokens || []).forEach(token => removedIndexes.add(token.index));
     });
     selectedMistakeIndexes = selectedMistakeIndexes.filter(index => !removedIndexes.has(index));
-    selectedErrorTypes = [];
-    errorTypesManuallyEdited = false;
 }
 
 function removePracticeChunk(slotIndex) {
@@ -1053,7 +1052,7 @@ function checkPracticeAnswer() {
     if (selectedPracticeIds.length !== currentPractice.targetIds.length) return;
     currentPracticeResult = Learning.evaluatePractice(currentPractice, selectedPracticeIds);
     if (!currentPracticeResult.correct) {
-        wordOrderMistake = true;
+        if (currentPracticeResult.errorTypes.includes('word_order')) wordOrderMistake = true;
         selectedPracticeIds = [...currentPractice.targetIds];
     }
     renderPracticeSelection();
@@ -1103,8 +1102,6 @@ function toggleMistakeWord(index) {
         selectedMistakeIndexes.push(index);
     }
     selectedMistakeIndexes.sort((a, b) => a - b);
-    selectedErrorTypes = [];
-    errorTypesManuallyEdited = false;
     renderPracticeSelection();
     renderEnglishReview();
     updateMistakeReview();
@@ -1116,87 +1113,58 @@ function toggleWordOrderMistake() {
     updateMistakeReview();
 }
 
-function getReportedErrorTypes(classification = getCurrentMistakeClassification()) {
-    const automaticTypes = classification.errorTypes.filter(type => type !== 'word_order');
-    const reported = errorTypesManuallyEdited ? [...selectedErrorTypes] : automaticTypes;
-    if (wordOrderMistake && !reported.includes('word_order')) reported.push('word_order');
-    return [...new Set(reported)];
-}
-
-function toggleReportedErrorType(type) {
-    if (currentAssessmentRecorded || selectedMistakeIndexes.length === 0) return;
-    const classification = getCurrentMistakeClassification();
-    if (!errorTypesManuallyEdited) {
-        selectedErrorTypes = classification.errorTypes.filter(value => value !== 'word_order');
-        errorTypesManuallyEdited = true;
-    }
-    if (selectedErrorTypes.includes(type)) {
-        selectedErrorTypes = selectedErrorTypes.filter(value => value !== type);
-    } else {
-        selectedErrorTypes.push(type);
-    }
-    updateMistakeReview();
-}
-
-function getCurrentMistakeClassification() {
+function getCurrentMistakeSelections() {
     const card = todayCards[currentIndex];
-    if (!card) return { mistakes: [], errorTypes: [] };
-    return Learning.classifyMistakeSelections(card, selectedMistakeIndexes, { wordOrder: wordOrderMistake });
+    if (!card) return { selectedTokenIndexes: [], selections: [] };
+    return Learning.buildMistakeSelections(card, selectedMistakeIndexes);
+}
+
+function getCurrentAssessmentSignals() {
+    return Learning.buildAssessmentSignals({
+        wordOrder: wordOrderMistake,
+        recall: practiceUsedHint || Boolean(currentPracticeResult?.skipped)
+    });
 }
 
 function updateMistakeReview() {
     const summary = document.getElementById('mistake-summary');
     const saveButton = document.getElementById('btn-save-mistakes');
     const orderButton = document.getElementById('btn-word-order');
-    const classification = getCurrentMistakeClassification();
-    const reportedTypes = getReportedErrorTypes(classification);
-    const reportedWordTypes = reportedTypes.filter(type => type !== 'word_order');
+    const selection = getCurrentMistakeSelections();
 
     if (summary) {
         summary.innerHTML = '';
-        if (!classification.mistakes.length) {
+        if (!selection.selections.length && !wordOrderMistake) {
             summary.innerText = '선택한 오류가 아직 없습니다.';
             summary.classList.add('empty');
         } else {
             summary.classList.remove('empty');
-            classification.mistakes.forEach(mistake => {
+            selection.selections.forEach(mistake => {
                 const chip = document.createElement('span');
                 chip.className = 'mistake-summary-chip';
-                chip.innerText = mistake.type === 'word_order'
-                    ? `${mistake.text} · ${Learning.ERROR_LABELS.word_order}`
-                    : `${mistake.text} · 자동 제안: ${Learning.ERROR_LABELS[mistake.type]}`;
+                chip.innerText = mistake.text;
                 summary.appendChild(chip);
             });
-            const reportedChip = document.createElement('span');
-            reportedChip.className = 'mistake-summary-chip reported-types';
-            const reportedLabel = reportedTypes.length
-                ? reportedTypes.map(type => Learning.ERROR_LABELS[type]).join(' · ')
-                : '오류 종류를 선택하세요';
-            reportedChip.innerText = `선택한 오류 전체 유형: ${reportedLabel}`;
-            summary.appendChild(reportedChip);
+            if (wordOrderMistake) {
+                const orderChip = document.createElement('span');
+                orderChip.className = 'mistake-summary-chip';
+                orderChip.innerText = '문장 어순';
+                summary.appendChild(orderChip);
+            }
         }
     }
-    const selectedWordsNeedType = selectedMistakeIndexes.length > 0 && reportedWordTypes.length === 0;
     if (saveButton) saveButton.disabled = currentAssessmentRecorded
-        || classification.mistakes.length === 0
-        || reportedTypes.length === 0
-        || selectedWordsNeedType;
+        || (selection.selections.length === 0 && !wordOrderMistake);
     if (orderButton) {
         orderButton.classList.toggle('selected', wordOrderMistake);
         orderButton.setAttribute('aria-pressed', wordOrderMistake ? 'true' : 'false');
         orderButton.disabled = currentAssessmentRecorded;
     }
-    document.querySelectorAll('[data-error-type]').forEach(button => {
-        const type = button.dataset.errorType;
-        button.classList.toggle('selected', reportedTypes.includes(type));
-        button.setAttribute('aria-pressed', reportedTypes.includes(type) ? 'true' : 'false');
-        button.disabled = currentAssessmentRecorded || selectedMistakeIndexes.length === 0;
-    });
 }
 
 function finishSelfAssessment(result, errorTypes, details, headline, usedHint = practiceUsedHint) {
     if (currentAssessmentRecorded) return;
-    const scheduleMessage = recordAssessment(result, errorTypes, usedHint, null, details);
+    const scheduleMessage = recordAssessment(result, errorTypes, usedHint, details);
     renderPracticeSelection();
     renderEnglishReview();
     updateMistakeReview();
@@ -1212,42 +1180,35 @@ function finishSelfAssessment(result, errorTypes, details, headline, usedHint = 
 }
 
 function saveSelectedMistakes() {
-    const classification = getCurrentMistakeClassification();
-    const reportedTypes = getReportedErrorTypes(classification);
-    const reportedWordTypes = reportedTypes.filter(type => type !== 'word_order');
-    if (!classification.mistakes.length || !reportedTypes.length) return;
-    if (selectedMistakeIndexes.length > 0 && reportedWordTypes.length === 0) return;
-    const wordMistakeCount = classification.mistakes.filter(mistake => mistake.type !== 'word_order').length;
-    const details = classification.mistakes.map(mistake => {
-        const reportedDetailTypes = mistake.type === 'word_order'
-            ? ['word_order']
-            : (errorTypesManuallyEdited ? reportedWordTypes : [mistake.type]);
-        const hasSingleManualMapping = errorTypesManuallyEdited
-            && wordMistakeCount === 1
-            && reportedWordTypes.length === 1
-            && mistake.type !== 'word_order';
-        return {
-            ...mistake,
-            suggestedType: mistake.type,
-            type: hasSingleManualMapping ? reportedWordTypes[0] : mistake.type,
-            reportedTypes: reportedDetailTypes
-        };
-    });
+    const selection = getCurrentMistakeSelections();
+    if (!selection.selections.length && !wordOrderMistake) return;
+    const details = selection.selections.map(({ start, end, text, tokenIndexes, chunkIndexes }) => ({
+        start,
+        end,
+        text,
+        tokenIndexes,
+        chunkIndexes
+    }));
+    const signals = getCurrentAssessmentSignals();
+    const recordCount = details.length + (wordOrderMistake ? 1 : 0);
     finishSelfAssessment(
         'X',
-        reportedTypes,
+        signals,
         details,
-        `${reportedTypes.map(type => Learning.ERROR_LABELS[type]).join(' · ')} 오류로 기록했습니다.`
+        `오류 표시 ${recordCount}개를 기록했습니다.`
     );
 }
 
 function markNoMistakes() {
     selectedMistakeIndexes = [];
-    selectedErrorTypes = [];
-    errorTypesManuallyEdited = false;
-    if (wordOrderMistake) {
-        const details = [{ start: null, end: null, text: '문장 어순', type: 'word_order' }];
-        finishSelfAssessment('X', ['word_order'], details, '단어 오류는 없지만 어순 오류는 기록했습니다.');
+    const signals = getCurrentAssessmentSignals();
+    if (signals.length) {
+        const headline = signals.includes('recall') && signals.includes('word_order')
+            ? '단어 오류는 없지만 회상 실패와 어순 오류는 기록했습니다.'
+            : (signals.includes('recall')
+                ? '단어 오류는 없지만 정답을 먼저 확인한 회상 실패는 기록했습니다.'
+                : '단어 오류는 없지만 어순 오류는 기록했습니다.');
+        finishSelfAssessment('X', signals, [], headline);
         return;
     }
     finishSelfAssessment('O', [], [], '단어 오류 없음으로 기록했습니다.');
@@ -1256,10 +1217,7 @@ function markNoMistakes() {
 function markRecallFailure() {
     selectedMistakeIndexes = [];
     wordOrderMistake = false;
-    selectedErrorTypes = [];
-    errorTypesManuallyEdited = false;
-    const details = [{ start: null, end: null, text: '문장 전체', type: 'recall' }];
-    finishSelfAssessment('X', ['recall'], details, '문장 전체 회상 실패로 기록했습니다.', true);
+    finishSelfAssessment('X', ['recall'], [], '문장 전체 회상 실패로 기록했습니다.', true);
 }
 
 function revealPracticeAnswer() {
@@ -1269,8 +1227,6 @@ function revealPracticeAnswer() {
     const englishAnswerLabel = document.getElementById('english-answer-label');
     const naturalAnswer = document.getElementById('natural-answer');
     const mistakeReview = document.getElementById('mistake-review');
-    const corePhraseBox = document.getElementById('core-phrase-box');
-    const corePhraseText = document.getElementById('core-phrase-text');
     const resultTip = document.getElementById('practice-result-tip');
     const cardActionRow = document.getElementById('card-action-row');
     const showAnswerBtn = document.getElementById('btn-show-answer');
@@ -1293,18 +1249,6 @@ function revealPracticeAnswer() {
     if (englishEl) englishEl.style.display = 'none';
     if (naturalAnswer) naturalAnswer.style.display = 'block';
     if (mistakeReview) mistakeReview.style.display = 'block';
-    if (corePhraseText) {
-        corePhraseText.innerHTML = '';
-        const patterns = currentPractice.corePatterns?.length
-            ? currentPractice.corePatterns
-            : [currentPractice.corePhrase];
-        patterns.filter(Boolean).forEach(pattern => {
-            const chip = document.createElement('span');
-            chip.className = 'core-pattern-chip';
-            chip.innerText = pattern;
-            corePhraseText.appendChild(chip);
-        });
-    }
     if (practiceTitle) practiceTitle.innerText = '👆 위 단어 칸에서 틀린 부분을 누르세요';
     if (practiceSlotsLabel) practiceSlotsLabel.innerText = '영어 정답 · 청크 안에서 단어별로 오답을 표시하세요';
     if (practiceSubtitle) {
@@ -1316,8 +1260,7 @@ function revealPracticeAnswer() {
             practiceSubtitle.innerText = '올바른 청크 어순으로 다시 놓았습니다. 어순 오류는 자동으로 표시했습니다.';
         }
     }
-    if (resultTip) resultTip.innerText = '이어진 단어는 청크 경계를 넘어도 한 구문으로 묶이며, 오류 종류는 직접 바꿀 수 있습니다.';
-    if (corePhraseBox) corePhraseBox.style.display = 'block';
+    if (resultTip) resultTip.innerText = '실제로 다르게 생각하거나 말한 단어만 누르면, 그 위치가 그대로 기록됩니다.';
     if (cardActionRow) cardActionRow.style.display = 'flex';
     if (actionButtons) actionButtons.style.display = 'none';
     if (showAnswerBtn) showAnswerBtn.style.display = 'none';
@@ -1326,34 +1269,101 @@ function revealPracticeAnswer() {
     updateMistakeReview();
 }
 
-function updatePracticeHistory(card, result, errorTypes, usedHint, attemptedType, mistakeDetails = []) {
-    const correct = result === 'O';
-    const types = new Set([attemptedType, ...(errorTypes || [])].filter(Boolean));
-    progressData.errorStats = progressData.errorStats || {};
-    types.forEach(type => {
-        const current = progressData.errorStats[type] || { attempts: 0, wrong: 0 };
-        current.attempts += 1;
-        if (!correct && ((errorTypes || []).includes(type) || type === attemptedType)) current.wrong += 1;
-        progressData.errorStats[type] = current;
-    });
+function normalizeMistakeRecord(record = {}) {
+    const legacyTypes = Array.isArray(record.errorTypes) ? record.errorTypes : [];
+    const sourceSelections = Array.isArray(record.selections)
+        ? record.selections
+        : (Array.isArray(record.mistakes) ? record.mistakes : []);
+    const selections = sourceSelections
+        .filter(item => item && item.type !== 'word_order' && item.type !== 'recall')
+        .map(item => {
+            const start = Number.isInteger(item.start) ? item.start : null;
+            const end = Number.isInteger(item.end) ? item.end : null;
+            const tokenIndexes = Array.isArray(item.tokenIndexes)
+                ? item.tokenIndexes.filter(Number.isInteger)
+                : (start !== null && end !== null && end > start
+                    ? Array.from({ length: end - start }, (_, offset) => start + offset)
+                    : []);
+            return {
+                start,
+                end,
+                text: String(item.text || '').trim(),
+                tokenIndexes,
+                chunkIndexes: Array.isArray(item.chunkIndexes)
+                    ? item.chunkIndexes.filter(Number.isInteger)
+                    : []
+            };
+        })
+        .filter(item => item.text || item.tokenIndexes.length);
+    const sourceIndexes = Array.isArray(record.selectedTokenIndexes)
+        ? record.selectedTokenIndexes.filter(Number.isInteger)
+        : selections.flatMap(item => item.tokenIndexes);
+    const selectedTokenIndexes = [...new Set(sourceIndexes)].sort((a, b) => a - b);
 
+    return {
+        timestamp: Number(record.timestamp) || Date.now(),
+        sentenceId: record.sentenceId || null,
+        sentence: String(record.sentence || ''),
+        naturalKo: String(record.naturalKo || ''),
+        verb: String(record.verb || ''),
+        assemblyChunks: Array.isArray(record.assemblyChunks) ? [...record.assemblyChunks] : [],
+        selectedTokenIndexes,
+        selections,
+        wordOrder: Boolean(record.wordOrder ?? record.wordOrderMistake ?? legacyTypes.includes('word_order')),
+        recall: Boolean(record.recall ?? record.recallFailure ?? legacyTypes.includes('recall')),
+        usedHint: Boolean(record.usedHint)
+    };
+}
+
+function getMistakeHistory() {
+    if (!Array.isArray(progressData.mistakeHistory)) {
+        progressData.mistakeHistory = (progressData.practiceHistory || [])
+            .filter(entry => entry && entry.correct === false)
+            .map(normalizeMistakeRecord)
+            .slice(-100);
+        saveProgress();
+    } else if (progressData.mistakeHistory.length > 100) {
+        progressData.mistakeHistory = progressData.mistakeHistory.slice(-100);
+        saveProgress();
+    }
+    return progressData.mistakeHistory;
+}
+
+function updatePracticeHistory(card, result, errorTypes, usedHint, mistakeDetails = []) {
+    const correct = result === 'O';
+    const mistakeHistory = getMistakeHistory();
     progressData.practiceHistory = progressData.practiceHistory || [];
     progressData.practiceHistory.push({
         timestamp: Date.now(),
         sentence: card.en,
         verb: card.verb,
         correct,
-        usedHint,
-        errorTypes: [...types],
-        mistakes: mistakeDetails
+        usedHint
     });
     progressData.practiceHistory = progressData.practiceHistory.slice(-100);
+
+    if (!correct) {
+        mistakeHistory.push(normalizeMistakeRecord({
+            timestamp: Date.now(),
+            sentenceId: card.id,
+            sentence: card.en,
+            naturalKo: card.ko,
+            verb: card.verb,
+            assemblyChunks: card.assemblyChunks,
+            selectedTokenIndexes: [...selectedMistakeIndexes],
+            selections: mistakeDetails,
+            wordOrder: (errorTypes || []).includes('word_order'),
+            recall: (errorTypes || []).includes('recall'),
+            usedHint
+        }));
+        progressData.mistakeHistory = mistakeHistory.slice(-100);
+    }
 }
 
 /**
  * 사용자가 직접 체크한 오류를 복습 일정과 개인 오류 기록에 반영한다.
  */
-function recordAssessment(result, errorTypes = [], usedHint = false, attemptedType = null, mistakeDetails = []) {
+function recordAssessment(result, errorTypes = [], usedHint = false, mistakeDetails = []) {
     if (currentAssessmentRecorded) return '';
     const card = todayCards[currentIndex];
     if (!card) return '';
@@ -1418,7 +1428,7 @@ function recordAssessment(result, errorTypes = [], usedHint = false, attemptedTy
     }
 
     progressData[card.en] = record;
-    updatePracticeHistory(card, result, errorTypes, usedHint, attemptedType, mistakeDetails);
+    updatePracticeHistory(card, result, errorTypes, usedHint, mistakeDetails);
     saveProgress();
     updateDashboardStats();
     return scheduleMessage;
@@ -1441,7 +1451,7 @@ function showCompletionScreen() {
     if (completionMsg) completionMsg.style.display = 'block';
     
     const elementsToHide = [
-        'order-guide', 'natural-answer', 'korean', 'english-answer-label', 'english', 'hint', 'practice-panel', 'core-phrase-box', 'card-action-row',
+        'order-guide', 'natural-answer', 'korean', 'english-answer-label', 'english', 'hint', 'practice-panel', 'mistake-review', 'card-action-row',
         'action-buttons', 'progress-container',
         'verb-badge', 'new-badge', 'wrong-badge'
     ];
@@ -1803,6 +1813,7 @@ updateQuestionBadge();
    재설치/새 기기에서 불러와 기존 진도를 그대로 이어서 학습한다.
    ========================================================================== */
 
+const MISTAKE_EXPORT_FORMAT = 'core-verbs-mistakes';
 const BACKUP_FORMAT = 'core-verbs-backup';
 const BACKUP_VERSION = 1;
 
@@ -1814,6 +1825,41 @@ function showBackupToast(html, bg) {
     feedbackEl.style.backgroundColor = bg;
     feedbackEl.style.display = 'block';
     setTimeout(() => feedbackEl.style.display = 'none', 2200);
+}
+
+// 🧠 최근 오답 원자료만 최대 100건으로 내보내 AI 분석에 사용할 수 있게 한다.
+function exportMistakeHistory() {
+    const records = getMistakeHistory().map(normalizeMistakeRecord).slice(-100);
+    if (!records.length) {
+        showBackupToast('아직 내보낼 오류 기록이 없습니다.', 'rgba(44, 62, 80, 0.95)');
+        return;
+    }
+
+    const payload = {
+        format: MISTAKE_EXPORT_FORMAT,
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        recordCount: records.length,
+        fieldGuide: {
+            selectedTokenIndexes: '영어 문장의 0부터 시작하는 단어 위치',
+            selections: '연속해서 선택한 실제 오답 구간. end는 포함하지 않음',
+            wordOrder: '청크 어순을 틀렸는지 여부',
+            recall: '문장 전체를 떠올리지 못했는지 여부',
+            note: '문법 유형은 앱이 단정하지 않습니다. 반복 패턴은 문장 문맥과 함께 분석하세요.'
+        },
+        records
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const stamp = new Date().toISOString().slice(0, 10);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `core-verbs-mistakes-${stamp}.json`;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    showBackupToast(`오류 기록 ${records.length}건을 파일로 저장했습니다.`, 'rgba(15, 118, 110, 0.96)');
 }
 
 // ⬇️ 현재 localStorage의 학습 데이터를 JSON 파일로 내려받는다.
