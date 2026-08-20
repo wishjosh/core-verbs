@@ -224,6 +224,65 @@ test('expands a selected chunk into word-level error boxes without losing chunk 
     assert.deepEqual(engine.evaluatePractice(question, ['target-1', 'target-0']).errorTypes, ['word_order']);
 });
 
+test('grows How did you get from short units to native chunks and free recall', () => {
+    const card = {
+        en: 'How did you get this designer bag?',
+        assemblyChunks: ['How did you get', 'this designer bag?'],
+        orderGlosses: ['어떻게 얻었니', '이 디자이너 가방을?']
+    };
+    const shortPlan = engine.buildAdaptiveChunkPlan(card, 0);
+    const nativePlan = engine.buildAdaptiveChunkPlan(card, 1);
+    const recallPlan = engine.buildAdaptiveChunkPlan(card, 2);
+
+    assert.deepEqual(shortPlan.chunks, ['How', 'did you get', 'this designer bag?']);
+    assert.equal(shortPlan.kind, 'micro');
+    assert.deepEqual(nativePlan.chunks, card.assemblyChunks);
+    assert.equal(nativePlan.kind, 'canonical');
+    assert.equal(recallPlan.mode, 'recall');
+    assert.deepEqual(recallPlan.chunks, card.assemblyChunks);
+});
+
+test('skips duplicate stages and never merges across strong punctuation', () => {
+    const card = {
+        en: 'I tried, but it did not work.',
+        assemblyChunks: ['I tried,', 'but it', 'did not', 'work.']
+    };
+    const first = engine.buildAdaptiveChunkPlan(card, 0);
+    const longer = engine.buildAdaptiveChunkPlan(card, 1);
+    assert.deepEqual(first.chunks, card.assemblyChunks);
+    assert.equal(longer.kind, 'merged');
+    assert.deepEqual(longer.chunks, ['I tried,', 'but it did not', 'work.']);
+    assert.equal(longer.chunks.join(' '), card.en);
+
+    const single = engine.buildAdaptiveChunkPlan({ en: 'Thanks!', assemblyChunks: ['Thanks!'] }, 0);
+    assert.equal(single.mode, 'recall');
+    assert.equal(single.maxStage, 0);
+});
+
+test('advances chunk stages after two clean recalls and backs off only for actual errors', () => {
+    let state = { chunkStage: 0, chunkSuccessStreak: 0 };
+    state = engine.updateChunkProgress(state, { kind: 'clean', stageBefore: 0, maxStage: 2 });
+    assert.deepEqual(state, { chunkStage: 0, chunkSuccessStreak: 1 });
+    state = engine.updateChunkProgress(state, { kind: 'clean', stageBefore: 0, maxStage: 2 });
+    assert.deepEqual(state, { chunkStage: 1, chunkSuccessStreak: 0 });
+    state = engine.updateChunkProgress(state, { kind: 'reveal', stageBefore: 1, maxStage: 2 });
+    assert.deepEqual(state, { chunkStage: 1, chunkSuccessStreak: 0 });
+    state = engine.updateChunkProgress(state, { kind: 'error', stageBefore: 1, maxStage: 2 });
+    assert.deepEqual(state, { chunkStage: 0, chunkSuccessStreak: 0 });
+    state = engine.updateChunkProgress({ chunkStage: 2, chunkSuccessStreak: 1 }, {
+        kind: 'recall_failure', stageBefore: 2, maxStage: 2
+    });
+    assert.deepEqual(state, { chunkStage: 1, chunkSuccessStreak: 0 });
+});
+
+test('infers a conservative adaptive stage from older interval records', () => {
+    assert.equal(engine.getChunkStage({}), 0);
+    assert.equal(engine.getChunkStage({ interval: 3, wrongCount: 0 }), 1);
+    assert.equal(engine.getChunkStage({ interval: 12, wrongCount: 0 }), 2);
+    assert.equal(engine.getChunkStage({ interval: 12, wrongCount: 1 }), 0);
+    assert.equal(engine.getChunkStage({ chunkStage: 0, interval: 12 }), 0);
+});
+
 test('does not expose the answer order when a shuffle leaves chunk candidates unchanged', () => {
     const question = engine.buildPracticeQuestion({
         verb: 'GET',

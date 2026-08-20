@@ -19,6 +19,8 @@ let currentIndex = 0;
 let availableVoices = [];
 let iosResumeTimer = null; // iOS Speech Synthesis 중간 무음 버그 방지 타이머
 let currentPractice = null;
+let currentChunkPlan = null;
+let currentChunkStage = 0;
 let selectedPracticeIds = [];
 let currentPracticeResult = null;
 let practiceUsedHint = false;
@@ -763,6 +765,8 @@ function updateDashboardStats() {
  */
 function loadCard() {
     currentPractice = null;
+    currentChunkPlan = null;
+    currentChunkStage = 0;
     selectedPracticeIds = [];
     currentPracticeResult = null;
     practiceUsedHint = false;
@@ -786,6 +790,10 @@ function loadCard() {
     if (verbBadge) verbBadge.innerText = `DAY ${currentDay} [ ${currentVerb} ]`;
     
     const record = progressData[card.en] || {};
+    currentChunkStage = Learning.getChunkStage(record);
+    currentChunkPlan = Learning.buildAdaptiveChunkPlan(card, currentChunkStage);
+    currentChunkStage = currentChunkPlan.stage;
+    const recallMode = currentChunkPlan.mode === 'recall';
     const wrongCount = record.wrongCount || 0;
     const newBadge = document.getElementById('new-badge');
     const wrongBadge = document.getElementById('wrong-badge');
@@ -829,12 +837,12 @@ function loadCard() {
     const practiceSlotsLabel = document.getElementById('practice-slots-label');
 
     if (koreanEl) koreanEl.innerText = card.ko;
-    if (naturalAnswer) naturalAnswer.style.display = 'none';
-    if (orderGuide) orderGuide.style.display = 'block';
+    if (naturalAnswer) naturalAnswer.style.display = recallMode ? 'block' : 'none';
+    if (orderGuide) orderGuide.style.display = recallMode ? 'none' : 'block';
     if (orderGlosses) {
         orderGlosses.innerHTML = '';
-        const glosses = Array.isArray(card.orderGlosses) && card.orderGlosses.length
-            ? card.orderGlosses
+        const glosses = Array.isArray(currentChunkPlan.orderGlosses) && currentChunkPlan.orderGlosses.length
+            ? currentChunkPlan.orderGlosses
             : [card.ko];
         glosses.forEach(gloss => {
             const chip = document.createElement('span');
@@ -853,17 +861,37 @@ function loadCard() {
         hintEl.style.display = 'none';
     }
     if (practicePanel) practicePanel.style.display = 'block';
-    if (practiceTitle) practiceTitle.innerText = '🧠 영어 문장을 먼저 떠올려 보세요';
-    if (practiceSubtitle) practiceSubtitle.innerText = '의미 단서를 앞에서부터 따라가며 영어 문장을 먼저 말해 보세요.';
+    if (practiceTitle) {
+        practiceTitle.innerText = recallMode
+            ? '🧠 선택지 없이 전체 문장을 떠올려 보세요'
+            : (currentChunkPlan.kind === 'micro'
+                ? '🧠 짧은 조립 단위로 영어를 떠올려 보세요'
+                : (currentChunkPlan.kind === 'merged'
+                    ? '🧠 더 긴 조립 단위로 영어를 떠올려 보세요'
+                    : '🧠 표현 청크로 영어를 떠올려 보세요'));
+    }
+    if (practiceSubtitle) {
+        practiceSubtitle.innerText = recallMode
+            ? '자연스러운 뜻만 보고 영어 문장 전체를 먼저 말해 보세요.'
+            : '의미 단서를 앞에서부터 따라가며 영어 문장을 먼저 말해 보세요.';
+    }
     if (practiceWorkspace) practiceWorkspace.style.display = 'none';
     if (practiceSlots) practiceSlots.innerHTML = '';
     if (practiceBank) practiceBank.innerHTML = '';
-    if (practiceSlotsLabel) practiceSlotsLabel.innerText = '내가 만든 문장 · 청크를 고르면 단어별로 펼쳐져요';
+    if (practiceSlotsLabel) practiceSlotsLabel.innerText = currentChunkPlan.kind === 'micro'
+        ? '내가 만든 문장 · 짧은 조립 단위를 고르세요'
+        : (currentChunkPlan.kind === 'merged'
+            ? '내가 만든 문장 · 더 긴 조립 단위를 고르세요'
+            : '내가 만든 문장 · 표현 청크를 고르세요');
     if (mistakeReview) mistakeReview.style.display = 'none';
     if (cardActionRow) cardActionRow.style.display = 'none';
     if (actionBtnEl) actionBtnEl.style.display = 'flex';
     if (showAnswerBtn) {
-        showAnswerBtn.innerText = '영어 청크로 확인';
+        showAnswerBtn.innerText = recallMode
+            ? '떠올린 뒤 영어 정답 확인'
+            : (currentChunkPlan.kind === 'micro'
+                ? '짧은 영어 조립 단위 확인'
+                : (currentChunkPlan.kind === 'merged' ? '더 긴 영어 조립 단위 확인' : '영어 청크로 확인'));
         showAnswerBtn.style.display = 'inline-flex';
     }
     if (nextBtn) nextBtn.style.display = 'none';
@@ -882,7 +910,18 @@ function startPractice() {
     if (!card) return;
 
     if (availableVoices.length === 0) populateVoiceList();
-    currentPractice = Learning.buildPracticeQuestion(card);
+    if (!currentChunkPlan) {
+        currentChunkPlan = Learning.buildAdaptiveChunkPlan(card, Learning.getChunkStage(progressData[card.en] || {}));
+        currentChunkStage = currentChunkPlan.stage;
+    }
+    currentPractice = Learning.buildPracticeQuestion(card, Math.random, {
+        chunks: currentChunkPlan.chunks,
+        orderGlosses: currentChunkPlan.orderGlosses,
+        chunkStage: currentChunkStage,
+        mode: currentChunkPlan.mode
+    });
+    currentPractice.chunkKind = currentChunkPlan.kind;
+    currentPractice.maxChunkStage = currentChunkPlan.maxStage;
     currentPractice.reviewChunks = Learning.buildReviewTokens(card, currentPractice.targetChunks);
     selectedPracticeIds = [];
     currentPracticeResult = null;
@@ -895,18 +934,41 @@ function startPractice() {
     const practiceWorkspace = document.getElementById('practice-workspace');
     const practiceSubtitle = document.getElementById('practice-subtitle');
     const practiceSlotsLabel = document.getElementById('practice-slots-label');
+    const practiceBankLabel = document.getElementById('practice-bank-label');
     const actionButtons = document.getElementById('action-buttons');
     const showAnswerBtn = document.getElementById('btn-show-answer');
     const practiceTitle = document.querySelector('#practice-panel .practice-title');
 
     if (hintEl) hintEl.style.display = 'none';
     if (practicePanel) practicePanel.style.display = 'block';
-    if (practiceWorkspace) practiceWorkspace.style.display = 'block';
-    if (practiceTitle) practiceTitle.innerText = '🧩 영어 덩어리를 어순대로 고르세요';
-    if (practiceSubtitle) practiceSubtitle.innerText = '청크를 누르면 빈칸에서 단어별 칸으로 펼쳐집니다. 떠올렸던 것과 다른 단어는 다시 누르세요.';
-    if (practiceSlotsLabel) practiceSlotsLabel.innerText = '내가 만든 문장 · 단어를 누르면 틀린 부분으로 표시돼요';
     if (actionButtons) actionButtons.style.display = 'none';
     if (showAnswerBtn) showAnswerBtn.style.display = 'none';
+
+    if (currentPractice.practiceMode === 'recall') {
+        currentPracticeResult = {
+            correct: true,
+            freeRecall: true,
+            errorTypes: [],
+            errorLabel: '',
+            tip: '선택지 없이 떠올린 문장과 정답을 비교하세요.'
+        };
+        selectedPracticeIds = [...currentPractice.targetIds];
+        if (practiceWorkspace) practiceWorkspace.style.display = 'none';
+        revealPracticeAnswer();
+        return;
+    }
+
+    if (practiceWorkspace) practiceWorkspace.style.display = 'block';
+    if (practiceTitle) practiceTitle.innerText = currentPractice.chunkKind === 'micro'
+        ? '🧩 짧은 조립 단위를 어순대로 고르세요'
+        : (currentPractice.chunkKind === 'merged'
+            ? '🧩 더 긴 조립 단위를 어순대로 고르세요'
+            : '🧩 영어 청크를 어순대로 고르세요');
+    if (practiceSubtitle) practiceSubtitle.innerText = '고른 단위는 단어별 칸으로 펼쳐집니다. 떠올렸던 것과 다른 단어는 다시 누르세요.';
+    if (practiceSlotsLabel) practiceSlotsLabel.innerText = '내가 만든 문장 · 단어를 누르면 틀린 부분으로 표시돼요';
+    if (practiceBankLabel) practiceBankLabel.innerText = currentPractice.chunkKind === 'canonical'
+        ? '영어 표현 청크 후보 · 어순을 생각해서 고르세요'
+        : '영어 조립 단위 후보 · 어순을 생각해서 고르세요';
     renderPracticeSelection();
 }
 
@@ -1083,7 +1145,8 @@ function renderEnglishReview() {
     if (!englishEl) return;
 
     englishEl.innerHTML = '';
-    (currentPractice.reviewChunks || Learning.buildReviewTokens(card)).forEach((chunk, chunkIndex) => {
+    // 문제 단계가 잘게 나뉘어도 정답은 검수된 실제 청크 경계로 보여 준다.
+    Learning.buildReviewTokens(card).forEach((chunk, chunkIndex) => {
         const chunkEl = document.createElement('span');
         chunkEl.className = 'english-chunk';
         chunkEl.dataset.chunk = String(chunkIndex + 1);
@@ -1107,12 +1170,6 @@ function toggleMistakeWord(index) {
     updateMistakeReview();
 }
 
-function toggleWordOrderMistake() {
-    if (currentAssessmentRecorded) return;
-    wordOrderMistake = !wordOrderMistake;
-    updateMistakeReview();
-}
-
 function getCurrentMistakeSelections() {
     const card = todayCards[currentIndex];
     if (!card) return { selectedTokenIndexes: [], selections: [] };
@@ -1129,7 +1186,7 @@ function getCurrentAssessmentSignals() {
 function updateMistakeReview() {
     const summary = document.getElementById('mistake-summary');
     const saveButton = document.getElementById('btn-save-mistakes');
-    const orderButton = document.getElementById('btn-word-order');
+    const noMistakesButton = document.querySelector('.self-check-btn.no-mistakes');
     const selection = getCurrentMistakeSelections();
 
     if (summary) {
@@ -1148,23 +1205,25 @@ function updateMistakeReview() {
             if (wordOrderMistake) {
                 const orderChip = document.createElement('span');
                 orderChip.className = 'mistake-summary-chip';
-                orderChip.innerText = '문장 어순';
+                orderChip.innerText = '청크 어순 · 자동 기록';
                 summary.appendChild(orderChip);
             }
         }
     }
-    if (saveButton) saveButton.disabled = currentAssessmentRecorded
-        || (selection.selections.length === 0 && !wordOrderMistake);
-    if (orderButton) {
-        orderButton.classList.toggle('selected', wordOrderMistake);
-        orderButton.setAttribute('aria-pressed', wordOrderMistake ? 'true' : 'false');
-        orderButton.disabled = currentAssessmentRecorded;
+    if (saveButton) {
+        saveButton.style.display = selection.selections.length ? 'block' : 'none';
+        saveButton.disabled = currentAssessmentRecorded || selection.selections.length === 0;
+    }
+    if (noMistakesButton) {
+        noMistakesButton.innerText = (wordOrderMistake || practiceUsedHint)
+            ? '단어는 맞았어요'
+            : '모두 맞았어요';
     }
 }
 
-function finishSelfAssessment(result, errorTypes, details, headline, usedHint = practiceUsedHint) {
+function finishSelfAssessment(result, errorTypes, details, headline, usedHint = practiceUsedHint, chunkOutcome = 'clean') {
     if (currentAssessmentRecorded) return;
-    const scheduleMessage = recordAssessment(result, errorTypes, usedHint, details);
+    const scheduleMessage = recordAssessment(result, errorTypes, usedHint, details, chunkOutcome);
     renderPracticeSelection();
     renderEnglishReview();
     updateMistakeReview();
@@ -1195,7 +1254,9 @@ function saveSelectedMistakes() {
         'X',
         signals,
         details,
-        `오류 표시 ${recordCount}개를 기록했습니다.`
+        `오류 표시 ${recordCount}개를 기록했습니다.`,
+        practiceUsedHint,
+        'error'
     );
 }
 
@@ -1208,16 +1269,23 @@ function markNoMistakes() {
             : (signals.includes('recall')
                 ? '단어 오류는 없지만 정답을 먼저 확인한 회상 실패는 기록했습니다.'
                 : '단어 오류는 없지만 어순 오류는 기록했습니다.');
-        finishSelfAssessment('X', signals, [], headline);
+        const chunkOutcome = signals.includes('word_order') ? 'error' : 'reveal';
+        finishSelfAssessment('X', signals, [], headline, practiceUsedHint, chunkOutcome);
         return;
     }
-    finishSelfAssessment('O', [], [], '단어 오류 없음으로 기록했습니다.');
+    finishSelfAssessment('O', [], [], '모두 맞은 것으로 기록했습니다.', false, 'clean');
 }
 
 function markRecallFailure() {
     selectedMistakeIndexes = [];
-    wordOrderMistake = false;
-    finishSelfAssessment('X', ['recall'], [], '문장 전체 회상 실패로 기록했습니다.', true);
+    const signals = Learning.buildAssessmentSignals({
+        wordOrder: wordOrderMistake,
+        recall: true
+    });
+    const headline = wordOrderMistake
+        ? '문장 전체 회상 실패와 자동 감지한 어순 오류를 기록했습니다.'
+        : '문장 전체 회상 실패로 기록했습니다.';
+    finishSelfAssessment('X', signals, [], headline, practiceUsedHint, 'recall_failure');
 }
 
 function revealPracticeAnswer() {
@@ -1236,6 +1304,7 @@ function revealPracticeAnswer() {
     const practiceTitle = document.querySelector('#practice-panel .practice-title');
     const practiceSubtitle = document.getElementById('practice-subtitle');
     const practiceSlotsLabel = document.getElementById('practice-slots-label');
+    const practiceWorkspace = document.getElementById('practice-workspace');
 
     if (selectedPracticeIds.length !== currentPractice.targetIds.length) {
         selectedPracticeIds = [...currentPractice.targetIds];
@@ -1243,16 +1312,19 @@ function revealPracticeAnswer() {
     renderPracticeSelection();
     renderEnglishReview();
     if (englishAnswerLabel) {
-        englishAnswerLabel.innerText = '영어 정답 · 위 단어 칸에서 실제로 틀린 단어를 다시 누르세요';
+        englishAnswerLabel.innerText = '영어 정답 · 실제 청크 경계 안에서 틀린 단어를 누르세요';
         englishAnswerLabel.style.display = 'block';
     }
-    if (englishEl) englishEl.style.display = 'none';
+    if (englishEl) englishEl.style.display = 'flex';
+    if (practiceWorkspace) practiceWorkspace.style.display = 'none';
     if (naturalAnswer) naturalAnswer.style.display = 'block';
     if (mistakeReview) mistakeReview.style.display = 'block';
-    if (practiceTitle) practiceTitle.innerText = '👆 위 단어 칸에서 틀린 부분을 누르세요';
+    if (practiceTitle) practiceTitle.innerText = '👆 영어 정답에서 틀린 부분을 누르세요';
     if (practiceSlotsLabel) practiceSlotsLabel.innerText = '영어 정답 · 청크 안에서 단어별로 오답을 표시하세요';
     if (practiceSubtitle) {
-        if (currentPracticeResult?.skipped) {
+        if (currentPracticeResult?.freeRecall) {
+            practiceSubtitle.innerText = '떠올린 전체 문장과 정답을 비교하고, 다르게 말한 단어만 표시하세요.';
+        } else if (currentPracticeResult?.skipped) {
             practiceSubtitle.innerText = '정답 청크를 펼쳤습니다. 떠올리지 못했거나 다르게 말한 단어를 표시하세요.';
         } else if (currentPracticeResult?.correct) {
             practiceSubtitle.innerText = '청크 어순이 맞습니다. 다르게 생각하거나 말했던 단어가 있으면 표시하세요.';
@@ -1307,6 +1379,10 @@ function normalizeMistakeRecord(record = {}) {
         naturalKo: String(record.naturalKo || ''),
         verb: String(record.verb || ''),
         assemblyChunks: Array.isArray(record.assemblyChunks) ? [...record.assemblyChunks] : [],
+        practiceChunks: Array.isArray(record.practiceChunks) ? [...record.practiceChunks] : [],
+        chunkStage: Number.isInteger(record.chunkStage) ? Math.max(0, record.chunkStage) : null,
+        chunkKind: String(record.chunkKind || ''),
+        chunkOutcome: String(record.chunkOutcome || ''),
         selectedTokenIndexes,
         selections,
         wordOrder: Boolean(record.wordOrder ?? record.wordOrderMistake ?? legacyTypes.includes('word_order')),
@@ -1329,7 +1405,7 @@ function getMistakeHistory() {
     return progressData.mistakeHistory;
 }
 
-function updatePracticeHistory(card, result, errorTypes, usedHint, mistakeDetails = []) {
+function updatePracticeHistory(card, result, errorTypes, usedHint, mistakeDetails = [], chunkMeta = {}) {
     const correct = result === 'O';
     const mistakeHistory = getMistakeHistory();
     progressData.practiceHistory = progressData.practiceHistory || [];
@@ -1338,7 +1414,13 @@ function updatePracticeHistory(card, result, errorTypes, usedHint, mistakeDetail
         sentence: card.en,
         verb: card.verb,
         correct,
-        usedHint
+        usedHint,
+        chunkStageBefore: chunkMeta.stageBefore,
+        chunkStageAfter: chunkMeta.stageAfter,
+        chunkSuccessStreakAfter: chunkMeta.successStreakAfter,
+        chunkKind: chunkMeta.kind,
+        chunkOutcome: chunkMeta.outcome,
+        practiceChunkCount: Array.isArray(chunkMeta.practiceChunks) ? chunkMeta.practiceChunks.length : 0
     });
     progressData.practiceHistory = progressData.practiceHistory.slice(-100);
 
@@ -1350,6 +1432,10 @@ function updatePracticeHistory(card, result, errorTypes, usedHint, mistakeDetail
             naturalKo: card.ko,
             verb: card.verb,
             assemblyChunks: card.assemblyChunks,
+            practiceChunks: chunkMeta.practiceChunks,
+            chunkStage: chunkMeta.stageBefore,
+            chunkKind: chunkMeta.kind,
+            chunkOutcome: chunkMeta.outcome,
             selectedTokenIndexes: [...selectedMistakeIndexes],
             selections: mistakeDetails,
             wordOrder: (errorTypes || []).includes('word_order'),
@@ -1363,7 +1449,7 @@ function updatePracticeHistory(card, result, errorTypes, usedHint, mistakeDetail
 /**
  * 사용자가 직접 체크한 오류를 복습 일정과 개인 오류 기록에 반영한다.
  */
-function recordAssessment(result, errorTypes = [], usedHint = false, mistakeDetails = []) {
+function recordAssessment(result, errorTypes = [], usedHint = false, mistakeDetails = [], chunkOutcome = 'clean') {
     if (currentAssessmentRecorded) return '';
     const card = todayCards[currentIndex];
     if (!card) return '';
@@ -1382,6 +1468,19 @@ function recordAssessment(result, errorTypes = [], usedHint = false, mistakeDeta
     record.wrongCount = record.wrongCount || 0;
     record.totalWrong = Math.max((record.totalWrong || 0), record.wrongCount);
     record.warningState = record.warningState || 0;
+
+    const chunkStageBefore = Number.isInteger(currentPractice?.chunkStage)
+        ? currentPractice.chunkStage
+        : currentChunkStage;
+    const chunkProgress = Learning.updateChunkProgress(record, {
+        kind: chunkOutcome,
+        stageBefore: chunkStageBefore,
+        maxStage: Number.isInteger(currentPractice?.maxChunkStage)
+            ? currentPractice.maxChunkStage
+            : currentChunkPlan?.maxStage
+    });
+    record.chunkStage = chunkProgress.chunkStage;
+    record.chunkSuccessStreak = chunkProgress.chunkSuccessStreak;
 
     const now = new Date();
     const todayMidnight = new Date();
@@ -1428,7 +1527,16 @@ function recordAssessment(result, errorTypes = [], usedHint = false, mistakeDeta
     }
 
     progressData[card.en] = record;
-    updatePracticeHistory(card, result, errorTypes, usedHint, mistakeDetails);
+    updatePracticeHistory(card, result, errorTypes, usedHint, mistakeDetails, {
+        stageBefore: chunkStageBefore,
+        stageAfter: chunkProgress.chunkStage,
+        successStreakAfter: chunkProgress.chunkSuccessStreak,
+        kind: currentPractice?.chunkKind || currentChunkPlan?.kind || '',
+        outcome: chunkOutcome,
+        practiceChunks: Array.isArray(currentPractice?.targetChunks)
+            ? [...currentPractice.targetChunks]
+            : []
+    });
     saveProgress();
     updateDashboardStats();
     return scheduleMessage;
@@ -1845,6 +1953,9 @@ function exportMistakeHistory() {
             selections: '연속해서 선택한 실제 오답 구간. end는 포함하지 않음',
             wordOrder: '청크 어순을 틀렸는지 여부',
             recall: '문장 전체를 떠올리지 못했는지 여부',
+            practiceChunks: '이 시도에서 실제로 제시된 조립 단위',
+            chunkKind: 'micro(짧은 조립), canonical(검수 청크), merged(긴 조립), recall(전체 회상)',
+            chunkStage: '이 문장에서 사용한 자동 청크 단계의 0부터 시작하는 위치',
             note: '문법 유형은 앱이 단정하지 않습니다. 반복 패턴은 문장 문맥과 함께 분석하세요.'
         },
         records

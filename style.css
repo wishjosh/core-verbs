@@ -657,24 +657,6 @@ body {
     margin-bottom: 10px;
 }
 
-.word-order-btn {
-    width: 100%;
-    min-height: 44px;
-    border: 1px solid #cbd5e1;
-    border-radius: 10px;
-    background: #ffffff;
-    color: #475569;
-    font-family: inherit;
-    font-weight: 800;
-    cursor: pointer;
-}
-
-.word-order-btn.selected {
-    border-color: #f97316;
-    background: #ffedd5;
-    color: #9a3412;
-}
-
 .mistake-summary {
     display: flex;
     flex-wrap: wrap;

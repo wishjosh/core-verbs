@@ -150,6 +150,18 @@ test('every English sentence is reconstructed exactly from native chunks', () =>
     }
 });
 
+test('every adaptive chunk stage preserves the source English exactly', () => {
+    for (const item of content.items) {
+        const card = { ...item, en: item.english, ko: item.naturalKo };
+        for (let requestedStage = 0; requestedStage <= 2; requestedStage++) {
+            const plan = engine.buildAdaptiveChunkPlan(card, requestedStage);
+            assert.equal(joinChunks(plan.chunks), item.english, `${item.id} stage ${requestedStage}`);
+            assert.ok(['micro', 'canonical', 'merged', 'recall'].includes(plan.kind), item.id);
+            if (plan.mode === 'assembly') assert.ok(plan.chunks.length >= 2, item.id);
+        }
+    }
+});
+
 test('most learning chunks stay within the preferred one-to-four-word range', () => {
     const chunks = content.items.flatMap(item => item.assemblyChunks);
     const compactChunks = chunks.filter(chunk => chunk.split(/\s+/).length <= 4);
@@ -255,7 +267,7 @@ test('the mobile review screen keeps word-level marking without error categories
     assert.match(app, /if \(!currentPracticeResult\.correct\) \{[\s\S]{0,180}errorTypes\.includes\('word_order'\)/);
     assert.match(app, /function markNoMistakes\(\) \{[\s\S]{0,700}finishSelfAssessment\('X', signals/);
     assert.doesNotMatch(app, /function markNoMistakes\(\) \{[\s\S]{0,180}wordOrderMistake = false/);
-    assert.match(html, />단어 오류 없음<\/button>/);
+    assert.match(html, />모두 맞았어요<\/button>/);
     assert.match(app, /createMistakeWordButton\(token, 'practice-slot-word'\)/);
     assert.match(html, /id="mistake-review"/);
     assert.match(html, /id="mistake-summary"/);
@@ -270,4 +282,11 @@ test('the mobile review screen keeps word-level marking without error categories
     }
     assert.doesNotMatch(html, /data-error-type|error-type-picker|id="core-phrase-box"|이 문장의 핵심 구문/);
     assert.doesNotMatch(app, /toggleReportedErrorType|getReportedErrorTypes|selectedErrorTypes|errorTypesManuallyEdited|자동 제안|선택한 오류 전체 유형/);
+    assert.doesNotMatch(html, /btn-word-order|어순도 틀렸어요/);
+    assert.doesNotMatch(app, /toggleWordOrderMistake/);
+    assert.match(app, /currentPracticeResult\.errorTypes\.includes\('word_order'\).*wordOrderMistake = true/);
+    assert.match(app, /practiceMode === 'recall'/);
+    assert.match(app, /떠올린 뒤 영어 정답 확인/);
+    assert.match(app, /function markRecallFailure\(\) \{[\s\S]{0,300}wordOrder: wordOrderMistake,[\s\S]{0,300}'recall_failure'/);
+    assert.doesNotMatch(app, /function markRecallFailure\(\) \{[\s\S]{0,120}wordOrderMistake = false/);
 });

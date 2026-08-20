@@ -416,6 +416,180 @@
         return result;
     }
 
+    const MAX_CHUNK_STAGE = 2;
+
+    function getChunkStage(record = {}) {
+        const value = Number(record?.chunkStage);
+        if (Number.isInteger(value)) return Math.max(0, Math.min(MAX_CHUNK_STAGE, value));
+
+        // 기존 학습 기록에는 단계 필드가 없다. 이미 간격 복습이 진행된 문장은
+        // 현재 숙련도에서 너무 멀리 되돌아가지 않도록 interval만 보수적으로 사용한다.
+        const interval = Number(record?.interval) || 0;
+        if (interval >= 6 && Number(record?.wrongCount || 0) === 0) return 2;
+        if (interval >= 1 && Number(record?.wrongCount || 0) === 0) return 1;
+        return 0;
+    }
+
+    function splitPracticeChunk(text) {
+        const words = String(text || '').trim().split(/\s+/).filter(Boolean);
+        if (words.length < 3) return [String(text || '').trim()].filter(Boolean);
+
+        const first = normalizeText(words[0]);
+        const whWords = new Set(['how', 'why', 'where', 'when', 'what', 'who', 'which']);
+        const auxiliaries = new Set([
+            'am', 'is', 'are', 'was', 'were', 'do', 'does', 'did', 'have', 'has', 'had',
+            'will', 'would', 'can', 'could', 'should', 'may', 'might', 'must'
+        ]);
+        let splitAt = Math.floor(words.length / 2);
+        const second = normalizeText(words[1]);
+        const third = normalizeText(words[2]);
+        const compoundWh = (first === 'what' && ['kind', 'type', 'sort', 'time'].includes(second)) ||
+            (first === 'how' && ['many', 'much', 'long', 'far', 'old'].includes(second));
+
+        if (first === 'how' && second === 'much' && third === 'longer' && words.length === 3) {
+            return [String(text || '').trim()];
+        } else if (compoundWh) {
+            splitAt = 2;
+        } else if (whWords.has(first)) {
+            splitAt = 1;
+        } else if (/['’](?:m|re|ve|ll|d|s|t)$/i.test(words[0])) {
+            splitAt = 1;
+        } else if (auxiliaries.has(first) && words.length >= 4) {
+            splitAt = 2;
+        } else if (words.length === 3) {
+            splitAt = 1;
+        }
+
+        splitAt = Math.max(1, Math.min(words.length - 1, splitAt));
+        return [
+            words.slice(0, splitAt).join(' '),
+            words.slice(splitAt).join(' ')
+        ];
+    }
+
+    function buildMicroChunks(baseChunks) {
+        const chunks = (baseChunks || []).map(text => String(text).trim()).filter(Boolean);
+        const totalWords = chunks.reduce(
+            (sum, chunk) => sum + chunk.split(/\s+/).filter(Boolean).length,
+            0
+        );
+        const desiredCount = Math.max(chunks.length, Math.min(8, Math.ceil(totalWords / 2.5)));
+
+        while (chunks.length < desiredCount) {
+            const candidates = chunks
+                .map((text, index) => ({ text, index, count: text.split(/\s+/).filter(Boolean).length }))
+                .filter(item => item.count >= 3)
+                .sort((a, b) => (b.count - a.count) || (a.index - b.index));
+            if (!candidates.length) break;
+
+            const target = candidates.find(item => {
+                const parts = splitPracticeChunk(item.text);
+                return parts.length === 2 && joinChunks(parts) === item.text;
+            });
+            if (!target) break;
+            const split = splitPracticeChunk(target.text);
+            chunks.splice(target.index, 1, ...split);
+        }
+
+        return chunks;
+    }
+
+    function buildMergedChunks(baseChunks) {
+        const chunks = (baseChunks || []).map(text => String(text).trim()).filter(Boolean);
+        const merged = [];
+        for (let index = 0; index < chunks.length;) {
+            const current = chunks[index];
+            const next = chunks[index + 1];
+            const hasStrongBoundary = /[,;:.!?—–]["'’”)]?$/.test(current);
+            if (next && !hasStrongBoundary) {
+                merged.push(joinChunks([current, next]));
+                index += 2;
+            } else {
+                merged.push(current);
+                index += 1;
+            }
+        }
+        return merged;
+    }
+
+    function buildAdaptiveChunkPlan(card, requestedStage = 0) {
+        const sentence = String(card?.en || '').trim();
+        const storedChunks = Array.isArray(card?.assemblyChunks)
+            ? card.assemblyChunks.map(chunk => String(chunk).trim()).filter(Boolean)
+            : [];
+        const baseChunks = storedChunks.length && joinChunks(storedChunks) === sentence
+            ? storedChunks
+            : buildChunks(card?.en, deriveCorePhrase(card));
+        const microChunks = buildMicroChunks(baseChunks);
+        const sameChunks = (left, right) => left.length === right.length &&
+            left.every((chunk, index) => chunk === right[index]);
+        const plans = [];
+
+        if (microChunks.length >= 2) {
+            plans.push({ kind: 'micro', mode: 'assembly', chunks: microChunks });
+        }
+        if (baseChunks.length >= 2 && !sameChunks(baseChunks, microChunks)) {
+            plans.push({ kind: 'canonical', mode: 'assembly', chunks: [...baseChunks] });
+        } else if (sameChunks(baseChunks, microChunks)) {
+            const mergedChunks = buildMergedChunks(baseChunks);
+            if (mergedChunks.length >= 2 && !sameChunks(mergedChunks, microChunks)) {
+                plans.push({ kind: 'merged', mode: 'assembly', chunks: mergedChunks });
+            }
+        }
+        if (!plans.length && baseChunks.length >= 2) {
+            plans.push({ kind: 'canonical', mode: 'assembly', chunks: [...baseChunks] });
+        }
+        // 전체 회상에서는 선택지를 보여주지 않는다. 정답 공개 뒤의 시각 경계는
+        // 언제나 검수된 baseChunks를 사용하므로 쉼표나 문장 경계를 합치지 않는다.
+        plans.push({ kind: 'recall', mode: 'recall', chunks: [...baseChunks] });
+
+        const requested = Number.isInteger(Number(requestedStage)) ? Number(requestedStage) : 0;
+        const maxStage = Math.max(0, plans.length - 1);
+        const stage = Math.max(0, Math.min(maxStage, requested));
+        const selectedPlan = plans[stage] || plans.at(-1);
+        let chunks = [...selectedPlan.chunks];
+        if (!chunks.length || joinChunks(chunks) !== sentence) chunks = [...baseChunks];
+
+        return {
+            stage,
+            maxStage,
+            kind: selectedPlan.kind,
+            mode: selectedPlan.mode,
+            chunks,
+            baseChunks: [...baseChunks],
+            orderGlosses: Array.isArray(card?.orderGlosses) ? [...card.orderGlosses] : []
+        };
+    }
+
+    function updateChunkProgress(record = {}, outcome = {}) {
+        const maxStage = Math.max(0, Math.min(MAX_CHUNK_STAGE, Number(outcome.maxStage) || 0));
+        let chunkStage = Number.isInteger(outcome.stageBefore)
+            ? Math.max(0, Math.min(maxStage, outcome.stageBefore))
+            : Math.min(maxStage, getChunkStage(record));
+        let chunkSuccessStreak = Math.max(0, Number(record?.chunkSuccessStreak) || 0);
+        const kind = String(outcome.kind || '');
+
+        if (kind === 'clean') {
+            if (chunkStage < maxStage) {
+                chunkSuccessStreak += 1;
+                if (chunkSuccessStreak >= 2) {
+                    chunkStage += 1;
+                    chunkSuccessStreak = 0;
+                }
+            } else {
+                chunkSuccessStreak = Math.min(2, chunkSuccessStreak + 1);
+            }
+        } else if (kind === 'error' || kind === 'recall_failure') {
+            chunkStage = Math.max(0, chunkStage - 1);
+            chunkSuccessStreak = 0;
+        } else {
+            // 정답 바로 보기는 SRS에서는 오답이지만 청크 단계는 유지한다.
+            chunkSuccessStreak = 0;
+        }
+
+        return { chunkStage, chunkSuccessStreak };
+    }
+
     function buildDistractorChunk(chunks, error) {
         if (!error) return null;
         for (let index = 0; index < chunks.length; index++) {
@@ -440,7 +614,7 @@
         return null;
     }
 
-    function buildPracticeQuestion(card, rng = Math.random) {
+    function buildPracticeQuestion(card, rng = Math.random, options = {}) {
         const corePatterns = Array.isArray(card?.corePatterns) && card.corePatterns.length
             ? card.corePatterns.map(pattern => String(pattern).trim()).filter(Boolean)
             : [deriveCorePhrase(card)].filter(Boolean);
@@ -453,9 +627,16 @@
         const sourceWordCount = String(card?.en || '').trim().split(/\s+/).filter(Boolean).length;
         const minimumStoredChunks = sourceWordCount <= 6 ? 1 : 2;
         const hasValidStoredChunks = storedChunks.length >= minimumStoredChunks && joinChunks(storedChunks) === String(card?.en || '').trim();
-        let chunks = hasValidStoredChunks
-            ? storedChunks
-            : buildChunks(card?.en, corePhrase, error?.separate ? error.correct : '');
+        const requestedChunks = Array.isArray(options?.chunks)
+            ? options.chunks.map(chunk => String(chunk).trim()).filter(Boolean)
+            : [];
+        const hasValidRequestedChunks = requestedChunks.length > 0 &&
+            joinChunks(requestedChunks) === String(card?.en || '').trim();
+        let chunks = hasValidRequestedChunks
+            ? requestedChunks
+            : (hasValidStoredChunks
+                ? storedChunks
+                : buildChunks(card?.en, corePhrase, error?.separate ? error.correct : ''));
         const targetIds = chunks.map((_, index) => `target-${index}`);
         const bank = chunks.map((text, index) => ({
             id: targetIds[index],
@@ -492,7 +673,11 @@
         return {
             corePhrase,
             corePatterns,
-            orderGlosses: Array.isArray(card?.orderGlosses) ? [...card.orderGlosses] : [],
+            orderGlosses: Array.isArray(options?.orderGlosses)
+                ? [...options.orderGlosses]
+                : (Array.isArray(card?.orderGlosses) ? [...card.orderGlosses] : []),
+            chunkStage: Number.isInteger(options?.chunkStage) ? options.chunkStage : 0,
+            practiceMode: options?.mode === 'recall' ? 'recall' : 'assembly',
             errorType: error?.type || 'word_order',
             errorLabel: ERROR_LABELS[error?.type || 'word_order'],
             tip: error?.tip || '영어는 단어보다 자주 함께 쓰는 표현 덩어리와 어순으로 기억하세요.',
@@ -733,6 +918,9 @@
         normalizeText,
         buildChunks,
         deriveCorePhrase,
+        getChunkStage,
+        buildAdaptiveChunkPlan,
+        updateChunkProgress,
         buildPracticeQuestion,
         evaluatePractice,
         buildPracticeSlots,
