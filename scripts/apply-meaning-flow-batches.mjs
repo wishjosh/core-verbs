@@ -15,19 +15,24 @@ const validateOnly = process.argv.includes('--validate-only');
 function sourceFingerprint(items) {
     return createHash('sha256').update(JSON.stringify(items.map(item => ({
         id: item.id,
-        english: item.english,
-        assemblyChunks: item.assemblyChunks
+        english: item.english
     })))).digest('hex');
+}
+
+function joinChunks(chunks) {
+    return chunks.reduce((sentence, chunk, index) => (
+        index === 0 ? chunk : `${sentence}${/[—–]$/.test(sentence) ? '' : ' '}${chunk}`
+    ), '');
 }
 
 function validateFlow(source, candidate, label) {
     const failures = [];
     if (!source) return [`${label}: 원본 ID를 찾을 수 없음`];
     if (candidate.english !== source.english) failures.push(`${label}: 영어 원문 불일치`);
-    if (JSON.stringify(candidate.assemblyChunks) !== JSON.stringify(source.assemblyChunks)) {
-        failures.push(`${label}: 영어 청크 불일치`);
+    if (!Array.isArray(candidate.assemblyChunks) || joinChunks(candidate.assemblyChunks) !== source.english) {
+        failures.push(`${label}: 영어 청크로 원문을 정확히 복원할 수 없음`);
     }
-    if (!Array.isArray(candidate.orderGlosses) || candidate.orderGlosses.length !== source.assemblyChunks.length) {
+    if (!Array.isArray(candidate.orderGlosses) || candidate.orderGlosses.length !== candidate.assemblyChunks?.length) {
         failures.push(`${label}: 의미 단서와 영어 청크가 1:1이 아님`);
     } else {
         candidate.orderGlosses.forEach((gloss, index) => {
@@ -67,7 +72,7 @@ async function main() {
     for (const file of files) {
         const document = JSON.parse(await readFile(path.join(BATCH_DIR, file), 'utf8'));
         if (document.rulesVersion !== RULES_VERSION) failures.push(`${file}: rulesVersion 불일치`);
-        if (document.reviewStatus !== 'ai_checked') failures.push(`${file}: reviewStatus가 ai_checked가 아님`);
+        if (document.reviewStatus !== 'reviewed') failures.push(`${file}: reviewStatus가 reviewed가 아님`);
         if (!Array.isArray(document.items)) {
             failures.push(`${file}: items 배열 누락`);
             continue;
@@ -89,17 +94,19 @@ async function main() {
 
     const missing = [...expectedIds].filter(id => !checkedById.has(id));
     const unexpected = [...checkedById.keys()].filter(id => !expectedIds.has(id));
-    if (missing.length) failures.push(`AI 교차검수 누락 ${missing.length}개: ${missing.slice(0, 30).join(', ')}`);
-    if (unexpected.length) failures.push(`AI 교차검수 범위 밖 ${unexpected.length}개: ${unexpected.slice(0, 30).join(', ')}`);
+    if (missing.length) failures.push(`직접 검수 누락 ${missing.length}개: ${missing.slice(0, 30).join(', ')}`);
+    if (unexpected.length) failures.push(`직접 검수 범위 밖 ${unexpected.length}개: ${unexpected.slice(0, 30).join(', ')}`);
     if (failures.length) throw new Error(`meaning-flow 배치 검증 실패 ${failures.length}건\n${failures.join('\n')}`);
 
     for (const [id, candidate] of checkedById) {
         const item = sourceById.get(id);
+        item.assemblyChunks = [...candidate.assemblyChunks];
         item.orderGlosses = [...candidate.orderGlosses];
         item.meaningFlow = {
             rulesVersion: RULES_VERSION,
-            reviewStatus: 'ai_checked',
-            reviewMethod: 'multi_agent_direct'
+            reviewStatus: 'reviewed',
+            reviewMethod: 'codex_direct_full_review',
+            pilot: false
         };
     }
 
@@ -107,19 +114,23 @@ async function main() {
         const item = sourceById.get(candidate.id);
         const itemFailures = validateFlow(item, candidate, `reviewed/${candidate.id}`);
         if (itemFailures.length) throw new Error(itemFailures.join('\n'));
+        item.assemblyChunks = [...candidate.assemblyChunks];
         item.orderGlosses = [...candidate.orderGlosses];
         item.meaningFlow = {
             rulesVersion: RULES_VERSION,
-            reviewStatus: 'reviewed'
+            reviewStatus: 'reviewed',
+            reviewMethod: 'codex_direct_full_review',
+            pilot: true
         };
     }
 
     content.meaningFlowRulesVersion = RULES_VERSION;
     content.meaningFlowReviewCount = reviewedIds.size;
-    content.meaningFlowAiCheckedCount = checkedById.size;
+    content.meaningFlowDirectReviewCount = reviewedIds.size + checkedById.size;
+    content.meaningFlowAiCheckedCount = 0;
     content.meaningFlowDraftCount = 0;
     content.meaningFlowTotal = reviewedIds.size + checkedById.size;
-    content.meaningFlowModel = 'multi_agent_direct';
+    content.meaningFlowModel = 'codex_direct_full_review';
 
     if (content.meaningFlowTotal !== content.items.length) {
         throw new Error(`meaning-flow 전체 수 불일치: ${content.meaningFlowTotal}/${content.items.length}`);
@@ -130,8 +141,8 @@ async function main() {
 
     if (!validateOnly) await writeJsonAtomic(CONTENT_PATH, content);
     process.stdout.write(
-        `meaning-flow 배치 ${files.length}개 검증 통과: 사람 검수 ${reviewedIds.size}, `
-        + `AI 교차검수 ${checkedById.size}, 영어 원문·청크 불변${validateOnly ? ' (검증 전용)' : ''}\n`
+        `meaning-flow 배치 ${files.length}개 검증 통과: 직접 검수 ${reviewedIds.size + checkedById.size}, `
+        + `영어 원문 보존${validateOnly ? ' (검증 전용)' : ''}\n`
     );
 }
 

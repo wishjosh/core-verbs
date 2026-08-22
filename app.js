@@ -5,7 +5,7 @@
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSR1wby3k5QhlAL8f8MeH-Ni1qjGgRMu8ROHDoPCKci-GYrbpx1DzTsAvcr_l5qBcemui93D4cqMLa0/pub?output=tsv";
 const CONTENT_URL = './data/learning-content.json';
 const MAKE_CHUNK_OVERRIDES_URL = './data/make-chunk-overrides.json';
-const APP_VERSION = '19';
+const APP_VERSION = '20';
 const pageParams = new URLSearchParams(window.location.search);
 const meaningFlowPilotMode = pageParams.get('pilot') === 'meaning-flow';
 const requestedVerbPilot = String(pageParams.get('verb') || '').trim().toUpperCase();
@@ -566,7 +566,7 @@ async function fetchDatabase() {
             .filter(card => card.en && card.ko);
         if (db.length !== content.items.length) throw new Error('일부 학습 자료의 영어 또는 한국어가 비어 있습니다.');
         if (meaningFlowPilotMode) {
-            db = db.filter(card => card.meaningFlow?.reviewStatus === 'reviewed');
+            db = db.filter(card => card.meaningFlow?.pilot === true);
             if (db.length !== 30) throw new Error(`의미 전개 파일럿 문장 수가 잘못되었습니다: ${db.length}/30`);
         } else if (requestedVerbPilot) {
             db = db.filter(card => String(card.verb || '').toUpperCase() === requestedVerbPilot);

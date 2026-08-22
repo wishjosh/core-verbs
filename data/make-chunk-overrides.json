@@ -294,10 +294,10 @@
     },
     {
       "id": "cv-0400",
-      "microChunks": ["Your girlfriend", "is already making you", "wear", "matching outfits?"],
-      "microOrderGlosses": ["네 여자 친구가", "벌써 너를 시키고 있어", "입으라고", "커플 룩을?"],
-      "assemblyChunks": ["Your girlfriend is already making you", "wear matching outfits?"],
-      "orderGlosses": ["네 여자 친구가 벌써 너를 시키고 있어", "커플 룩을 입도록?"]
+      "microChunks": ["Your girlfriend", "is already", "making you wear", "matching outfits?"],
+      "microOrderGlosses": ["네 여자친구가", "벌써", "시키고 있어", "커플 룩을 입으라고?"],
+      "assemblyChunks": ["Your girlfriend is already", "making you wear matching outfits?"],
+      "orderGlosses": ["네 여자친구가 벌써", "커플 룩을 입으라고 시키고 있어?"]
     },
     {
       "id": "cv-0401",
@@ -441,8 +441,8 @@
     },
     {
       "id": "cv-0421",
-      "microChunks": ["Working", "for myself", "made me realize", "that", "unreliable income", "can make you feel", "insecure."],
-      "microOrderGlosses": ["일하는 것이", "나 자신을 위해", "내게 깨닫게 했어요", "그 내용을—", "불안정한 수입이", "사람에게 느끼게 할 수 있다는 걸", "불안하게."],
+      "microChunks": ["Working", "for myself", "made me realize", "that unreliable income", "can make you feel", "insecure."],
+      "microOrderGlosses": ["혼자", "일해 본 경험이", "깨닫게 했어요", "불안정한 수입이", "사람을 만들 수 있다는 걸", "불안하게."],
       "assemblyChunks": ["Working for myself", "made me realize", "that unreliable income", "can make you feel insecure."],
       "orderGlosses": ["혼자 일해 본 경험이", "내게 깨닫게 했어요", "불안정한 수입이", "사람을 불안하게 만들 수 있다는 걸."]
     },

@@ -104,9 +104,10 @@ test('MAKE-unit cards use reviewed micro chunks, then reviewed phrase chunks, th
     }
 });
 
-test('stores a reviewed 30-sentence English meaning-flow pilot across all 15 verb groups', () => {
+test('keeps the representative 30-sentence review set across all 15 verb groups', () => {
     assert.equal(content.meaningFlowRulesVersion, 1);
     assert.equal(content.meaningFlowReviewCount, 30);
+    assert.equal(content.meaningFlowDirectReviewCount, 869);
     assert.equal(meaningFlowOverrides.rulesVersion, 1);
     assert.equal(meaningFlowOverrides.reviewStatus, 'reviewed');
     assert.equal(meaningFlowOverrides.items.length, 30);
@@ -122,7 +123,12 @@ test('stores a reviewed 30-sentence English meaning-flow pilot across all 15 ver
         assert.deepEqual(item.orderGlosses, override.orderGlosses, override.id);
         assert.equal(item.orderGlosses.length, item.assemblyChunks.length, override.id);
         assert.ok(item.orderGlosses.every(value => value.trim()), override.id);
-        assert.deepEqual(item.meaningFlow, { rulesVersion: 1, reviewStatus: 'reviewed' }, override.id);
+        assert.deepEqual(item.meaningFlow, {
+            rulesVersion: 1,
+            reviewStatus: 'reviewed',
+            reviewMethod: 'codex_direct_full_review',
+            pilot: true
+        }, override.id);
         verbs.add(item.verb);
     }
 
@@ -135,17 +141,18 @@ test('stores a reviewed 30-sentence English meaning-flow pilot across all 15 ver
     }
 });
 
-test('stores AI-cross-checked meaning flow for every remaining sentence', () => {
+test('stores directly reviewed meaning flow for every sentence', () => {
     assert.equal(content.meaningFlowTotal, 869);
     assert.equal(content.meaningFlowReviewCount, 30);
-    assert.equal(content.meaningFlowAiCheckedCount, 839);
+    assert.equal(content.meaningFlowDirectReviewCount, 869);
+    assert.equal(content.meaningFlowAiCheckedCount, 0);
     assert.equal(content.meaningFlowDraftCount, 0);
     assert.equal(meaningFlowBatches.length, 9);
 
     const reviewedIds = new Set(meaningFlowOverrides.items.map(item => item.id));
     const batchItems = meaningFlowBatches.flatMap(batch => {
         assert.equal(batch.rulesVersion, 1);
-        assert.equal(batch.reviewStatus, 'ai_checked');
+        assert.equal(batch.reviewStatus, 'reviewed');
         return batch.items;
     });
     assert.equal(batchItems.length, 839);
@@ -160,21 +167,22 @@ test('stores AI-cross-checked meaning flow for every remaining sentence', () => 
         assert.deepEqual(item.orderGlosses, candidate.orderGlosses, candidate.id);
         assert.deepEqual(item.meaningFlow, {
             rulesVersion: 1,
-            reviewStatus: 'ai_checked',
-            reviewMethod: 'multi_agent_direct'
+            reviewStatus: 'reviewed',
+            reviewMethod: 'codex_direct_full_review',
+            pilot: false
         }, candidate.id);
     }
 });
 
 test('meaning-flow pilot fixes representative reverse-translation traps', () => {
     const byId = new Map(content.items.map(item => [item.id, item]));
-    assert.deepEqual(byId.get('cv-0062').orderGlosses, ['(과거 질문으로 시작)', '너는 벌써 퇴근했어?']);
+    assert.deepEqual(byId.get('cv-0062').orderGlosses, ['퇴근했어요', '벌써?']);
     assert.deepEqual(byId.get('cv-0148').orderGlosses, ['어떻게 구했어요', '이 명품 가방을?']);
     assert.deepEqual(byId.get('cv-0421').orderGlosses, [
         '혼자 일해 본 경험이',
         '내게 깨닫게 했어요',
-        '깨달은 내용은—불안정한 수입이 사람에게 줄 수 있는 영향,',
-        '바로 불안감을 느끼게 한다는 걸.'
+        '불안정한 수입이',
+        '사람을 불안하게 만들 수 있다는 걸.'
     ]);
     assert.deepEqual(byId.get('cv-0750').orderGlosses, ['포장지에는 적혀 있어요', '이탈리아에서 만들어졌다고.']);
 });
@@ -224,6 +232,14 @@ test('Korean chunk cues do not repeat question marks within one English question
                 countQuestions(item[field].join(' ')) <= englishQuestionCount,
                 `${item.id} ${field} repeats question punctuation`
             );
+        }
+    }
+});
+
+test('Korean chunk cues contain no translation scaffolding', () => {
+    for (const item of content.items) {
+        for (const gloss of item.orderGlosses) {
+            assert.doesNotMatch(gloss, /—|\([^)]*\)|뜻 확인|번역 필요|이어서|확인 필요/, item.id);
         }
     }
 });
@@ -281,7 +297,7 @@ test('stored learner error points remain exact source substrings across visual c
 test('reviewed examples preserve the agreed learning intent', () => {
     const byEnglish = new Map(content.items.map(item => [item.english, item]));
     const did = byEnglish.get('Did you leave work yet?');
-    assert.deepEqual(did.assemblyChunks, ['Did', 'you leave work yet?']);
+    assert.deepEqual(did.assemblyChunks, ['Did you leave work', 'yet?']);
     assert.ok(did.errorPoints.some(point => point.correct === 'Did' && point.distractor === 'Do'));
     assert.equal(did.reviewStatus, 'reviewed');
 
@@ -342,7 +358,7 @@ test('the mobile review screen keeps word-level marking without error categories
     assert.match(app, /pilot.*meaning-flow/);
     assert.match(app, /pageParams\.get\('verb'\)/);
     assert.match(app, /requestedVerbPilot/);
-    assert.match(app, /meaningFlow\?\.reviewStatus === 'reviewed'/);
+    assert.match(app, /meaningFlow\?\.pilot === true/);
     assert.match(app, /MAKE_CHUNK_OVERRIDES_URL/);
     assert.match(app, /makeChunkById\.get\(item\.id\)/);
     assert.doesNotMatch(html, /같은 번호|번째 청크/);
@@ -370,11 +386,11 @@ test('the mobile review screen keeps word-level marking without error categories
     assert.match(html, /id="daily-session-progress"/);
     assert.match(app, /adaptiveLimit - dailyLearned/);
     assert.match(app, /const DAILY_NEW_LIMIT = 12/);
-    assert.match(app, /const APP_VERSION = '19'/);
+    assert.match(app, /const APP_VERSION = '20'/);
     assert.match(app, /Learning\.selectCoreVerbNewCards/);
     assert.match(app, /newByVerb/);
     assert.match(app, /register\(`sw\.js\?v=\$\{APP_VERSION\}`,[^)]*updateViaCache: 'none'/);
-    assert.match(html, /Core Verbs v19/);
+    assert.match(html, /Core Verbs v20/);
     assert.match(html, /id="completion-title"/);
     assert.match(html, /id="btn-extra-review"[^>]*onclick="startExtraReviewSession\(\)"/);
     assert.match(html, /id="btn-demo-session"[^>]*onclick="startDemoSession\(\)"/);
