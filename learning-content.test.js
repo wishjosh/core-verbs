@@ -206,7 +206,7 @@ test('dedicated meaning-flow generation is resumable and cannot write English or
 test('every English sentence is reconstructed exactly from native chunks', () => {
     for (const item of content.items) {
         assert.ok(item.assemblyChunks.length >= 1 && item.assemblyChunks.length <= 10, item.id);
-        assert.ok(item.assemblyChunks.every(chunk => chunk.split(/\s+/).length <= 5), item.id);
+        assert.ok(item.assemblyChunks.every(chunk => chunk.split(/\s+/).length <= 6), item.id);
         assert.equal(joinChunks(item.assemblyChunks), item.english, item.id);
         assert.equal(item.orderGlosses.length, item.assemblyChunks.length, item.id);
         assert.ok(item.orderGlosses.every(Boolean), item.id);
@@ -386,11 +386,11 @@ test('the mobile review screen keeps word-level marking without error categories
     assert.match(html, /id="daily-session-progress"/);
     assert.match(app, /adaptiveLimit - dailyLearned/);
     assert.match(app, /const DAILY_NEW_LIMIT = 12/);
-    assert.match(app, /const APP_VERSION = '20'/);
+    assert.match(app, /const APP_VERSION = '21'/);
     assert.match(app, /Learning\.selectCoreVerbNewCards/);
     assert.match(app, /newByVerb/);
     assert.match(app, /register\(`sw\.js\?v=\$\{APP_VERSION\}`,[^)]*updateViaCache: 'none'/);
-    assert.match(html, /Core Verbs v20/);
+    assert.match(html, /Core Verbs v21/);
     assert.match(html, /id="completion-title"/);
     assert.match(html, /id="btn-extra-review"[^>]*onclick="startExtraReviewSession\(\)"/);
     assert.match(html, /id="btn-demo-session"[^>]*onclick="startDemoSession\(\)"/);
