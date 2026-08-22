@@ -404,9 +404,56 @@ test('preserves source verb proportions when selecting new cards', () => {
     assert.deepEqual(counts, { GET: 7, HAVE: 2, SEE: 1 });
 });
 
+test('starts with three new sentences from each priority core verb', () => {
+    const coreVerbs = ['HAVE', 'GET', 'MAKE', 'TAKE'];
+    const allCards = coreVerbs.flatMap(verb =>
+        Array.from({ length: 5 }, (_, i) => ({ verb, en: `${verb} ${i}` }))
+    ).concat(Array.from({ length: 8 }, (_, i) => ({ verb: 'SEE', en: `SEE ${i}` })));
+    const selected = engine.selectCoreVerbNewCards(allCards, 12, allCards, {
+        dailyLimit: 12,
+        rng: fixedRandom
+    });
+    const counts = selected.reduce((map, card) => ({ ...map, [card.verb]: (map[card.verb] || 0) + 1 }), {});
+    assert.deepEqual(counts, { HAVE: 3, GET: 3, MAKE: 3, TAKE: 3 });
+});
+
+test('fills an exhausted core verb slot from other verbs without overloading another core verb', () => {
+    const allCards = [
+        ...Array.from({ length: 5 }, (_, i) => ({ verb: 'HAVE', en: `HAVE ${i}` })),
+        ...Array.from({ length: 5 }, (_, i) => ({ verb: 'GET', en: `GET ${i}` })),
+        { verb: 'MAKE', en: 'MAKE 0' },
+        ...Array.from({ length: 5 }, (_, i) => ({ verb: 'TAKE', en: `TAKE ${i}` })),
+        ...Array.from({ length: 6 }, (_, i) => ({ verb: 'SEE', en: `SEE ${i}` }))
+    ];
+    const selected = engine.selectCoreVerbNewCards(allCards, 12, allCards, {
+        dailyLimit: 12,
+        rng: fixedRandom
+    });
+    const counts = selected.reduce((map, card) => ({ ...map, [card.verb]: (map[card.verb] || 0) + 1 }), {});
+    assert.deepEqual(counts, { HAVE: 3, GET: 3, MAKE: 1, TAKE: 3, SEE: 2 });
+});
+
+test('uses today’s learned verb counts to keep repeated sessions balanced', () => {
+    const coreVerbs = ['HAVE', 'GET', 'MAKE', 'TAKE'];
+    const allCards = coreVerbs.flatMap(verb =>
+        Array.from({ length: 5 }, (_, i) => ({ verb, en: `${verb} ${i}` }))
+    );
+    const selected = engine.selectCoreVerbNewCards(allCards, 8, allCards, {
+        dailyLimit: 12,
+        learnedByVerb: { HAVE: 1, GET: 1, MAKE: 1, TAKE: 1 },
+        rng: fixedRandom
+    });
+    const counts = selected.reduce((map, card) => ({ ...map, [card.verb]: (map[card.verb] || 0) + 1 }), {});
+    assert.deepEqual(counts, { HAVE: 2, GET: 2, MAKE: 2, TAKE: 2 });
+});
+
 test('reduces new work when recent recall is weak or reviews are backed up', () => {
     const weak = Array.from({ length: 10 }, (_, i) => ({ correct: i < 5, usedHint: false }));
     assert.equal(engine.getAdaptiveNewLimit(5, weak, 10), 4);
     assert.equal(engine.getAdaptiveNewLimit(20, [], 10), 0);
     assert.equal(engine.getAdaptiveNewLimit(0, [], 10), 10);
+    assert.equal(engine.getAdaptiveNewLimit(0, [], 12), 12);
+    assert.equal(engine.getAdaptiveNewLimit(8, [], 12), 8);
+    assert.equal(engine.getAdaptiveNewLimit(12, [], 12), 4);
+    assert.equal(engine.getAdaptiveNewLimit(5, weak, 12), 4);
 });

@@ -912,14 +912,63 @@
         return shuffle(selected, rng);
     }
 
+    function selectCoreVerbNewCards(newCards, targetCount, allCards, options = {}) {
+        if (!Array.isArray(newCards) || targetCount <= 0) return [];
+
+        const coreVerbs = ['HAVE', 'GET', 'MAKE', 'TAKE'];
+        const coreSet = new Set(coreVerbs);
+        const rng = typeof options.rng === 'function' ? options.rng : Math.random;
+        const dailyLimit = Math.max(0, Number(options.dailyLimit) || targetCount);
+        const perVerbTarget = Math.min(3, Math.floor(dailyLimit / coreVerbs.length));
+        const learnedByVerb = options.learnedByVerb && typeof options.learnedByVerb === 'object'
+            ? options.learnedByVerb
+            : {};
+        const buckets = new Map(coreVerbs.map(verb => [verb, []]));
+
+        newCards.forEach(card => {
+            const verb = String(card.verb || '').toUpperCase();
+            if (coreSet.has(verb)) buckets.get(verb).push(card);
+        });
+        buckets.forEach((cards, verb) => buckets.set(verb, shuffle(cards, rng)));
+
+        const needs = new Map(coreVerbs.map(verb => [
+            verb,
+            Math.max(0, perVerbTarget - (Number(learnedByVerb[verb]) || 0))
+        ]));
+        const selectedCore = [];
+        let canTakeCore = true;
+
+        // HAVE→GET→MAKE→TAKE 순환 배정으로 일부만 남은 날에도 한 동사로 쏠리지 않게 한다.
+        while (selectedCore.length < targetCount && canTakeCore) {
+            canTakeCore = false;
+            for (const verb of coreVerbs) {
+                if (selectedCore.length >= targetCount) break;
+                const bucket = buckets.get(verb);
+                if ((needs.get(verb) || 0) <= 0 || bucket.length === 0) continue;
+                selectedCore.push(bucket.shift());
+                needs.set(verb, needs.get(verb) - 1);
+                canTakeCore = true;
+            }
+        }
+
+        const remainingCount = targetCount - selectedCore.length;
+        const otherCards = newCards.filter(card => !coreSet.has(String(card.verb || '').toUpperCase()));
+        const selectedOther = selectWeightedNewCards(otherCards, remainingCount, allCards, rng);
+        return shuffle([...selectedCore, ...selectedOther], rng);
+    }
+
     function getAdaptiveNewLimit(pendingReviews, recentAttempts, maximum = 10) {
+        const middleLimit = Math.min(maximum, Math.max(4, Math.round(maximum * 2 / 3)));
+        let limit = maximum;
         if (pendingReviews >= 20) return 0;
+        if (pendingReviews >= 12) limit = Math.min(limit, 4);
+        else if (pendingReviews >= 8) limit = Math.min(limit, middleLimit);
         const attempts = (Array.isArray(recentAttempts) ? recentAttempts : []).slice(-20);
-        if (attempts.length < 5) return maximum;
+        if (attempts.length < 5) return limit;
         const accuracy = attempts.filter(item => item.correct && !item.usedHint).length / attempts.length;
-        if (accuracy < 0.7) return Math.min(maximum, 4);
-        if (accuracy < 0.85) return Math.min(maximum, 7);
-        return maximum;
+        if (accuracy < 0.7) return Math.min(limit, 4);
+        if (accuracy < 0.85) return Math.min(limit, middleLimit);
+        return limit;
     }
 
     return {
@@ -939,6 +988,7 @@
         buildAssessmentSignals,
         classifyMistakeSelections,
         selectWeightedNewCards,
+        selectCoreVerbNewCards,
         getAdaptiveNewLimit
     };
 });

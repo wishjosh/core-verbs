@@ -9,7 +9,7 @@ const pageParams = new URLSearchParams(window.location.search);
 const meaningFlowPilotMode = pageParams.get('pilot') === 'meaning-flow';
 const requestedVerbPilot = String(pageParams.get('verb') || '').trim().toUpperCase();
 const STORAGE_KEY = 'coreVerbs_Memory_v1';
-const DAILY_NEW_LIMIT = 10;
+const DAILY_NEW_LIMIT = 12;
 const SESSION_CARD_LIMIT = 20;
 const Learning = window.CoreVerbsLearning;
 
@@ -694,7 +694,7 @@ function init() {
         }
     });
 
-    // 2. 동적 세션 타겟팅 (일일 10개 엄수 & 복습 우선)
+    // 2. 동적 세션 타겟팅 (일일 최대 12개 & 복습 우선)
     const todayStr = getTodayKey();
     ensureTodayNewCards(todayStr);
     const dailyLearned = progressData.dailyStats?.[todayStr]?.newLearned || 0;
@@ -713,15 +713,18 @@ function init() {
         targetNew = 0;
         targetReview = SESSION_CARD_LIMIT;
     } else {
-        // 적응형 한도(10·7·4·0)를 세션 한도가 아니라 실제 하루 한도로 적용한다.
+        // 적응형 한도(12·8·4·0)를 세션 한도가 아니라 실제 하루 한도로 적용한다.
         const remainToday = Math.max(0, adaptiveLimit - dailyLearned);
         targetNew = remainToday;
         targetReview = SESSION_CARD_LIMIT - targetNew;
     }
 
-    // 3. 원본 자료의 동사별 문장 비중을 유지하며 새 문장을 선정한다.
-    // DAY 순서를 강제하지 않되, 고빈도 기본동사가 더 많이 배치된 책의 의도는 보존한다.
-    const selectedNew = Learning.selectWeightedNewCards(newCards, targetNew, db);
+    // 3. 핵심 네 동사를 균등 배정하고, 끝난 동사의 자리는 나머지 동사로 채운다.
+    const learnedByVerb = progressData.dailyStats?.[todayStr]?.newByVerb || {};
+    const selectedNew = Learning.selectCoreVerbNewCards(newCards, targetNew, db, {
+        dailyLimit: adaptiveLimit,
+        learnedByVerb
+    });
 
     rememberTodayNewCards(selectedNew);
 
@@ -1742,6 +1745,10 @@ function recordAssessment(result, errorTypes = [], usedHint = false, mistakeDeta
         progressData.dailyStats = progressData.dailyStats || {};
         if (!progressData.dailyStats[todayStr]) progressData.dailyStats[todayStr] = { newLearned: 0 };
         progressData.dailyStats[todayStr].newLearned += 1;
+        progressData.dailyStats[todayStr].newByVerb = progressData.dailyStats[todayStr].newByVerb || {};
+        const verbKey = String(card.verb || 'OTHER').toUpperCase();
+        progressData.dailyStats[todayStr].newByVerb[verbKey] =
+            (progressData.dailyStats[todayStr].newByVerb[verbKey] || 0) + 1;
     }
 
     record.interval = record.interval || 0;
