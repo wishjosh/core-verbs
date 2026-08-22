@@ -4,7 +4,7 @@
    ※ 저장된 학습 자료(JSON)는 앱 셸과 함께 캐시하고, 구글 시트·폰트 등 외부 리소스는 네트워크로 요청한다.
    ========================================================================== */
 
-const CACHE_NAME = 'core-verbs-shell-v11';
+const CACHE_NAME = 'core-verbs-shell-v12';
 
 // 앱 셸(자체 호스팅 파일)만 사전 캐시한다.
 const APP_SHELL = [
@@ -13,6 +13,7 @@ const APP_SHELL = [
     './style.css',
     './learning-engine.js',
     './data/learning-content.json',
+    './data/make-chunk-overrides.json',
     './app.js',
     './manifest.webmanifest',
     './icon-192.png',

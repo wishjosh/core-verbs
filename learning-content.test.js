@@ -7,6 +7,8 @@ const engine = require('./learning-engine.js');
 
 const contentPath = path.join(__dirname, 'data', 'learning-content.json');
 const content = JSON.parse(fs.readFileSync(contentPath, 'utf8'));
+const makeChunkOverridesPath = path.join(__dirname, 'data', 'make-chunk-overrides.json');
+const makeChunkOverrides = JSON.parse(fs.readFileSync(makeChunkOverridesPath, 'utf8'));
 const meaningFlowOverridesPath = path.join(__dirname, 'data', 'meaning-flow-overrides.json');
 const meaningFlowOverrides = JSON.parse(fs.readFileSync(meaningFlowOverridesPath, 'utf8'));
 const meaningFlowBatchDir = path.join(__dirname, 'data', 'meaning-flow-batches');
@@ -46,6 +48,60 @@ test('stores the complete 50-day, 869-sentence learning set', () => {
     assert.equal(content.items.length, 869);
     assert.equal(new Set(content.items.map(item => item.id)).size, 869);
     assert.equal(Math.max(...content.items.map(item => item.day)), 50);
+});
+
+test('stores directly reviewed two-level chunk progression for all 100 MAKE-unit sentences', () => {
+    assert.equal(makeChunkOverrides.schemaVersion, 1);
+    assert.equal(makeChunkOverrides.verb, 'MAKE');
+    assert.equal(makeChunkOverrides.reviewStatus, 'reviewed');
+    assert.equal(makeChunkOverrides.reviewMethod, 'codex_direct');
+    assert.equal(makeChunkOverrides.reviewCount, 100);
+    assert.equal(makeChunkOverrides.items.length, 100);
+    assert.equal(new Set(makeChunkOverrides.items.map(item => item.id)).size, 100);
+
+    const makeItems = content.items.filter(item => item.verb === 'MAKE');
+    const makeIds = new Set(makeItems.map(item => item.id));
+    assert.equal(makeItems.length, 100);
+
+    for (const override of makeChunkOverrides.items) {
+        const source = content.items.find(item => item.id === override.id);
+        assert.ok(source, override.id);
+        assert.ok(makeIds.has(override.id), override.id);
+        assert.equal(joinChunks(override.microChunks), source.english, `${override.id} micro`);
+        assert.equal(joinChunks(override.assemblyChunks), source.english, `${override.id} phrase`);
+        assert.equal(override.microChunks.length, override.microOrderGlosses.length, override.id);
+        assert.equal(override.assemblyChunks.length, override.orderGlosses.length, override.id);
+        assert.ok(override.microChunks.length > override.assemblyChunks.length, override.id);
+        assert.ok(override.microChunks.length <= 10, override.id);
+        assert.ok(override.microOrderGlosses.every(Boolean), override.id);
+        assert.ok(override.orderGlosses.every(Boolean), override.id);
+    }
+
+    assert.deepEqual(new Set(makeChunkOverrides.items.map(item => item.id)), makeIds);
+});
+
+test('MAKE-unit cards use reviewed micro chunks, then reviewed phrase chunks, then recall', () => {
+    const sourceById = new Map(content.items.map(item => [item.id, item]));
+    for (const override of makeChunkOverrides.items) {
+        const source = sourceById.get(override.id);
+        const card = { ...source, ...override, en: source.english, ko: source.naturalKo };
+        const micro = engine.buildAdaptiveChunkPlan(card, 0);
+        const next = engine.buildAdaptiveChunkPlan(card, 1);
+
+        assert.equal(micro.kind, 'micro', override.id);
+        assert.deepEqual(micro.chunks, override.microChunks, override.id);
+        assert.deepEqual(micro.orderGlosses, override.microOrderGlosses, override.id);
+
+        if (override.assemblyChunks.length >= 2) {
+            const recall = engine.buildAdaptiveChunkPlan(card, 2);
+            assert.equal(next.kind, 'canonical', override.id);
+            assert.deepEqual(next.chunks, override.assemblyChunks, override.id);
+            assert.deepEqual(next.orderGlosses, override.orderGlosses, override.id);
+            assert.equal(recall.mode, 'recall', override.id);
+        } else {
+            assert.equal(next.mode, 'recall', override.id);
+        }
+    }
 });
 
 test('stores a reviewed 30-sentence English meaning-flow pilot across all 15 verb groups', () => {
@@ -257,7 +313,11 @@ test('the mobile review screen keeps word-level marking without error categories
     assert.match(html, /영어 의미 전개 순서/);
     assert.match(app, /의미 단서를 앞에서부터 따라가며/);
     assert.match(app, /pilot.*meaning-flow/);
+    assert.match(app, /pageParams\.get\('verb'\)/);
+    assert.match(app, /requestedVerbPilot/);
     assert.match(app, /meaningFlow\?\.reviewStatus === 'reviewed'/);
+    assert.match(app, /MAKE_CHUNK_OVERRIDES_URL/);
+    assert.match(app, /makeChunkById\.get\(item\.id\)/);
     assert.doesNotMatch(html, /같은 번호|번째 청크/);
     assert.doesNotMatch(app, /data-slot|번째 청크/);
     assert.match(html, /id="practice-slots"/);

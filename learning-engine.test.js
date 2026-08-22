@@ -242,6 +242,26 @@ test('grows How did you get from short units to native chunks and free recall', 
     assert.deepEqual(recallPlan.chunks, card.assemblyChunks);
 });
 
+test('prefers directly reviewed micro chunks and their matching English-order glosses', () => {
+    const card = {
+        en: 'The pandemic made online learning the new norm.',
+        microChunks: ['The pandemic', 'made', 'online learning', 'the new norm.'],
+        microOrderGlosses: ['팬데믹은', '자리 잡게 했어요', '온라인 학습을', '새로운 표준으로.'],
+        assemblyChunks: ['The pandemic', 'made online learning the new norm.'],
+        orderGlosses: ['팬데믹은', '온라인 학습을 새로운 표준으로 자리 잡게 했어요.']
+    };
+
+    const micro = engine.buildAdaptiveChunkPlan(card, 0);
+    const phrase = engine.buildAdaptiveChunkPlan(card, 1);
+    const recall = engine.buildAdaptiveChunkPlan(card, 2);
+
+    assert.deepEqual(micro.chunks, card.microChunks);
+    assert.deepEqual(micro.orderGlosses, card.microOrderGlosses);
+    assert.deepEqual(phrase.chunks, card.assemblyChunks);
+    assert.deepEqual(phrase.orderGlosses, card.orderGlosses);
+    assert.equal(recall.mode, 'recall');
+});
+
 test('skips duplicate stages and never merges across strong punctuation', () => {
     const card = {
         en: 'I tried, but it did not work.',

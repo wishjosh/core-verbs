@@ -4,7 +4,10 @@
 
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSR1wby3k5QhlAL8f8MeH-Ni1qjGgRMu8ROHDoPCKci-GYrbpx1DzTsAvcr_l5qBcemui93D4cqMLa0/pub?output=tsv";
 const CONTENT_URL = './data/learning-content.json';
-const meaningFlowPilotMode = new URLSearchParams(window.location.search).get('pilot') === 'meaning-flow';
+const MAKE_CHUNK_OVERRIDES_URL = './data/make-chunk-overrides.json';
+const pageParams = new URLSearchParams(window.location.search);
+const meaningFlowPilotMode = pageParams.get('pilot') === 'meaning-flow';
+const requestedVerbPilot = String(pageParams.get('verb') || '').trim().toUpperCase();
 const STORAGE_KEY = 'coreVerbs_Memory_v1';
 const Learning = window.CoreVerbsLearning;
 
@@ -466,6 +469,8 @@ function mapStoredContent(item) {
         en: item.english || '',
         assemblyChunks: Array.isArray(item.assemblyChunks) ? item.assemblyChunks : [],
         orderGlosses: Array.isArray(item.orderGlosses) ? item.orderGlosses : [],
+        microChunks: Array.isArray(item.microChunks) ? item.microChunks : [],
+        microOrderGlosses: Array.isArray(item.microOrderGlosses) ? item.microOrderGlosses : [],
         meaningFlow: item.meaningFlow && typeof item.meaningFlow === 'object' ? { ...item.meaningFlow } : null,
         corePatterns: Array.isArray(item.corePatterns) ? item.corePatterns : [],
         errorPoints: Array.isArray(item.errorPoints) ? item.errorPoints : [],
@@ -531,11 +536,29 @@ async function fetchDatabase() {
         if (!response.ok) throw new Error(`학습 자료 요청 실패: ${response.status}`);
         const content = await response.json();
         if (!Array.isArray(content.items) || content.items.length === 0) throw new Error('학습 자료가 비어 있습니다.');
-        db = content.items.map(mapStoredContent).filter(card => card.en && card.ko);
+        let makeChunkOverrides = [];
+        try {
+            const makeResponse = await fetch(MAKE_CHUNK_OVERRIDES_URL, { cache: 'no-cache' });
+            if (!makeResponse.ok) throw new Error(`MAKE 청크 자료 요청 실패: ${makeResponse.status}`);
+            const makeContent = await makeResponse.json();
+            if (!Array.isArray(makeContent.items) || makeContent.items.length !== 100) {
+                throw new Error(`MAKE 청크 자료 수가 잘못되었습니다: ${makeContent.items?.length || 0}/100`);
+            }
+            makeChunkOverrides = makeContent.items;
+        } catch (makeError) {
+            console.warn('직접 검수한 MAKE 청크 자료를 불러오지 못해 기본 청크를 사용합니다.', makeError);
+        }
+        const makeChunkById = new Map(makeChunkOverrides.map(item => [item.id, item]));
+        db = content.items
+            .map(item => mapStoredContent({ ...item, ...(makeChunkById.get(item.id) || {}) }))
+            .filter(card => card.en && card.ko);
         if (db.length !== content.items.length) throw new Error('일부 학습 자료의 영어 또는 한국어가 비어 있습니다.');
         if (meaningFlowPilotMode) {
             db = db.filter(card => card.meaningFlow?.reviewStatus === 'reviewed');
             if (db.length !== 30) throw new Error(`의미 전개 파일럿 문장 수가 잘못되었습니다: ${db.length}/30`);
+        } else if (requestedVerbPilot) {
+            db = db.filter(card => String(card.verb || '').toUpperCase() === requestedVerbPilot);
+            if (db.length === 0) throw new Error(`요청한 동사 단원을 찾지 못했습니다: ${requestedVerbPilot}`);
         }
         init();
     } catch (error) {

@@ -520,28 +520,65 @@
         const baseChunks = storedChunks.length && joinChunks(storedChunks) === sentence
             ? storedChunks
             : buildChunks(card?.en, deriveCorePhrase(card));
-        const microChunks = buildMicroChunks(baseChunks);
+        const storedMicroChunks = Array.isArray(card?.microChunks)
+            ? card.microChunks.map(chunk => String(chunk).trim()).filter(Boolean)
+            : [];
+        const microChunks = storedMicroChunks.length && joinChunks(storedMicroChunks) === sentence
+            ? storedMicroChunks
+            : buildMicroChunks(baseChunks);
+        const baseGlosses = Array.isArray(card?.orderGlosses) ? [...card.orderGlosses] : [];
+        const storedMicroGlosses = Array.isArray(card?.microOrderGlosses)
+            ? card.microOrderGlosses.map(gloss => String(gloss).trim()).filter(Boolean)
+            : [];
+        const microGlosses = storedMicroGlosses.length === microChunks.length
+            ? storedMicroGlosses
+            : baseGlosses;
         const sameChunks = (left, right) => left.length === right.length &&
             left.every((chunk, index) => chunk === right[index]);
         const plans = [];
 
         if (microChunks.length >= 2) {
-            plans.push({ kind: 'micro', mode: 'assembly', chunks: microChunks });
+            plans.push({
+                kind: 'micro',
+                mode: 'assembly',
+                chunks: microChunks,
+                orderGlosses: microGlosses
+            });
         }
         if (baseChunks.length >= 2 && !sameChunks(baseChunks, microChunks)) {
-            plans.push({ kind: 'canonical', mode: 'assembly', chunks: [...baseChunks] });
+            plans.push({
+                kind: 'canonical',
+                mode: 'assembly',
+                chunks: [...baseChunks],
+                orderGlosses: baseGlosses
+            });
         } else if (sameChunks(baseChunks, microChunks)) {
             const mergedChunks = buildMergedChunks(baseChunks);
             if (mergedChunks.length >= 2 && !sameChunks(mergedChunks, microChunks)) {
-                plans.push({ kind: 'merged', mode: 'assembly', chunks: mergedChunks });
+                plans.push({
+                    kind: 'merged',
+                    mode: 'assembly',
+                    chunks: mergedChunks,
+                    orderGlosses: baseGlosses
+                });
             }
         }
         if (!plans.length && baseChunks.length >= 2) {
-            plans.push({ kind: 'canonical', mode: 'assembly', chunks: [...baseChunks] });
+            plans.push({
+                kind: 'canonical',
+                mode: 'assembly',
+                chunks: [...baseChunks],
+                orderGlosses: baseGlosses
+            });
         }
         // 전체 회상에서는 선택지를 보여주지 않는다. 정답 공개 뒤의 시각 경계는
         // 언제나 검수된 baseChunks를 사용하므로 쉼표나 문장 경계를 합치지 않는다.
-        plans.push({ kind: 'recall', mode: 'recall', chunks: [...baseChunks] });
+        plans.push({
+            kind: 'recall',
+            mode: 'recall',
+            chunks: [...baseChunks],
+            orderGlosses: baseGlosses
+        });
 
         const requested = Number.isInteger(Number(requestedStage)) ? Number(requestedStage) : 0;
         const maxStage = Math.max(0, plans.length - 1);
@@ -557,7 +594,9 @@
             mode: selectedPlan.mode,
             chunks,
             baseChunks: [...baseChunks],
-            orderGlosses: Array.isArray(card?.orderGlosses) ? [...card.orderGlosses] : []
+            orderGlosses: Array.isArray(selectedPlan.orderGlosses)
+                ? [...selectedPlan.orderGlosses]
+                : baseGlosses
         };
     }
 
