@@ -346,6 +346,16 @@ test('the mobile review screen keeps word-level marking without error categories
     assert.match(html, /id="daily-new-progress"/);
     assert.match(html, /id="daily-session-progress"/);
     assert.match(app, /adaptiveLimit - dailyLearned/);
+    assert.match(html, /id="completion-title"/);
+    assert.match(html, /id="btn-extra-review"[^>]*onclick="startExtraReviewSession\(\)"/);
+    assert.match(html, /id="btn-demo-session"[^>]*onclick="startDemoSession\(\)"/);
+    assert.match(app, /function selectExtraReviewCards\(limit = 10\)/);
+    assert.match(app, /function startExtraReviewSession\(\)/);
+    assert.match(app, /function startDemoSession\(\)/);
+    assert.match(app, /sessionMode === 'demo'[\s\S]{0,180}진도·오류 기록·복습 일정에 저장하지 않았습니다/);
+    assert.match(app, /result === 'O' && sessionMode === 'extra_review'/);
+    assert.doesNotMatch(html, /id="btn-reload"|다음 세션/);
+    assert.doesNotMatch(app, /function checkReload\(\)/);
     assert.match(html, /id="practice-result-tip"/);
     assert.match(html, /id="btn-error-export"[^>]*onclick="exportMistakeHistory\(\)"/);
     assert.match(app, /progressData\.mistakeHistory = mistakeHistory\.slice\(-100\)/);

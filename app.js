@@ -35,6 +35,7 @@ let insertionEditorOpen = false;
 let wordOrderMistake = false;
 let currentAssessmentRecorded = false;
 let sessionRetryCounts = {};
+let sessionMode = 'core';
 let currentSessionPlan = {
     dailyNewLimit: DAILY_NEW_LIMIT,
     newTarget: 0,
@@ -607,10 +608,78 @@ function shuffleArray(array) {
 }
 
 /**
+ * 이미 학습한 문장 가운데 오답 누적이 많고 간격이 짧은 문장을 우선해 추가 복습을 만든다.
+ * 동점 문장은 먼저 섞어서 매번 같은 순서가 반복되지 않게 한다.
+ */
+function selectExtraReviewCards(limit = 10) {
+    const learnedCards = db.filter(card => Boolean(progressData[card.en]));
+    shuffleArray(learnedCards);
+    learnedCards.sort((a, b) => {
+        const aRecord = progressData[a.en] || {};
+        const bRecord = progressData[b.en] || {};
+        return ((bRecord.totalWrong || 0) - (aRecord.totalWrong || 0))
+            || ((aRecord.interval || 0) - (bRecord.interval || 0));
+    });
+    return learnedCards.slice(0, limit);
+}
+
+/**
+ * 체험은 저장 여부와 관계없이 현재 자료에서 문장을 고르며 결과를 진도에 반영하지 않는다.
+ */
+function selectDemoCards(limit = 10) {
+    const candidates = [...db];
+    shuffleArray(candidates);
+    return candidates.slice(0, limit);
+}
+
+function hideCompletionScreen() {
+    const completionMsg = document.getElementById('completion-msg');
+    const progressContainer = document.getElementById('progress-container');
+    const verbBadge = document.getElementById('verb-badge');
+    if (completionMsg) completionMsg.style.display = 'none';
+    if (progressContainer) progressContainer.style.display = '';
+    if (verbBadge) verbBadge.style.display = '';
+}
+
+function startStandaloneSession(cards, mode) {
+    if (!Array.isArray(cards) || cards.length === 0) return;
+
+    sessionMode = mode;
+    todayCards = [...cards];
+    currentIndex = 0;
+    currentAssessmentRecorded = false;
+    sessionRetryCounts = {};
+    currentSessionPlan = {
+        dailyNewLimit: currentSessionPlan.dailyNewLimit,
+        newTarget: 0,
+        reviewTarget: mode === 'extra_review' ? todayCards.length : 0,
+        total: todayCards.length
+    };
+
+    hideCompletionScreen();
+    const totalIdx = document.getElementById('total-idx');
+    if (totalIdx) totalIdx.innerText = todayCards.length;
+    loadCard();
+    updateDashboardStats();
+}
+
+function startExtraReviewSession() {
+    startStandaloneSession(selectExtraReviewCards(10), 'extra_review');
+}
+
+function startDemoSession() {
+    startStandaloneSession(selectDemoCards(10), 'demo');
+}
+
+/**
  * 🚀 세션 생성 및 초기 실행
  */
 function init() {
-    const today = new Date().getTime(); 
+    sessionMode = 'core';
+    currentIndex = 0;
+    currentAssessmentRecorded = false;
+    sessionRetryCounts = {};
+    const today = new Date().getTime();
 
     let newCards = [];
     let dueReviewCards = [];
@@ -789,9 +858,15 @@ function updateDashboardStats() {
     if (dailyPlanNote) {
         const retryCount = Object.values(sessionRetryCounts).reduce((sum, value) => sum + Number(value || 0), 0);
         const retryLabel = retryCount ? ` · 재도전 ${retryCount}회` : '';
-        dailyPlanNote.innerText = dailyLimit === 0
-            ? '밀린 복습부터 마치도록 오늘은 새 문장을 쉬어요.'
-            : `새 문장 ${currentSessionPlan.newTarget}개 · 복습 ${currentSessionPlan.reviewTarget}개${retryLabel}로 구성했어요.`;
+        if (sessionMode === 'demo') {
+            dailyPlanNote.innerText = `진도를 저장하지 않는 체험 ${todayCards.length}문장을 연습하고 있어요.`;
+        } else if (sessionMode === 'extra_review') {
+            dailyPlanNote.innerText = `이미 배운 문장 ${todayCards.length}개를 추가로 복습하고 있어요.${retryLabel}`;
+        } else {
+            dailyPlanNote.innerText = dailyLimit === 0
+                ? '밀린 복습부터 마치도록 오늘은 새 문장을 쉬어요.'
+                : `새 문장 ${currentSessionPlan.newTarget}개 · 복습 ${currentSessionPlan.reviewTarget}개${retryLabel}로 구성했어요.`;
+        }
     }
 
     const errorSummary = document.getElementById('error-summary');
@@ -864,7 +939,7 @@ function loadCard() {
     const wrongBadge = document.getElementById('wrong-badge');
 
     if (newBadge) {
-        if (isTodayNewCard(card)) {
+        if (sessionMode === 'core' && isTodayNewCard(card)) {
             newBadge.style.display = 'inline-block';
         } else {
             newBadge.style.display = 'none';
@@ -1409,7 +1484,10 @@ function finishSelfAssessment(result, errorTypes, details, headline, usedHint = 
     selfCheckButtons.forEach(button => { button.disabled = true; });
     document.querySelectorAll('#insertion-editor input, #insertion-editor select, #insertion-editor button')
         .forEach(control => { control.disabled = true; });
-    if (resultTip) resultTip.innerText = `${headline} ${scheduleMessage}`;
+    const feedbackHeadline = sessionMode === 'demo'
+        ? headline.replaceAll('기록했습니다', '확인했습니다').replaceAll('기록한', '확인한')
+        : headline;
+    if (resultTip) resultTip.innerText = `${feedbackHeadline} ${scheduleMessage}`;
     if (actionButtons) actionButtons.style.display = 'flex';
     if (nextBtn) nextBtn.style.display = 'inline-flex';
 }
@@ -1568,6 +1646,7 @@ function normalizeMistakeRecord(record = {}) {
 
     return {
         timestamp: Number(record.timestamp) || Date.now(),
+        sessionMode: String(record.sessionMode || 'core'),
         sentenceId: record.sentenceId || null,
         sentence: String(record.sentence || ''),
         naturalKo: String(record.naturalKo || ''),
@@ -1605,6 +1684,7 @@ function updatePracticeHistory(card, result, errorTypes, usedHint, mistakeDetail
     progressData.practiceHistory = progressData.practiceHistory || [];
     progressData.practiceHistory.push({
         timestamp: Date.now(),
+        sessionMode,
         sentence: card.en,
         verb: card.verb,
         correct,
@@ -1621,6 +1701,7 @@ function updatePracticeHistory(card, result, errorTypes, usedHint, mistakeDetail
     if (!correct) {
         mistakeHistory.push(normalizeMistakeRecord({
             timestamp: Date.now(),
+            sessionMode,
             sentenceId: card.id,
             sentence: card.en,
             naturalKo: card.ko,
@@ -1648,6 +1729,11 @@ function recordAssessment(result, errorTypes = [], usedHint = false, mistakeDeta
     const card = todayCards[currentIndex];
     if (!card) return '';
     currentAssessmentRecorded = true;
+
+    if (sessionMode === 'demo') {
+        updateDashboardStats();
+        return '체험 결과는 진도·오류 기록·복습 일정에 저장하지 않았습니다.';
+    }
 
     const isBrandNew = !progressData[card.en];
     const record = progressData[card.en] || {};
@@ -1681,7 +1767,9 @@ function recordAssessment(result, errorTypes = [], usedHint = false, mistakeDeta
     todayMidnight.setHours(0, 0, 0, 0);
     let scheduleMessage = '';
 
-    if (result === 'O') {
+    if (result === 'O' && sessionMode === 'extra_review') {
+        scheduleMessage = '추가 복습은 기록하되 기존 복습 일정은 유지합니다.';
+    } else if (result === 'O') {
         const consecutive = record.wrongCount;
         record.wrongCount = 0;
         if (record.interval === 0) record.interval = 0.5;
@@ -1749,6 +1837,40 @@ function advanceCard() {
 function showCompletionScreen() {
     const cardEl = document.getElementById('card');
     const completionMsg = document.getElementById('completion-msg');
+    const completionIcon = document.getElementById('completion-icon');
+    const completionTitle = document.getElementById('completion-title');
+    const completionDetail = document.getElementById('completion-detail');
+    const extraReviewButton = document.getElementById('btn-extra-review');
+    const demoButton = document.getElementById('btn-demo-session');
+
+    const learnedCount = db.filter(card => Boolean(progressData[card.en])).length;
+    const todayStr = getTodayKey();
+    const dailyLearned = progressData.dailyStats?.[todayStr]?.newLearned || 0;
+
+    if (sessionMode === 'demo') {
+        if (completionIcon) completionIcon.innerText = '✅';
+        if (completionTitle) completionTitle.innerText = '체험 완료';
+        if (completionDetail) completionDetail.innerText = '체험 결과는 진도나 오류 기록에 저장하지 않았어요.';
+    } else if (sessionMode === 'extra_review') {
+        if (completionIcon) completionIcon.innerText = '👏';
+        if (completionTitle) completionTitle.innerText = '추가 복습 완료';
+        if (completionDetail) completionDetail.innerText = `이미 배운 문장 ${todayCards.length}개를 한 번 더 확인했어요.`;
+    } else {
+        if (completionIcon) completionIcon.innerText = '🎉';
+        if (completionTitle) completionTitle.innerText = '오늘의 핵심 학습 완료';
+        if (completionDetail) {
+            if (todayCards.length === 0 && currentSessionPlan.dailyNewLimit > 0 && dailyLearned >= currentSessionPlan.dailyNewLimit) {
+                completionDetail.innerText = '오늘 새 문장 한도를 채웠어요. 더 하고 싶다면 이미 배운 문장만 복습할 수 있어요.';
+            } else if (todayCards.length === 0 && currentSessionPlan.dailyNewLimit === 0) {
+                completionDetail.innerText = '오늘은 학습 상태에 맞춰 새 문장을 쉬는 날이에요.';
+            } else {
+                completionDetail.innerText = '오늘 배정된 새 문장과 복습을 모두 마쳤어요.';
+            }
+        }
+    }
+
+    if (extraReviewButton) extraReviewButton.style.display = learnedCount > 0 ? '' : 'none';
+    if (demoButton) demoButton.style.display = db.length > 0 ? '' : 'none';
 
     if (completionMsg) completionMsg.style.display = 'block';
     
@@ -1766,13 +1888,8 @@ function showCompletionScreen() {
     if (cardEl) {
         cardEl.onclick = null; // 뒤집기 방지
     }
-}
 
-/**
- * 🔄 다음 세션을 실행하기 위한 새로고침 처리
- */
-function checkReload() {
-    location.reload();
+    updateDashboardStats();
 }
 
 // 🚀 데이터베이스 불러오며 서비스 즉시 부트스트랩
