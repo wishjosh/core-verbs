@@ -98,8 +98,8 @@
     },
     {
       "id": "cv-0372",
-      "microChunks": ["I don’t cook", "much", "because it’s cheaper", "to go out and eat", "than to cook", "for one person."],
-      "microOrderGlosses": ["나는 요리하지 않아요", "많이는", "왜냐하면 더 싸거든요", "나가서 사 먹는 게", "요리하는 것보다", "한 사람을 위해."],
+      "microChunks": ["I don’t cook", "much", "because it’s cheaper", "to go out", "and eat", "than to cook", "for one person."],
+      "microOrderGlosses": ["나는 요리하지 않아요", "많이는", "왜냐하면 더 싸거든요", "밖에 나가", "사 먹는 게", "요리하는 것보다", "한 사람을 위해."],
       "assemblyChunks": ["I don’t cook much", "because it’s cheaper", "to go out and eat", "than to cook for one person."],
       "orderGlosses": ["나는 요리를 많이 하지 않아요", "왜냐하면 더 싸거든요", "나가서 사 먹는 게", "한 사람을 위해 요리하는 것보다."]
     },
@@ -329,8 +329,8 @@
     },
     {
       "id": "cv-0405",
-      "microChunks": ["My parents", "made me", "walk to school", "when I was a kid."],
-      "microOrderGlosses": ["부모님은", "나를 시키셨어요", "학교까지 걸어가도록", "내가 어렸을 때."],
+      "microChunks": ["My parents", "made me", "walk to school", "when I was", "a kid."],
+      "microOrderGlosses": ["부모님은", "나를 시키셨어요", "학교까지 걸어가도록", "내가", "어렸을 때."],
       "assemblyChunks": ["My parents made me", "walk to school", "when I was a kid."],
       "orderGlosses": ["부모님은 나를 시키셨어요", "학교까지 걸어가도록", "내가 어렸을 때."]
     },
@@ -407,7 +407,7 @@
     {
       "id": "cv-0416",
       "microChunks": ["Did", "talking to your husband", "help", "at all?"],
-      "microOrderGlosses": ["(과거 질문으로 시작)", "남편과 이야기한 것이", "도움이 됐나요", "조금이라도?"],
+      "microOrderGlosses": ["혹시", "남편과 이야기한 것이", "도움이 됐나요", "조금이라도?"],
       "assemblyChunks": ["Did talking to your husband", "help at all?"],
       "orderGlosses": ["남편과 이야기한 것이", "조금이라도 도움이 됐나요?"]
     },
@@ -595,8 +595,8 @@
     },
     {
       "id": "cv-0443",
-      "microChunks": ["The conference", "is a little over two weeks away,", "and we need", "to verify our guest list.", "Please respond", "and let me know ASAP", "if you CANNOT make it."],
-      "microOrderGlosses": ["회의는", "2주 조금 넘게 남았고,", "그리고 우리는 해야 합니다", "참석자 명단을 확인하는 걸.", "회신해 주세요", "그리고 최대한 빨리 알려 주세요", "참석할 수 없다면."],
+      "microChunks": ["The conference", "is a little over", "two weeks away,", "and we need", "to verify", "our guest list.", "Please respond", "and let me know", "ASAP", "if you CANNOT", "make it."],
+      "microOrderGlosses": ["회의는", "조금 넘게", "2주가 남았고,", "그리고 우리는 해야 합니다", "확인하는 걸", "참석자 명단을.", "회신해 주세요", "그리고 알려 주세요", "최대한 빨리", "참석할 수 없다면", "그 자리에."],
       "assemblyChunks": ["The conference is a little over two weeks away,", "and we need to verify our guest list.", "Please respond", "and let me know ASAP", "if you CANNOT make it."],
       "orderGlosses": ["회의는 2주 조금 넘게 남았고,", "우리는 참석자 명단을 확인해야 합니다.", "회신해 주세요", "그리고 최대한 빨리 알려 주세요", "참석할 수 없다면."]
     },

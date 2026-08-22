@@ -72,7 +72,7 @@ test('stores directly reviewed two-level chunk progression for all 100 MAKE-unit
         assert.equal(override.microChunks.length, override.microOrderGlosses.length, override.id);
         assert.equal(override.assemblyChunks.length, override.orderGlosses.length, override.id);
         assert.ok(override.microChunks.length > override.assemblyChunks.length, override.id);
-        assert.ok(override.microChunks.length <= 10, override.id);
+        assert.ok(override.microChunks.length <= 12, override.id);
         assert.ok(override.microOrderGlosses.every(Boolean), override.id);
         assert.ok(override.orderGlosses.every(Boolean), override.id);
     }
@@ -214,6 +214,46 @@ test('every English sentence is reconstructed exactly from native chunks', () =>
     }
 });
 
+test('all 869 sentences store a finer first-pass chunk plan with matching Korean cues', () => {
+    assert.equal(content.microChunkRulesVersion, 1);
+    assert.equal(content.microChunkReviewCount, 869);
+    assert.equal(content.microChunkReviewMethod, 'codex_full_pass_with_direct_exceptions');
+
+    for (const item of content.items) {
+        assert.ok(Array.isArray(item.microChunks) && item.microChunks.length >= item.assemblyChunks.length, item.id);
+        assert.equal(joinChunks(item.microChunks), item.english, item.id);
+        assert.equal(item.microOrderGlosses.length, item.microChunks.length, item.id);
+        assert.ok(item.microOrderGlosses.every(value => value.trim()), item.id);
+        assert.deepEqual(item.microChunkReview, {
+            rulesVersion: 1,
+            reviewStatus: 'reviewed',
+            reviewMethod: 'codex_full_pass_with_direct_exceptions'
+        }, item.id);
+    }
+});
+
+test('first-pass chunks stay short except for explicitly preserved fixed expressions', () => {
+    const preserved = new Set([
+        'in front of the camera.',
+        'would you like to come',
+        'to the Taylor Swift concert?',
+        'to the John Lee concert?',
+        'every once in a while.',
+        'for less than a week.',
+        'to get some fresh air.',
+        'Let’s call it a night.',
+        'let’s call it a night.',
+        'a pat on the back.'
+    ]);
+    const makeById = new Map(makeChunkOverrides.items.map(item => [item.id, item]));
+    for (const item of content.items) {
+        const chunks = makeById.get(item.id)?.microChunks || item.microChunks;
+        for (const chunk of chunks) {
+            assert.ok(chunk.split(/\s+/).length <= 4 || preserved.has(chunk), `${item.id}: ${chunk}`);
+        }
+    }
+});
+
 test('Korean chunk cues do not repeat question marks within one English question', () => {
     const countQuestions = value => (String(value || '').match(/\?/g) || []).length;
     const englishById = new Map(content.items.map(item => [item.id, item.english]));
@@ -238,8 +278,13 @@ test('Korean chunk cues do not repeat question marks within one English question
 
 test('Korean chunk cues contain no translation scaffolding', () => {
     for (const item of content.items) {
-        for (const gloss of item.orderGlosses) {
+        for (const gloss of [...item.orderGlosses, ...item.microOrderGlosses]) {
             assert.doesNotMatch(gloss, /—|\([^)]*\)|뜻 확인|번역 필요|이어서|확인 필요/, item.id);
+        }
+    }
+    for (const item of makeChunkOverrides.items) {
+        for (const gloss of [...item.orderGlosses, ...item.microOrderGlosses]) {
+            assert.doesNotMatch(gloss, /\([^)]*\)|뜻 확인|번역 필요|이어서|확인 필요/, item.id);
         }
     }
 });
@@ -386,11 +431,11 @@ test('the mobile review screen keeps word-level marking without error categories
     assert.match(html, /id="daily-session-progress"/);
     assert.match(app, /adaptiveLimit - dailyLearned/);
     assert.match(app, /const DAILY_NEW_LIMIT = 12/);
-    assert.match(app, /const APP_VERSION = '22'/);
+    assert.match(app, /const APP_VERSION = '23'/);
     assert.match(app, /Learning\.selectCoreVerbNewCards/);
     assert.match(app, /newByVerb/);
     assert.match(app, /register\(`sw\.js\?v=\$\{APP_VERSION\}`,[^)]*updateViaCache: 'none'/);
-    assert.match(html, /Core Verbs v22/);
+    assert.match(html, /Core Verbs v23/);
     assert.match(html, /id="completion-title"/);
     assert.match(html, /id="btn-extra-review"[^>]*onclick="startExtraReviewSession\(\)"/);
     assert.match(html, /id="btn-demo-session"[^>]*onclick="startDemoSession\(\)"/);

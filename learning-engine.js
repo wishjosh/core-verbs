@@ -466,9 +466,9 @@
             ? card.microChunks.map(chunk => String(chunk).trim()).filter(Boolean)
             : [];
         const hasStoredMicroChunks = storedMicroChunks.length && joinChunks(storedMicroChunks) === sentence;
-        // 저장된 의미 청크가 있는 869문장에서는 이를 첫 학습 단위로 사용한다.
-        // 영어만 기계적으로 더 쪼개면 한국어 단서와 경계가 어긋나므로, 별도 검수된
-        // microChunks가 있는 문장(MAKE 100문장)에서만 더 세분화한다.
+        // 869문장 모두에서 직접 저장한 최소 의미 청크를 첫 학습 단위로 사용한다.
+        // 영어와 한국어를 실행 중에 기계적으로 나누지 않고, 1:1로 대응시켜 둔
+        // microChunks와 microOrderGlosses만 사용한다.
         const microChunks = hasStoredMicroChunks ? storedMicroChunks : [...baseChunks];
         const baseGlosses = Array.isArray(card?.orderGlosses) ? [...card.orderGlosses] : [];
         const storedMicroGlosses = Array.isArray(card?.microOrderGlosses)
