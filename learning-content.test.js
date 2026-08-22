@@ -206,6 +206,28 @@ test('every English sentence is reconstructed exactly from native chunks', () =>
     }
 });
 
+test('Korean chunk cues do not repeat question marks within one English question', () => {
+    const countQuestions = value => (String(value || '').match(/\?/g) || []).length;
+    const englishById = new Map(content.items.map(item => [item.id, item.english]));
+
+    for (const item of content.items) {
+        assert.ok(
+            countQuestions(item.orderGlosses.join(' ')) <= countQuestions(item.english),
+            `${item.id} stored order glosses repeat question punctuation`
+        );
+    }
+
+    for (const item of makeChunkOverrides.items) {
+        const englishQuestionCount = countQuestions(englishById.get(item.id));
+        for (const field of ['microOrderGlosses', 'orderGlosses']) {
+            assert.ok(
+                countQuestions(item[field].join(' ')) <= englishQuestionCount,
+                `${item.id} ${field} repeats question punctuation`
+            );
+        }
+    }
+});
+
 test('every adaptive chunk stage preserves the source English exactly', () => {
     const makeById = new Map(makeChunkOverrides.items.map(item => [item.id, item]));
     for (const item of content.items) {
@@ -348,11 +370,11 @@ test('the mobile review screen keeps word-level marking without error categories
     assert.match(html, /id="daily-session-progress"/);
     assert.match(app, /adaptiveLimit - dailyLearned/);
     assert.match(app, /const DAILY_NEW_LIMIT = 12/);
-    assert.match(app, /const APP_VERSION = '18'/);
+    assert.match(app, /const APP_VERSION = '19'/);
     assert.match(app, /Learning\.selectCoreVerbNewCards/);
     assert.match(app, /newByVerb/);
     assert.match(app, /register\(`sw\.js\?v=\$\{APP_VERSION\}`,[^)]*updateViaCache: 'none'/);
-    assert.match(html, /Core Verbs v18/);
+    assert.match(html, /Core Verbs v19/);
     assert.match(html, /id="completion-title"/);
     assert.match(html, /id="btn-extra-review"[^>]*onclick="startExtraReviewSession\(\)"/);
     assert.match(html, /id="btn-demo-session"[^>]*onclick="startDemoSession\(\)"/);

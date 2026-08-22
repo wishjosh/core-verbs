@@ -64,16 +64,16 @@
     {
       "id": "cv-0367",
       "microChunks": ["Have you", "seen", "this YouTube channel?"],
-      "microOrderGlosses": ["너는", "봤어?", "이 유튜브 채널을?"],
+      "microOrderGlosses": ["너는", "봤어", "이 유튜브 채널을?"],
       "assemblyChunks": ["Have you seen", "this YouTube channel?"],
-      "orderGlosses": ["봤어?", "이 유튜브 채널을?"]
+      "orderGlosses": ["봤어", "이 유튜브 채널을?"]
     },
     {
       "id": "cv-0368",
       "microChunks": ["Oh,", "is that", "that Canadian-Korean couple?", "Yeah,", "I love", "that channel."],
-      "microOrderGlosses": ["아,", "저게 그거야?", "그 캐나다인-한국인 부부?", "응,", "나는 정말 좋아해", "그 채널을."],
+      "microOrderGlosses": ["아,", "저게 그거야", "그 캐나다인-한국인 부부?", "응,", "나는 정말 좋아해", "그 채널을."],
       "assemblyChunks": ["Oh, is that", "that Canadian-Korean couple?", "Yeah, I love that channel."],
-      "orderGlosses": ["아, 저게 그거야?", "그 캐나다인-한국인 부부?", "응, 그 채널 정말 좋아해."]
+      "orderGlosses": ["아, 저게 그거야", "그 캐나다인-한국인 부부?", "응, 그 채널 정말 좋아해."]
     },
     {
       "id": "cv-0369",
@@ -295,9 +295,9 @@
     {
       "id": "cv-0400",
       "microChunks": ["Your girlfriend", "is already making you", "wear", "matching outfits?"],
-      "microOrderGlosses": ["네 여자 친구가", "벌써 너를 시키고 있어?", "입도록", "커플 룩을?"],
+      "microOrderGlosses": ["네 여자 친구가", "벌써 너를 시키고 있어", "입으라고", "커플 룩을?"],
       "assemblyChunks": ["Your girlfriend is already making you", "wear matching outfits?"],
-      "orderGlosses": ["네 여자 친구가 벌써 너를 시키고 있어?", "커플 룩을 입도록?"]
+      "orderGlosses": ["네 여자 친구가 벌써 너를 시키고 있어", "커플 룩을 입도록?"]
     },
     {
       "id": "cv-0401",
@@ -309,7 +309,7 @@
     {
       "id": "cv-0402",
       "microChunks": ["You guys", "have been dating", "for less than a week.", "Isn’t that", "a little fast?"],
-      "microOrderGlosses": ["너희 둘은", "사귀고 있어", "일주일도 안 되게.", "그건 그렇지 않아?", "조금 빠르다고?"],
+      "microOrderGlosses": ["너희 둘은", "사귀고 있어", "일주일도 안 되게.", "그건 그렇지 않아", "조금 빠르다고?"],
       "assemblyChunks": ["You guys have been dating", "for less than a week.", "Isn’t that a little fast?"],
       "orderGlosses": ["너희 둘은 사귀고 있어", "일주일도 안 되게.", "그건 조금 빠르지 않아?"]
     },
@@ -456,23 +456,23 @@
     {
       "id": "cv-0423",
       "microChunks": ["Do you want", "to go", "see a movie?"],
-      "microOrderGlosses": ["너는 원해?", "가서", "영화를 보는 걸?"],
+      "microOrderGlosses": ["너는 원해", "가서", "영화를 보는 걸?"],
       "assemblyChunks": ["Do you want", "to go see a movie?"],
-      "orderGlosses": ["너는 원해?", "영화를 보러 가는 걸?"]
+      "orderGlosses": ["너는 원해", "영화를 보러 가는 걸?"]
     },
     {
       "id": "cv-0424",
       "microChunks": ["That", "sounds fun.", "Do you know", "what’s playing?"],
-      "microOrderGlosses": ["그거", "재미있겠다.", "너는 알아?", "무엇을 상영 중인지?"],
+      "microOrderGlosses": ["그거", "재미있겠다.", "너는 알아", "무엇을 상영 중인지?"],
       "assemblyChunks": ["That sounds fun.", "Do you know what’s playing?"],
       "orderGlosses": ["그거 재미있겠다.", "무엇을 상영 중인지 알아?"]
     },
     {
       "id": "cv-0425",
       "microChunks": ["The new Marvel movie", "just came out.", "Do you wanna", "see it", "with me?"],
-      "microOrderGlosses": ["새 마블 영화가", "막 개봉했어.", "너는 원해?", "그걸 보는 걸", "나와 함께?"],
+      "microOrderGlosses": ["새 마블 영화가", "막 개봉했어.", "너는 원해", "그걸 보는 걸", "나와 함께?"],
       "assemblyChunks": ["The new Marvel movie just came out.", "Do you wanna see it", "with me?"],
-      "orderGlosses": ["새 마블 영화가 막 개봉했어.", "그걸 보고 싶어?", "나와 함께?"]
+      "orderGlosses": ["새 마블 영화가 막 개봉했어.", "그걸 보고 싶어", "나와 함께?"]
     },
     {
       "id": "cv-0426",
@@ -498,9 +498,9 @@
     {
       "id": "cv-0429",
       "microChunks": ["We’re having", "a party", "tomorrow;", "do you think", "you can", "make it?"],
-      "microOrderGlosses": ["우리는 열어", "파티를", "내일;", "너는 생각해?", "네가 할 수 있다고", "오는 걸?"],
+      "microOrderGlosses": ["우리는 열어", "파티를", "내일;", "너는 생각해", "네가 할 수 있다고", "오는 걸?"],
       "assemblyChunks": ["We’re having a party tomorrow;", "do you think you can", "make it?"],
-      "orderGlosses": ["우리 내일 파티를 해;", "너는 네가 할 수 있을 것 같아?", "오는 걸?"]
+      "orderGlosses": ["우리 내일 파티를 해;", "너는 네가 할 수 있을 것 같아", "오는 걸?"]
     },
     {
       "id": "cv-0430",
@@ -533,9 +533,9 @@
     {
       "id": "cv-0434",
       "microChunks": ["Do you think", "we can", "make it", "there", "in time?"],
-      "microOrderGlosses": ["너는 생각해?", "우리가 할 수 있다고", "도착하는 걸", "그곳에", "제시간에?"],
+      "microOrderGlosses": ["너는 생각해", "우리가 할 수 있다고", "도착하는 걸", "그곳에", "제시간에?"],
       "assemblyChunks": ["Do you think we can", "make it there in time?"],
-      "orderGlosses": ["우리가 할 수 있을 것 같아?", "그곳에 제시간에 도착하는 걸?"]
+      "orderGlosses": ["우리가 할 수 있을 것 같아", "그곳에 제시간에 도착하는 걸?"]
     },
     {
       "id": "cv-0435",
@@ -554,9 +554,9 @@
     {
       "id": "cv-0437",
       "microChunks": ["Pretty good!", "Do you think", "you can", "make it", "this weekend?"],
-      "microOrderGlosses": ["꽤 좋아!", "너는 생각해?", "네가 할 수 있다고", "오는 걸", "이번 주말에?"],
+      "microOrderGlosses": ["꽤 좋아!", "너는 생각해", "네가 할 수 있다고", "오는 걸", "이번 주말에?"],
       "assemblyChunks": ["Pretty good!", "Do you think you can", "make it this weekend?"],
-      "orderGlosses": ["꽤 좋아!", "너는 네가 할 수 있을 것 같아?", "이번 주말에 오는 걸?"]
+      "orderGlosses": ["꽤 좋아!", "너는 네가 할 수 있을 것 같아", "이번 주말에 오는 걸?"]
     },
     {
       "id": "cv-0438",
