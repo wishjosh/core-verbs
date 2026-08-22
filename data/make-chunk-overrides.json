@@ -64,9 +64,9 @@
     {
       "id": "cv-0367",
       "microChunks": ["Have you", "seen", "this YouTube channel?"],
-      "microOrderGlosses": ["너는 해 본 적 있어?", "보는 걸", "이 유튜브 채널을?"],
+      "microOrderGlosses": ["너는", "봤어?", "이 유튜브 채널을?"],
       "assemblyChunks": ["Have you seen", "this YouTube channel?"],
-      "orderGlosses": ["본 적 있어", "이 유튜브 채널을?"]
+      "orderGlosses": ["봤어?", "이 유튜브 채널을?"]
     },
     {
       "id": "cv-0368",

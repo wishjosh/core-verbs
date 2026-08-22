@@ -156,6 +156,49 @@ body {
     text-align: left;
 }
 
+.daily-plan {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1px 1fr;
+    align-items: center;
+    margin-bottom: 7px;
+    padding: 10px 12px;
+    border: 1px solid #bbf7d0;
+    border-radius: 12px;
+    background: #f0fdf4;
+}
+
+.daily-plan-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    color: #64748b;
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+.daily-plan-item strong {
+    color: #166534;
+    font-size: 1rem;
+    font-weight: 900;
+}
+
+.daily-plan-divider {
+    width: 1px;
+    height: 28px;
+    background: #bbf7d0;
+}
+
+.daily-plan-note {
+    width: 100%;
+    margin: -1px 0 9px;
+    color: #64748b;
+    font-size: 0.7rem;
+    line-height: 1.4;
+    text-align: center;
+}
+
 .error-profile-title {
     color: #334155;
     font-weight: 800;
@@ -681,6 +724,83 @@ body {
     background: #fff;
     color: #9a3412;
     font-weight: 800;
+}
+
+button.mistake-summary-chip {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.mistake-summary-chip.insertion {
+    border-color: #c4b5fd;
+    color: #6d28d9;
+}
+
+.insertion-toggle {
+    width: 100%;
+    min-height: 42px;
+    padding: 8px 10px;
+    border: 1px dashed #a78bfa;
+    border-radius: 10px;
+    background: #faf5ff;
+    color: #6d28d9;
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.insertion-editor {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+    margin-top: 8px;
+    padding: 10px;
+    border: 1px solid #ddd6fe;
+    border-radius: 11px;
+    background: #fff;
+}
+
+.insertion-editor[hidden] {
+    display: none;
+}
+
+.insertion-editor label {
+    color: #475569;
+    font-size: 0.72rem;
+    font-weight: 800;
+}
+
+.insertion-editor input,
+.insertion-editor select {
+    width: 100%;
+    min-height: 42px;
+    padding: 8px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 9px;
+    background: #fff;
+    color: #1e293b;
+    font-family: inherit;
+    font-size: 0.88rem;
+}
+
+.insertion-add {
+    min-height: 42px;
+    border: none;
+    border-radius: 9px;
+    background: #7c3aed;
+    color: #fff;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.insertion-help {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.7rem;
+    line-height: 1.4;
 }
 
 .self-check-controls {

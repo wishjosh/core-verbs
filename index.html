@@ -23,7 +23,7 @@
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
 
     <!-- 🎨 역할 분리: 외부 스타일시트 불러오기 -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=14">
 </head>
 <body>
     
@@ -47,8 +47,20 @@
         <!-- 📊 학습 통계 대시보드 -->
         <div class="stats-container">
             <div class="stats-header">총 학습 문장: <span id="stat-total">0</span>개</div>
+            <div class="daily-plan" aria-label="오늘 학습량">
+                <div class="daily-plan-item">
+                    <span>오늘 새 문장</span>
+                    <strong id="daily-new-progress">0 / 10</strong>
+                </div>
+                <div class="daily-plan-divider"></div>
+                <div class="daily-plan-item">
+                    <span>이번 세션</span>
+                    <strong id="daily-session-progress">0 / 0</strong>
+                </div>
+            </div>
+            <div id="daily-plan-note" class="daily-plan-note">오늘 학습량을 계산하고 있어요.</div>
             <div id="stats-dashboard">
-                <div class="stat-box new-box">🆕 새 문장<br><span id="stat-new">0</span></div>
+                <div class="stat-box new-box">🆕 남은 문장<br><span id="stat-new">0</span></div>
                 <div class="stat-box danger-box">🔥 집중 복습<br><span id="stat-danger">0</span></div>
                 <div class="stat-box mid-box">⏳ 단기<br><span id="stat-mid">0</span></div>
                 <div class="stat-box long-box">🧠 장기<br><span id="stat-long">0</span></div>
@@ -109,8 +121,17 @@
             <div id="english" aria-label="영어 정답"></div>
             <div id="mistake-review" class="mistake-review">
                 <span class="mistake-review-label">나의 오류 체크</span>
-                <div class="mistake-review-help">틀린 단어를 하나씩 누르세요. 구문 전체를 틀렸다면 이어진 단어를 모두 누르세요. 청크 어순 오류는 자동으로 기록됩니다.</div>
+                <div class="mistake-review-help">정답과 다르게 말한 단어만 누르세요. 정답에 없는 말을 덧붙였다면 아래 버튼으로 그 단어만 기록하세요.</div>
                 <div id="mistake-summary" class="mistake-summary empty" aria-live="polite">선택한 오류가 아직 없습니다.</div>
+                <button id="btn-toggle-insertion" class="insertion-toggle" type="button" onclick="event.stopPropagation(); toggleInsertionEditor();">＋ 정답에 없는 말을 더했어요</button>
+                <div id="insertion-editor" class="insertion-editor" hidden>
+                    <label for="insertion-text">더 말했던 단어</label>
+                    <input id="insertion-text" type="text" maxlength="60" autocomplete="off" autocapitalize="none" placeholder="예: ever">
+                    <label for="insertion-position">어디에 넣었나요?</label>
+                    <select id="insertion-position"></select>
+                    <button class="insertion-add" type="button" onclick="event.stopPropagation(); addInsertionMistake();">추가 오류 기록</button>
+                    <p id="insertion-help" class="insertion-help" aria-live="polite">문장 전체가 아니라 덧붙인 말만 입력하면 됩니다.</p>
+                </div>
                 <div class="self-check-controls">
                     <button class="self-check-btn recall-fail" type="button" onclick="event.stopPropagation(); markRecallFailure();">전체 문장 실패</button>
                     <button class="self-check-btn no-mistakes" type="button" onclick="event.stopPropagation(); markNoMistakes();">모두 맞았어요</button>
@@ -248,7 +269,7 @@
     </div>
 
     <!-- 🧠 학습 문제 생성·배정 규칙과 애플리케이션 화면 로직 -->
-    <script src="learning-engine.js"></script>
-    <script src="app.js"></script>
+    <script src="learning-engine.js?v=14"></script>
+    <script src="app.js?v=14"></script>
 </body>
 </html>

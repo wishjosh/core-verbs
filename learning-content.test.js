@@ -207,13 +207,18 @@ test('every English sentence is reconstructed exactly from native chunks', () =>
 });
 
 test('every adaptive chunk stage preserves the source English exactly', () => {
+    const makeById = new Map(makeChunkOverrides.items.map(item => [item.id, item]));
     for (const item of content.items) {
-        const card = { ...item, en: item.english, ko: item.naturalKo };
+        const card = { ...item, ...(makeById.get(item.id) || {}), en: item.english, ko: item.naturalKo };
         for (let requestedStage = 0; requestedStage <= 2; requestedStage++) {
             const plan = engine.buildAdaptiveChunkPlan(card, requestedStage);
             assert.equal(joinChunks(plan.chunks), item.english, `${item.id} stage ${requestedStage}`);
             assert.ok(['micro', 'canonical', 'merged', 'recall'].includes(plan.kind), item.id);
-            if (plan.mode === 'assembly') assert.ok(plan.chunks.length >= 2, item.id);
+            if (plan.mode === 'assembly') {
+                assert.ok(plan.chunks.length >= 2, item.id);
+                assert.equal(plan.orderGlosses.length, plan.chunks.length, `${item.id} gloss stage ${requestedStage}`);
+                assert.ok(plan.orderGlosses.every(Boolean), `${item.id} gloss stage ${requestedStage}`);
+            }
         }
     }
 });
@@ -331,6 +336,16 @@ test('the mobile review screen keeps word-level marking without error categories
     assert.match(app, /createMistakeWordButton\(token, 'practice-slot-word'\)/);
     assert.match(html, /id="mistake-review"/);
     assert.match(html, /id="mistake-summary"/);
+    assert.match(html, /id="btn-toggle-insertion"/);
+    assert.match(html, /id="insertion-text"/);
+    assert.match(html, /id="insertion-position"/);
+    assert.match(app, /function addInsertionMistake\(\)/);
+    assert.match(app, /Learning\.buildInsertionMistake/);
+    assert.match(app, /operation: 'source_token'/);
+    assert.match(app, /insertedText:/);
+    assert.match(html, /id="daily-new-progress"/);
+    assert.match(html, /id="daily-session-progress"/);
+    assert.match(app, /adaptiveLimit - dailyLearned/);
     assert.match(html, /id="practice-result-tip"/);
     assert.match(html, /id="btn-error-export"[^>]*onclick="exportMistakeHistory\(\)"/);
     assert.match(app, /progressData\.mistakeHistory = mistakeHistory\.slice\(-100\)/);

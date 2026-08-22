@@ -224,22 +224,43 @@ test('expands a selected chunk into word-level error boxes without losing chunk 
     assert.deepEqual(engine.evaluatePractice(question, ['target-1', 'target-0']).errorTypes, ['word_order']);
 });
 
-test('grows How did you get from short units to native chunks and free recall', () => {
+test('uses reviewed native chunks before free recall when an extra merge would make one trivial choice', () => {
     const card = {
         en: 'How did you get this designer bag?',
         assemblyChunks: ['How did you get', 'this designer bag?'],
         orderGlosses: ['어떻게 얻었니', '이 디자이너 가방을?']
     };
     const shortPlan = engine.buildAdaptiveChunkPlan(card, 0);
-    const nativePlan = engine.buildAdaptiveChunkPlan(card, 1);
-    const recallPlan = engine.buildAdaptiveChunkPlan(card, 2);
+    const recallPlan = engine.buildAdaptiveChunkPlan(card, 1);
 
-    assert.deepEqual(shortPlan.chunks, ['How', 'did you get', 'this designer bag?']);
+    assert.deepEqual(shortPlan.chunks, card.assemblyChunks);
     assert.equal(shortPlan.kind, 'micro');
-    assert.deepEqual(nativePlan.chunks, card.assemblyChunks);
-    assert.equal(nativePlan.kind, 'canonical');
     assert.equal(recallPlan.mode, 'recall');
     assert.deepEqual(recallPlan.chunks, card.assemblyChunks);
+});
+
+test('records an added word at the exact source-word boundary without marking correct words', () => {
+    const card = {
+        en: 'Have you seen this YouTube channel?',
+        assemblyChunks: ['Have you seen', 'this YouTube channel?']
+    };
+    const mistake = engine.buildInsertionMistake(card, '  ever  ', 1);
+
+    assert.deepEqual(mistake, {
+        operation: 'insertion',
+        start: null,
+        end: null,
+        text: 'ever',
+        insertedText: 'ever',
+        afterTokenIndex: 1,
+        beforeTokenIndex: 2,
+        leftContext: 'you',
+        rightContext: 'seen',
+        tokenIndexes: [],
+        chunkIndexes: [0]
+    });
+    assert.equal(engine.buildInsertionMistake(card, '', 1), null);
+    assert.equal(engine.buildInsertionMistake(card, 'ever', 99), null);
 });
 
 test('prefers directly reviewed micro chunks and their matching English-order glosses', () => {

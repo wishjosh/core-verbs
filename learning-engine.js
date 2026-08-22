@@ -430,86 +430,28 @@
         return 0;
     }
 
-    function splitPracticeChunk(text) {
-        const words = String(text || '').trim().split(/\s+/).filter(Boolean);
-        if (words.length < 3) return [String(text || '').trim()].filter(Boolean);
-
-        const first = normalizeText(words[0]);
-        const whWords = new Set(['how', 'why', 'where', 'when', 'what', 'who', 'which']);
-        const auxiliaries = new Set([
-            'am', 'is', 'are', 'was', 'were', 'do', 'does', 'did', 'have', 'has', 'had',
-            'will', 'would', 'can', 'could', 'should', 'may', 'might', 'must'
-        ]);
-        let splitAt = Math.floor(words.length / 2);
-        const second = normalizeText(words[1]);
-        const third = normalizeText(words[2]);
-        const compoundWh = (first === 'what' && ['kind', 'type', 'sort', 'time'].includes(second)) ||
-            (first === 'how' && ['many', 'much', 'long', 'far', 'old'].includes(second));
-
-        if (first === 'how' && second === 'much' && third === 'longer' && words.length === 3) {
-            return [String(text || '').trim()];
-        } else if (compoundWh) {
-            splitAt = 2;
-        } else if (whWords.has(first)) {
-            splitAt = 1;
-        } else if (/['’](?:m|re|ve|ll|d|s|t)$/i.test(words[0])) {
-            splitAt = 1;
-        } else if (auxiliaries.has(first) && words.length >= 4) {
-            splitAt = 2;
-        } else if (words.length === 3) {
-            splitAt = 1;
-        }
-
-        splitAt = Math.max(1, Math.min(words.length - 1, splitAt));
-        return [
-            words.slice(0, splitAt).join(' '),
-            words.slice(splitAt).join(' ')
-        ];
-    }
-
-    function buildMicroChunks(baseChunks) {
+    function buildMergedChunkPlan(baseChunks, baseGlosses = []) {
         const chunks = (baseChunks || []).map(text => String(text).trim()).filter(Boolean);
-        const totalWords = chunks.reduce(
-            (sum, chunk) => sum + chunk.split(/\s+/).filter(Boolean).length,
-            0
-        );
-        const desiredCount = Math.max(chunks.length, Math.min(8, Math.ceil(totalWords / 2.5)));
-
-        while (chunks.length < desiredCount) {
-            const candidates = chunks
-                .map((text, index) => ({ text, index, count: text.split(/\s+/).filter(Boolean).length }))
-                .filter(item => item.count >= 3)
-                .sort((a, b) => (b.count - a.count) || (a.index - b.index));
-            if (!candidates.length) break;
-
-            const target = candidates.find(item => {
-                const parts = splitPracticeChunk(item.text);
-                return parts.length === 2 && joinChunks(parts) === item.text;
-            });
-            if (!target) break;
-            const split = splitPracticeChunk(target.text);
-            chunks.splice(target.index, 1, ...split);
-        }
-
-        return chunks;
-    }
-
-    function buildMergedChunks(baseChunks) {
-        const chunks = (baseChunks || []).map(text => String(text).trim()).filter(Boolean);
-        const merged = [];
+        const glosses = Array.isArray(baseGlosses) && baseGlosses.length === chunks.length
+            ? baseGlosses.map(text => String(text).trim())
+            : [];
+        const mergedChunks = [];
+        const mergedGlosses = [];
         for (let index = 0; index < chunks.length;) {
             const current = chunks[index];
             const next = chunks[index + 1];
             const hasStrongBoundary = /[,;:.!?—–]["'’”)]?$/.test(current);
             if (next && !hasStrongBoundary) {
-                merged.push(joinChunks([current, next]));
+                mergedChunks.push(joinChunks([current, next]));
+                if (glosses.length) mergedGlosses.push([glosses[index], glosses[index + 1]].filter(Boolean).join(' '));
                 index += 2;
             } else {
-                merged.push(current);
+                mergedChunks.push(current);
+                if (glosses.length) mergedGlosses.push(glosses[index]);
                 index += 1;
             }
         }
-        return merged;
+        return { chunks: mergedChunks, orderGlosses: mergedGlosses };
     }
 
     function buildAdaptiveChunkPlan(card, requestedStage = 0) {
@@ -523,16 +465,18 @@
         const storedMicroChunks = Array.isArray(card?.microChunks)
             ? card.microChunks.map(chunk => String(chunk).trim()).filter(Boolean)
             : [];
-        const microChunks = storedMicroChunks.length && joinChunks(storedMicroChunks) === sentence
-            ? storedMicroChunks
-            : buildMicroChunks(baseChunks);
+        const hasStoredMicroChunks = storedMicroChunks.length && joinChunks(storedMicroChunks) === sentence;
+        // 저장된 의미 청크가 있는 869문장에서는 이를 첫 학습 단위로 사용한다.
+        // 영어만 기계적으로 더 쪼개면 한국어 단서와 경계가 어긋나므로, 별도 검수된
+        // microChunks가 있는 문장(MAKE 100문장)에서만 더 세분화한다.
+        const microChunks = hasStoredMicroChunks ? storedMicroChunks : [...baseChunks];
         const baseGlosses = Array.isArray(card?.orderGlosses) ? [...card.orderGlosses] : [];
         const storedMicroGlosses = Array.isArray(card?.microOrderGlosses)
             ? card.microOrderGlosses.map(gloss => String(gloss).trim()).filter(Boolean)
             : [];
-        const microGlosses = storedMicroGlosses.length === microChunks.length
+        const microGlosses = hasStoredMicroChunks && storedMicroGlosses.length === microChunks.length
             ? storedMicroGlosses
-            : baseGlosses;
+            : [...baseGlosses];
         const sameChunks = (left, right) => left.length === right.length &&
             left.every((chunk, index) => chunk === right[index]);
         const plans = [];
@@ -553,13 +497,13 @@
                 orderGlosses: baseGlosses
             });
         } else if (sameChunks(baseChunks, microChunks)) {
-            const mergedChunks = buildMergedChunks(baseChunks);
-            if (mergedChunks.length >= 2 && !sameChunks(mergedChunks, microChunks)) {
+            const mergedPlan = buildMergedChunkPlan(baseChunks, baseGlosses);
+            if (mergedPlan.chunks.length >= 2 && !sameChunks(mergedPlan.chunks, microChunks)) {
                 plans.push({
                     kind: 'merged',
                     mode: 'assembly',
-                    chunks: mergedChunks,
-                    orderGlosses: baseGlosses
+                    chunks: mergedPlan.chunks,
+                    orderGlosses: mergedPlan.orderGlosses
                 });
             }
         }
@@ -826,6 +770,32 @@
         };
     }
 
+    function buildInsertionMistake(card, insertedText, afterTokenIndex) {
+        const text = String(insertedText || '').trim().replace(/\s+/g, ' ');
+        if (!text) return null;
+
+        const tokens = buildReviewTokens(card).flatMap(chunk => chunk.tokens);
+        const after = Number(afterTokenIndex);
+        if (!Number.isInteger(after) || after < -1 || after >= tokens.length) return null;
+
+        const before = after + 1 < tokens.length ? after + 1 : null;
+        const adjacentChunkIndexes = [tokens[after]?.chunkIndex, tokens[before]?.chunkIndex]
+            .filter(Number.isInteger);
+        return {
+            operation: 'insertion',
+            start: null,
+            end: null,
+            text,
+            insertedText: text,
+            afterTokenIndex: after,
+            beforeTokenIndex: before,
+            leftContext: after >= 0 ? tokens[after].text : '',
+            rightContext: before !== null ? tokens[before].text : '',
+            tokenIndexes: [],
+            chunkIndexes: [...new Set(adjacentChunkIndexes)]
+        };
+    }
+
     function buildAssessmentSignals(options = {}) {
         const signals = [];
         if (options.wordOrder) signals.push('word_order');
@@ -965,6 +935,7 @@
         buildPracticeSlots,
         buildReviewTokens,
         buildMistakeSelections,
+        buildInsertionMistake,
         buildAssessmentSignals,
         classifyMistakeSelections,
         selectWeightedNewCards,

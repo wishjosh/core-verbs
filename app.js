@@ -9,6 +9,8 @@ const pageParams = new URLSearchParams(window.location.search);
 const meaningFlowPilotMode = pageParams.get('pilot') === 'meaning-flow';
 const requestedVerbPilot = String(pageParams.get('verb') || '').trim().toUpperCase();
 const STORAGE_KEY = 'coreVerbs_Memory_v1';
+const DAILY_NEW_LIMIT = 10;
+const SESSION_CARD_LIMIT = 20;
 const Learning = window.CoreVerbsLearning;
 
 if (!Learning) {
@@ -28,9 +30,17 @@ let selectedPracticeIds = [];
 let currentPracticeResult = null;
 let practiceUsedHint = false;
 let selectedMistakeIndexes = [];
+let addedWordMistakes = [];
+let insertionEditorOpen = false;
 let wordOrderMistake = false;
 let currentAssessmentRecorded = false;
 let sessionRetryCounts = {};
+let currentSessionPlan = {
+    dailyNewLimit: DAILY_NEW_LIMIT,
+    newTarget: 0,
+    reviewTarget: 0,
+    total: 0
+};
 
 // 💾 학습 진행 상태 및 사용자 설정 로드
 let progressData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
@@ -620,25 +630,24 @@ function init() {
     ensureTodayNewCards(todayStr);
     const dailyLearned = progressData.dailyStats?.[todayStr]?.newLearned || 0;
     const pendingReviews = dueReviewCards.length;
-    const DAILY_LIMIT = 10;
     const adaptiveLimit = Learning.getAdaptiveNewLimit(
         pendingReviews,
         progressData.practiceHistory || [],
-        DAILY_LIMIT
+        DAILY_NEW_LIMIT
     );
 
     let targetNew = 0;
-    let targetReview = 20;
+    let targetReview = SESSION_CARD_LIMIT;
 
-    if (pendingReviews >= 20) {
+    if (pendingReviews >= SESSION_CARD_LIMIT) {
         // 원칙 2: 복습 폭발 방어 (복습에 몰빵)
         targetNew = 0;
-        targetReview = 20;
+        targetReview = SESSION_CARD_LIMIT;
     } else {
-        // 원칙 1 & 3: 남은 일일 할당량 내에서만 새 문장 허용
-        let remainToday = Math.max(0, DAILY_LIMIT - dailyLearned);
-        targetNew = Math.min(remainToday, adaptiveLimit);
-        targetReview = 20 - targetNew;
+        // 적응형 한도(10·7·4·0)를 세션 한도가 아니라 실제 하루 한도로 적용한다.
+        const remainToday = Math.max(0, adaptiveLimit - dailyLearned);
+        targetNew = remainToday;
+        targetReview = SESSION_CARD_LIMIT - targetNew;
     }
 
     // 3. 원본 자료의 동사별 문장 비중을 유지하며 새 문장을 선정한다.
@@ -695,6 +704,12 @@ function init() {
     }
 
     todayCards = meaningFlowPilotMode ? [...db] : [...selectedNew, ...selectedReview];
+    currentSessionPlan = {
+        dailyNewLimit: adaptiveLimit,
+        newTarget: selectedNew.length,
+        reviewTarget: selectedReview.length,
+        total: todayCards.length
+    };
 
     if (todayCards.length === 0) {
         showCompletionScreen();
@@ -748,12 +763,36 @@ function updateDashboardStats() {
     const statDanger = document.getElementById('stat-danger');
     const statMid = document.getElementById('stat-mid');
     const statLong = document.getElementById('stat-long');
+    const dailyNewProgress = document.getElementById('daily-new-progress');
+    const dailySessionProgress = document.getElementById('daily-session-progress');
+    const dailyPlanNote = document.getElementById('daily-plan-note');
 
     if (statTotal) statTotal.innerText = countTotal;
     if (statNew) statNew.innerText = countNew;
     if (statDanger) statDanger.innerText = countDanger;
     if (statMid) statMid.innerText = countMid;
     if (statLong) statLong.innerText = countLong;
+
+    const todayStr = getTodayKey();
+    const dailyLearned = progressData.dailyStats?.[todayStr]?.newLearned || 0;
+    const dailyLimit = currentSessionPlan.dailyNewLimit;
+    const sessionCompleted = Math.min(
+        todayCards.length,
+        currentIndex + (currentAssessmentRecorded ? 1 : 0)
+    );
+    if (dailyNewProgress) {
+        dailyNewProgress.innerText = dailyLimit > 0
+            ? `${Math.min(dailyLearned, dailyLimit)} / ${dailyLimit}`
+            : '복습 우선';
+    }
+    if (dailySessionProgress) dailySessionProgress.innerText = `${sessionCompleted} / ${todayCards.length}`;
+    if (dailyPlanNote) {
+        const retryCount = Object.values(sessionRetryCounts).reduce((sum, value) => sum + Number(value || 0), 0);
+        const retryLabel = retryCount ? ` · 재도전 ${retryCount}회` : '';
+        dailyPlanNote.innerText = dailyLimit === 0
+            ? '밀린 복습부터 마치도록 오늘은 새 문장을 쉬어요.'
+            : `새 문장 ${currentSessionPlan.newTarget}개 · 복습 ${currentSessionPlan.reviewTarget}개${retryLabel}로 구성했어요.`;
+    }
 
     const errorSummary = document.getElementById('error-summary');
     if (errorSummary) {
@@ -763,8 +802,9 @@ function updateDashboardStats() {
             (entry.selections || []).forEach(selection => {
                 const text = String(selection.text || '').trim();
                 if (!text) return;
-                const key = text.toLocaleLowerCase('en-US');
-                const current = counts.get(key) || { text, count: 0 };
+                const displayText = selection.operation === 'insertion' ? `+ ${text}` : text;
+                const key = `${selection.operation || 'source_token'}:${text.toLocaleLowerCase('en-US')}`;
+                const current = counts.get(key) || { text: displayText, count: 0 };
                 current.count += 1;
                 counts.set(key, current);
             });
@@ -794,6 +834,8 @@ function loadCard() {
     currentPracticeResult = null;
     practiceUsedHint = false;
     selectedMistakeIndexes = [];
+    addedWordMistakes = [];
+    insertionEditorOpen = false;
     wordOrderMistake = false;
     currentAssessmentRecorded = false;
 
@@ -1199,6 +1241,99 @@ function getCurrentMistakeSelections() {
     return Learning.buildMistakeSelections(card, selectedMistakeIndexes);
 }
 
+function getCurrentReviewTokens() {
+    const card = todayCards[currentIndex];
+    return card ? Learning.buildReviewTokens(card).flatMap(chunk => chunk.tokens) : [];
+}
+
+function getInsertionPositionLabel(mistake) {
+    if (mistake.afterTokenIndex === -1) return '문장 맨 앞';
+    if (!mistake.rightContext) return `“${mistake.leftContext}” 뒤 · 문장 끝`;
+    return `“${mistake.leftContext}” 뒤 · “${mistake.rightContext}” 앞`;
+}
+
+function renderInsertionEditor() {
+    const editor = document.getElementById('insertion-editor');
+    const toggleButton = document.getElementById('btn-toggle-insertion');
+    const positionSelect = document.getElementById('insertion-position');
+    if (!editor || !toggleButton || !positionSelect) return;
+
+    editor.hidden = !insertionEditorOpen;
+    toggleButton.innerText = insertionEditorOpen
+        ? '− 추가 단어 기록 닫기'
+        : '＋ 정답에 없는 말을 더했어요';
+    toggleButton.disabled = currentAssessmentRecorded;
+    if (!insertionEditorOpen) return;
+
+    const previousValue = positionSelect.value;
+    const tokens = getCurrentReviewTokens();
+    positionSelect.innerHTML = '';
+    const placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.innerText = '추가한 위치를 선택하세요';
+    positionSelect.appendChild(placeholder);
+    const positions = [
+        { value: -1, label: tokens.length ? `문장 맨 앞 · “${tokens[0].text}” 앞` : '문장 맨 앞' },
+        ...tokens.map((token, index) => ({
+            value: index,
+            label: index === tokens.length - 1
+                ? `“${token.text}” 뒤 · 문장 끝`
+                : `“${token.text}” 뒤 · “${tokens[index + 1].text}” 앞`
+        }))
+    ];
+    positions.forEach(position => {
+        const option = document.createElement('option');
+        option.value = String(position.value);
+        option.innerText = position.label;
+        positionSelect.appendChild(option);
+    });
+    if (positions.some(position => String(position.value) === previousValue)) {
+        positionSelect.value = previousValue;
+    }
+}
+
+function toggleInsertionEditor() {
+    if (currentAssessmentRecorded) return;
+    insertionEditorOpen = !insertionEditorOpen;
+    renderInsertionEditor();
+    if (insertionEditorOpen) document.getElementById('insertion-text')?.focus();
+}
+
+function addInsertionMistake() {
+    if (currentAssessmentRecorded) return;
+    const card = todayCards[currentIndex];
+    const textInput = document.getElementById('insertion-text');
+    const positionSelect = document.getElementById('insertion-position');
+    const help = document.getElementById('insertion-help');
+    const positionValue = positionSelect?.value;
+    const mistake = Learning.buildInsertionMistake(
+        card,
+        textInput?.value,
+        positionValue === '' || positionValue === undefined ? Number.NaN : Number(positionValue)
+    );
+    if (!mistake) {
+        if (help) help.innerText = '더 말했던 단어와 위치를 확인해 주세요.';
+        return;
+    }
+
+    const duplicate = addedWordMistakes.some(item =>
+        item.insertedText.toLocaleLowerCase('en-US') === mistake.insertedText.toLocaleLowerCase('en-US') &&
+        item.afterTokenIndex === mistake.afterTokenIndex
+    );
+    if (!duplicate) addedWordMistakes.push(mistake);
+    if (textInput) textInput.value = '';
+    if (help) help.innerText = duplicate
+        ? '같은 추가 단어가 이미 기록되어 있어요.'
+        : `“${mistake.insertedText}” 추가를 기록에 넣었어요.`;
+    updateMistakeReview();
+}
+
+function removeInsertionMistake(index) {
+    if (currentAssessmentRecorded) return;
+    addedWordMistakes.splice(index, 1);
+    updateMistakeReview();
+}
+
 function getCurrentAssessmentSignals() {
     return Learning.buildAssessmentSignals({
         wordOrder: wordOrderMistake,
@@ -1211,10 +1346,11 @@ function updateMistakeReview() {
     const saveButton = document.getElementById('btn-save-mistakes');
     const noMistakesButton = document.querySelector('.self-check-btn.no-mistakes');
     const selection = getCurrentMistakeSelections();
+    const hasManualMistake = selection.selections.length > 0 || addedWordMistakes.length > 0;
 
     if (summary) {
         summary.innerHTML = '';
-        if (!selection.selections.length && !wordOrderMistake) {
+        if (!selection.selections.length && !addedWordMistakes.length && !wordOrderMistake) {
             summary.innerText = '선택한 오류가 아직 없습니다.';
             summary.classList.add('empty');
         } else {
@@ -1225,6 +1361,19 @@ function updateMistakeReview() {
                 chip.innerText = mistake.text;
                 summary.appendChild(chip);
             });
+            addedWordMistakes.forEach((mistake, index) => {
+                const chip = document.createElement('button');
+                chip.type = 'button';
+                chip.className = 'mistake-summary-chip insertion';
+                chip.innerText = `＋ ${mistake.insertedText} · ${getInsertionPositionLabel(mistake)} ×`;
+                chip.setAttribute('aria-label', `${mistake.insertedText} 추가 오류 삭제`);
+                chip.disabled = currentAssessmentRecorded;
+                chip.onclick = (event) => {
+                    event.stopPropagation();
+                    removeInsertionMistake(index);
+                };
+                summary.appendChild(chip);
+            });
             if (wordOrderMistake) {
                 const orderChip = document.createElement('span');
                 orderChip.className = 'mistake-summary-chip';
@@ -1233,14 +1382,16 @@ function updateMistakeReview() {
             }
         }
     }
+    renderInsertionEditor();
     if (saveButton) {
-        saveButton.style.display = selection.selections.length ? 'block' : 'none';
-        saveButton.disabled = currentAssessmentRecorded || selection.selections.length === 0;
+        saveButton.style.display = hasManualMistake ? 'block' : 'none';
+        saveButton.disabled = currentAssessmentRecorded || !hasManualMistake;
     }
     if (noMistakesButton) {
         noMistakesButton.innerText = (wordOrderMistake || practiceUsedHint)
             ? '단어는 맞았어요'
             : '모두 맞았어요';
+        noMistakesButton.disabled = currentAssessmentRecorded || hasManualMistake;
     }
 }
 
@@ -1256,6 +1407,8 @@ function finishSelfAssessment(result, errorTypes, details, headline, usedHint = 
     const actionButtons = document.getElementById('action-buttons');
     const selfCheckButtons = document.querySelectorAll('.self-check-btn');
     selfCheckButtons.forEach(button => { button.disabled = true; });
+    document.querySelectorAll('#insertion-editor input, #insertion-editor select, #insertion-editor button')
+        .forEach(control => { control.disabled = true; });
     if (resultTip) resultTip.innerText = `${headline} ${scheduleMessage}`;
     if (actionButtons) actionButtons.style.display = 'flex';
     if (nextBtn) nextBtn.style.display = 'inline-flex';
@@ -1263,14 +1416,15 @@ function finishSelfAssessment(result, errorTypes, details, headline, usedHint = 
 
 function saveSelectedMistakes() {
     const selection = getCurrentMistakeSelections();
-    if (!selection.selections.length && !wordOrderMistake) return;
+    if (!selection.selections.length && !addedWordMistakes.length && !wordOrderMistake) return;
     const details = selection.selections.map(({ start, end, text, tokenIndexes, chunkIndexes }) => ({
+        operation: 'source_token',
         start,
         end,
         text,
         tokenIndexes,
         chunkIndexes
-    }));
+    })).concat(addedWordMistakes.map(mistake => ({ ...mistake })));
     const signals = getCurrentAssessmentSignals();
     const recordCount = details.length + (wordOrderMistake ? 1 : 0);
     finishSelfAssessment(
@@ -1285,6 +1439,7 @@ function saveSelectedMistakes() {
 
 function markNoMistakes() {
     selectedMistakeIndexes = [];
+    addedWordMistakes = [];
     const signals = getCurrentAssessmentSignals();
     if (signals.length) {
         const headline = signals.includes('recall') && signals.includes('word_order')
@@ -1301,6 +1456,7 @@ function markNoMistakes() {
 
 function markRecallFailure() {
     selectedMistakeIndexes = [];
+    addedWordMistakes = [];
     const signals = Learning.buildAssessmentSignals({
         wordOrder: wordOrderMistake,
         recall: true
@@ -1372,6 +1528,9 @@ function normalizeMistakeRecord(record = {}) {
     const selections = sourceSelections
         .filter(item => item && item.type !== 'word_order' && item.type !== 'recall')
         .map(item => {
+            const operation = item.operation === 'insertion' || item.insertedText
+                ? 'insertion'
+                : 'source_token';
             const start = Number.isInteger(item.start) ? item.start : null;
             const end = Number.isInteger(item.end) ? item.end : null;
             const tokenIndexes = Array.isArray(item.tokenIndexes)
@@ -1380,9 +1539,21 @@ function normalizeMistakeRecord(record = {}) {
                     ? Array.from({ length: end - start }, (_, offset) => start + offset)
                     : []);
             return {
+                operation,
                 start,
                 end,
                 text: String(item.text || '').trim(),
+                insertedText: operation === 'insertion'
+                    ? String(item.insertedText || item.text || '').trim()
+                    : '',
+                afterTokenIndex: operation === 'insertion' && Number.isInteger(item.afterTokenIndex)
+                    ? item.afterTokenIndex
+                    : null,
+                beforeTokenIndex: operation === 'insertion' && Number.isInteger(item.beforeTokenIndex)
+                    ? item.beforeTokenIndex
+                    : null,
+                leftContext: operation === 'insertion' ? String(item.leftContext || '') : '',
+                rightContext: operation === 'insertion' ? String(item.rightContext || '') : '',
                 tokenIndexes,
                 chunkIndexes: Array.isArray(item.chunkIndexes)
                     ? item.chunkIndexes.filter(Number.isInteger)
@@ -1968,12 +2139,15 @@ function exportMistakeHistory() {
 
     const payload = {
         format: MISTAKE_EXPORT_FORMAT,
-        version: 1,
+        version: 2,
         exportedAt: new Date().toISOString(),
         recordCount: records.length,
         fieldGuide: {
             selectedTokenIndexes: '영어 문장의 0부터 시작하는 단어 위치',
-            selections: '연속해서 선택한 실제 오답 구간. end는 포함하지 않음',
+            selections: '실제 오답 원자료. operation이 source_token이면 정답 단어 선택, insertion이면 정답에 없는 말 추가',
+            insertedText: '학습자가 정답에 덧붙여 생각하거나 말한 단어 또는 짧은 구문',
+            afterTokenIndex: '추가한 말 바로 앞 정답 단어의 위치. -1이면 문장 맨 앞',
+            beforeTokenIndex: '추가한 말 바로 뒤 정답 단어의 위치. null이면 문장 끝',
             wordOrder: '청크 어순을 틀렸는지 여부',
             recall: '문장 전체를 떠올리지 못했는지 여부',
             practiceChunks: '이 시도에서 실제로 제시된 조립 단위',

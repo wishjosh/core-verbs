@@ -10358,15 +10358,15 @@
       "id": "cv-0367",
       "day": 22,
       "verb": "MAKE",
-      "naturalKo": "이 유튜브 채널 본 적 있니?",
+      "naturalKo": "이 유튜브 채널 봤어?",
       "english": "Have you seen this YouTube channel?",
       "assemblyChunks": [
         "Have you seen",
         "this YouTube channel?"
       ],
       "orderGlosses": [
-        "본 적 있어",
-        "이 유튜브 채널?"
+        "봤어?",
+        "이 유튜브 채널을?"
       ],
       "corePatterns": [
         "Have you seen + 목적어"
