@@ -420,10 +420,10 @@
     },
     {
       "id": "cv-0418",
-      "microChunks": ["How’s", "freelance life", "going", "so far?"],
-      "microOrderGlosses": ["어떻게 되어 가나요", "프리랜서 생활은", "흘러가고 있나요", "지금까지?"],
-      "assemblyChunks": ["How’s freelance life", "going so far?"],
-      "orderGlosses": ["프리랜서 생활은 어떻게", "지금까지 되어 가나요?"]
+      "microChunks": ["How’s freelance life going", "so far?"],
+      "microOrderGlosses": ["프리랜서 생활은 어떻게 되어 가나요", "지금까지?"],
+      "assemblyChunks": ["How’s freelance life going so far?"],
+      "orderGlosses": ["지금까지 프리랜서 생활은 어때요?"]
     },
     {
       "id": "cv-0419",
