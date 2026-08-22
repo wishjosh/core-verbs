@@ -132,7 +132,7 @@ const corrections = {
   'cv-0344': [["I can’t get myself", 'to wake up', 'at a decent time.'], ['나는 도무지 나 자신을 못 움직이겠어요', '일어나도록', '제시간에.']],
   'cv-0347': [['It took me forever', 'to get the printer to work.'], ['정말 한참 걸렸어요', '프린터를 작동시키는 데.']],
   'cv-0352': [['I know,', 'but I don’t want', 'to make a big deal', 'out of it.'], ['알아요,', '하지만 원하지 않아요', '크게 문제 삼는 걸', '이 일을.']],
-  'cv-0353': [['Still,', 'you should get him to pay', 'for the damages!'], ['그래도,', '그 사람이 물어내게 해야 해', '그 손해를!']],
+  'cv-0353': [['Still,', 'you should', 'get him to pay', 'for the damages!'], ['그래도,', '네가 해야 해', '그 사람이 물어내게', '그 손해를!']],
   'cv-0369': [['The Canadian mother-in-law', 'makes them Korean food', 'all the time.', 'My own mom', 'doesn’t even do that', 'for me!'], ['그 캐나다인 장모님은', '그들에게 한국 음식을 해 줘요', '늘.', '정작 우리 엄마는', '그것조차 안 해 주시는데', '나한테는!']],
   'cv-0372': [["I don’t cook much", 'because it’s cheaper', 'to go out and eat', 'than to cook', 'for one person.'], ['나는 요리를 많이 하지 않아요', '그게 더 싸기 때문이에요', '나가서 사 먹는 게', '요리하는 것보다', '혼자 먹으려고.']],
   'cv-0385': [['True,', 'but the battery life', 'makes it a better choice', 'for me.'], ['맞아,', '하지만 배터리 수명 덕분에', '그 제품이 더 나은 선택이 돼요', '나에게는.']],

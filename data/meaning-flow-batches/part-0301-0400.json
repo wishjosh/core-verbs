@@ -717,12 +717,14 @@
       "english": "Still, you should get him to pay for the damages!",
       "assemblyChunks": [
         "Still,",
-        "you should get him to pay",
+        "you should",
+        "get him to pay",
         "for the damages!"
       ],
       "orderGlosses": [
         "그래도,",
-        "그 사람이 물어내게 해야 해",
+        "네가 해야 해",
+        "그 사람이 물어내게",
         "그 손해를!"
       ]
     },
