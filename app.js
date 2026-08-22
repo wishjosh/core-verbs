@@ -2246,6 +2246,41 @@ function showBackupToast(html, bg) {
     setTimeout(() => feedbackEl.style.display = 'none', 2200);
 }
 
+// 🧹 문장별 진도·일정·오류만 지우고 질문 노트와 음성 설정은 유지한다.
+function resetLearningProgress() {
+    const learnedCount = db.filter(card => Boolean(progressData[card.en])).length;
+    const mistakeCount = Array.isArray(progressData.mistakeHistory)
+        ? progressData.mistakeHistory.length
+        : 0;
+    const firstConfirmed = window.confirm(
+        `학습한 문장 ${learnedCount}개와 오류 기록 ${mistakeCount}건을 삭제합니다.\n\n`
+        + '질문 노트와 음성 설정은 유지됩니다.\n'
+        + '필요하면 먼저 백업 파일을 내보내세요.\n\n'
+        + '계속할까요?'
+    );
+    if (!firstConfirmed) return;
+
+    const finalConfirmed = window.confirm(
+        '정말 처음부터 시작할까요?\n\n'
+        + '초기화한 학습 진도는 백업 파일 없이는 되돌릴 수 없습니다.'
+    );
+    if (!finalConfirmed) return;
+
+    const savedRate = Number(progressData.settings?.rate);
+    const preservedSettings = {
+        voiceName: String(progressData.settings?.voiceName || ''),
+        rate: Number.isFinite(savedRate) ? savedRate : 0.9
+    };
+
+    progressData = { settings: preservedSettings };
+    saveProgress();
+    showBackupToast(
+        '학습 진도를 초기화했습니다.<br><span style="font-size:0.9rem;font-weight:500;">질문 노트와 음성 설정은 그대로 유지됩니다</span>',
+        'rgba(180, 35, 24, 0.96)'
+    );
+    setTimeout(() => window.location.reload(), 900);
+}
+
 // 🧠 최근 오답 원자료만 최대 100건으로 내보내 AI 분석에 사용할 수 있게 한다.
 function exportMistakeHistory() {
     const records = getMistakeHistory().map(normalizeMistakeRecord).slice(-100);

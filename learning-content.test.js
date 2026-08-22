@@ -356,6 +356,12 @@ test('the mobile review screen keeps word-level marking without error categories
     assert.match(app, /result === 'O' && sessionMode === 'extra_review'/);
     assert.doesNotMatch(html, /id="btn-reload"|다음 세션/);
     assert.doesNotMatch(app, /function checkReload\(\)/);
+    assert.match(html, /id="btn-reset-progress"[^>]*onclick="resetLearningProgress\(\)"/);
+    assert.match(app, /function resetLearningProgress\(\)/);
+    assert.match(app, /const firstConfirmed = window\.confirm/);
+    assert.match(app, /const finalConfirmed = window\.confirm/);
+    assert.match(app, /progressData = \{ settings: preservedSettings \}/);
+    assert.doesNotMatch(app, /function resetLearningProgress\([\s\S]{0,1600}QUESTION_STORAGE_KEY/);
     assert.match(html, /id="practice-result-tip"/);
     assert.match(html, /id="btn-error-export"[^>]*onclick="exportMistakeHistory\(\)"/);
     assert.match(app, /progressData\.mistakeHistory = mistakeHistory\.slice\(-100\)/);

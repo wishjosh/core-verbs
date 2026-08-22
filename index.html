@@ -23,14 +23,14 @@
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
 
     <!-- 🎨 역할 분리: 외부 스타일시트 불러오기 -->
-    <link rel="stylesheet" href="style.css?v=15">
+    <link rel="stylesheet" href="style.css?v=16">
 </head>
 <body>
     
     <!-- 🧭 상단 헤더 바 -->
     <div class="header-bar">
         <h1 class="app-title">Core Verbs</h1>
-        <button id="btn-settings" onclick="toggleSettings()" aria-label="발음 설정 열기">⚙️</button>
+        <button id="btn-settings" onclick="toggleSettings()" aria-label="설정 열기">⚙️</button>
     </div>
 
     <!-- 🗂️ 탭 네비게이션 -->
@@ -244,7 +244,7 @@
     <!-- ⚙️ 원어민 발음 설정 패널 드로어 (우측 슬라이드인) -->
     <div id="settings-panel" class="settings-panel">
         <div class="settings-header">
-            <h3>원어민 발음 설정</h3>
+            <h3>설정</h3>
             <button id="close-settings" onclick="toggleSettings()" aria-label="설정 닫기">✕</button>
         </div>
         <div class="settings-body">
@@ -267,6 +267,13 @@
                 <button id="btn-restore" onclick="document.getElementById('restore-file').click()">⬆️ 백업 파일 불러오기</button>
                 <input type="file" id="restore-file" accept="application/json,.json" style="display:none" onchange="importBackup(this)">
             </div>
+
+            <!-- 🧹 학습 진도 초기화 -->
+            <div class="setting-item reset-section">
+                <label>🧹 새로 시작하기</label>
+                <p class="reset-desc">문장 진도·복습 일정·오류 기록만 지우며, 질문 노트와 음성 설정은 유지합니다.</p>
+                <button id="btn-reset-progress" onclick="resetLearningProgress()">학습 진도만 초기화</button>
+            </div>
         </div>
         <div class="settings-footer">
             Core Verbs © 2026<br>자연스러운 인토네이션 학습 모드
@@ -274,7 +281,7 @@
     </div>
 
     <!-- 🧠 학습 문제 생성·배정 규칙과 애플리케이션 화면 로직 -->
-    <script src="learning-engine.js?v=15"></script>
-    <script src="app.js?v=15"></script>
+    <script src="learning-engine.js?v=16"></script>
+    <script src="app.js?v=16"></script>
 </body>
 </html>
