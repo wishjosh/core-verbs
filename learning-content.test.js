@@ -51,10 +51,10 @@ test('stores the complete 50-day, 869-sentence learning set', () => {
 });
 
 test('stores directly reviewed two-level chunk progression for all 100 MAKE-unit sentences', () => {
-    assert.equal(makeChunkOverrides.schemaVersion, 2);
+    assert.equal(makeChunkOverrides.schemaVersion, 3);
     assert.equal(makeChunkOverrides.verb, 'MAKE');
     assert.equal(makeChunkOverrides.reviewStatus, 'reviewed');
-    assert.equal(makeChunkOverrides.reviewMethod, 'codex_theory_guided_full_review');
+    assert.equal(makeChunkOverrides.reviewMethod, 'codex_theory_guided_full_micro_review');
     assert.equal(makeChunkOverrides.reviewCount, 100);
     assert.equal(makeChunkOverrides.items.length, 100);
     assert.equal(new Set(makeChunkOverrides.items.map(item => item.id)).size, 100);
@@ -221,9 +221,9 @@ test('every English sentence is reconstructed exactly from native chunks', () =>
 });
 
 test('all 869 sentences store a meaning-complete first-pass scaffold with matching Korean cues', () => {
-    assert.equal(content.microChunkRulesVersion, 2);
+    assert.equal(content.microChunkRulesVersion, 3);
     assert.equal(content.microChunkReviewCount, 869);
-    assert.equal(content.microChunkReviewMethod, 'codex_theory_guided_full_review');
+    assert.equal(content.microChunkReviewMethod, 'codex_theory_guided_full_micro_review');
 
     for (const item of content.items) {
         assert.ok(Array.isArray(item.microChunks) && item.microChunks.length >= item.assemblyChunks.length, item.id);
@@ -231,14 +231,14 @@ test('all 869 sentences store a meaning-complete first-pass scaffold with matchi
         assert.equal(item.microOrderGlosses.length, item.microChunks.length, item.id);
         assert.ok(item.microOrderGlosses.every(value => value.trim()), item.id);
         assert.deepEqual(item.microChunkReview, {
-            rulesVersion: 2,
+            rulesVersion: 3,
             reviewStatus: 'reviewed',
-            reviewMethod: 'codex_theory_guided_full_review'
+            reviewMethod: 'codex_theory_guided_full_micro_review'
         }, item.id);
     }
 });
 
-test('formulaic sequences stay inside one chunk instead of obeying a word-count cap', () => {
+test('formulaic sequences stay intact in the later expression-chunk stage', () => {
     const protectedSequences = [
         'a lot of', 'a couple of', 'a great deal of', 'be able to',
         'make ends meet', 'call it a night', 'fill in', 'take care of',
@@ -246,7 +246,6 @@ test('formulaic sequences stay inside one chunk instead of obeying a word-count 
         'in front of', 'every once in a while', 'a pat on the back',
         'cut down on'
     ];
-    const makeById = new Map(makeChunkOverrides.items.map(item => [item.id, item]));
     const boundaryOffsets = chunks => {
         const offsets = [];
         let sentence = '';
@@ -257,7 +256,7 @@ test('formulaic sequences stay inside one chunk instead of obeying a word-count 
         return offsets;
     };
     for (const item of content.items) {
-        const plans = [item.assemblyChunks, makeById.get(item.id)?.microChunks || item.microChunks];
+        const plans = [item.assemblyChunks];
         for (const chunks of plans) {
             const sentence = joinChunks(chunks).toLowerCase();
             const boundaries = boundaryOffsets(chunks);
@@ -388,7 +387,7 @@ test('reviewed examples preserve the agreed learning intent', () => {
 
     const youtubeComments = byEnglish.get('Internet trolls. He takes YouTube comments so personally.');
     assert.deepEqual(youtubeComments.microChunks, [
-        'Internet trolls.', 'He', 'takes YouTube comments', 'so personally.'
+        'Internet trolls.', 'He', 'takes', 'YouTube comments', 'so personally.'
     ]);
     assert.deepEqual(youtubeComments.assemblyChunks, [
         'Internet trolls.', 'He', 'takes YouTube comments so personally.'
@@ -466,11 +465,11 @@ test('the mobile review screen keeps word-level marking without error categories
     assert.match(html, /id="daily-session-progress"/);
     assert.match(app, /adaptiveLimit - dailyLearned/);
     assert.match(app, /const DAILY_NEW_LIMIT = 12/);
-    assert.match(app, /const APP_VERSION = '27'/);
+    assert.match(app, /const APP_VERSION = '28'/);
     assert.match(app, /Learning\.selectCoreVerbNewCards/);
     assert.match(app, /newByVerb/);
     assert.match(app, /register\(`sw\.js\?v=\$\{APP_VERSION\}`,[^)]*updateViaCache: 'none'/);
-    assert.match(html, /Core Verbs v27/);
+    assert.match(html, /Core Verbs v28/);
     assert.match(css, /\.self-check-controls\s*\{[^}]*margin-top:\s*10px;/s);
     assert.match(html, /id="completion-title"/);
     assert.match(html, /id="btn-extra-review"[^>]*onclick="startExtraReviewSession\(\)"/);

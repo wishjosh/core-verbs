@@ -5,6 +5,12 @@ const ROOT = path.resolve(import.meta.dirname, '..');
 const DATA = path.join(ROOT, 'data');
 const representativeReview = JSON.parse(await readFile(path.join(DATA, 'meaning-flow-overrides.json'), 'utf8'));
 const pilotIds = new Set(representativeReview.items.map(item => item.id));
+let reviewedMicroDocument = null;
+try {
+  reviewedMicroDocument = JSON.parse(await readFile(path.join(DATA, 'micro-chunk-overrides.json'), 'utf8'));
+} catch {}
+const reviewedMicroById = new Map((reviewedMicroDocument?.items || []).map(item => [item.id, item]));
+const hasFullMicroReview = reviewedMicroDocument?.reviewStatus === 'reviewed' && reviewedMicroById.size === 869;
 
 const corrections = {
   'cv-0001': [['Do you have', 'any pets?'], ['키우고 있나요', '반려동물을?']],
@@ -666,7 +672,11 @@ const scaffoldCorrections = {
 };
 
 function buildMicroChunks(item) {
-  const correction = scaffoldCorrections[item.id];
+  const reviewed = reviewedMicroById.get(item.id);
+  if (hasFullMicroReview && reviewed) return [reviewed.microChunks, reviewed.microOrderGlosses];
+  const correction = scaffoldCorrections[item.id]
+    ?? legacyScaffoldCorrections[item.id]
+    ?? corrections[item.id];
   if (correction) return correction;
   return [item.assemblyChunks.slice(), item.orderGlosses.slice()];
 }
@@ -719,9 +729,11 @@ async function updateJson(file) {
       item.microOrderGlosses = microOrderGlosses.map(cleanGloss);
       item.reviewStatus = 'reviewed';
       item.microChunkReview = {
-        rulesVersion: 2,
+        rulesVersion: hasFullMicroReview ? 3 : 2,
         reviewStatus: 'reviewed',
-        reviewMethod: 'codex_theory_guided_full_review',
+        reviewMethod: hasFullMicroReview
+          ? 'codex_theory_guided_full_micro_review'
+          : 'codex_theory_guided_full_review',
       };
       item.meaningFlow = {
         rulesVersion: 2,
@@ -743,9 +755,11 @@ async function updateJson(file) {
     document.meaningFlowDraftCount = 0;
     document.meaningFlowTotal = document.items.length;
     document.meaningFlowModel = 'codex_theory_guided_full_review';
-    document.microChunkRulesVersion = 2;
+    document.microChunkRulesVersion = hasFullMicroReview ? 3 : 2;
     document.microChunkReviewCount = document.items.length;
-    document.microChunkReviewMethod = 'codex_theory_guided_full_review';
+    document.microChunkReviewMethod = hasFullMicroReview
+      ? 'codex_theory_guided_full_micro_review'
+      : 'codex_theory_guided_full_review';
   } else if (file.includes(`${path.sep}meaning-flow-batches${path.sep}`)) {
     document.rulesVersion = 2;
     document.reviewStatus = 'reviewed';
@@ -780,10 +794,12 @@ const makeItems = reviewedContent.items
     orderGlosses: item.orderGlosses,
   }));
 await writeFile(path.join(DATA, 'make-chunk-overrides.json'), `${JSON.stringify({
-  schemaVersion: 2,
+  schemaVersion: hasFullMicroReview ? 3 : 2,
   verb: 'MAKE',
   reviewStatus: 'reviewed',
-  reviewMethod: 'codex_theory_guided_full_review',
+  reviewMethod: hasFullMicroReview
+    ? 'codex_theory_guided_full_micro_review'
+    : 'codex_theory_guided_full_review',
   reviewCount: makeItems.length,
   items: makeItems,
 }, null, 2)}\n`, 'utf8');
