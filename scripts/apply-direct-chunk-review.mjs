@@ -114,7 +114,7 @@ const corrections = {
   'cv-0277': [["She’s quite drunk.", 'Could you make sure', 'to get her home safely?'], ['그녀는 꽤 취했어요.', '꼭 해 주시겠어요', '안전하게 집에 데려다주는 걸?']],
   'cv-0278': [['Do you think', 'we have time', 'to get a coffee?'], ['어떻게 생각해요', '우리 시간이 될까요', '커피 한잔할 만큼?']],
   'cv-0281': [['Oh, I hate', 'when I do that.', 'What about the kids?'], ['아, 정말 싫어', '내가 그럴 때면.', '아이들은 어떡했어?']],
-  'cv-0282': [['I', 'somehow managed', 'to get the kids to school', 'on time.'], ['나는', '어찌어찌 해냈어', '아이들을 학교에 보내는 걸', '제시간에.']],
+  'cv-0282': [['I somehow managed', 'to get the kids', 'to school', 'on time.'], ['나는 어찌어찌 해냈어', '아이들을 보내는 것을', '학교에', '제시간에.']],
   'cv-0290': [['This area', 'doesn’t get much sunshine.'], ['이 지역은', '햇볕이 많이 들지 않아요.']],
   'cv-0291': [['We get', 'a lot of tourists', 'in the summer.'], ['우리 지역에는 와요', '관광객이 많이', '여름에.']],
   'cv-0294': [['Even on the weekend', 'we don’t get much', 'foot traffic', 'these days.'], ['주말에도', '많지 않아요', '찾아오는 손님이', '요즘에는.']],

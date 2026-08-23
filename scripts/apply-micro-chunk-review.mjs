@@ -53,7 +53,7 @@ const manualCorrections = {
   'cv-0261': [['My mom', 'got cancer', 'when I was', 'in middle school.'], ['엄마가', '암에 걸리셨어', '내가 다니고 있을 때', '중학교에.']],
   'cv-0268': [['Oh, no.', 'Sorry to hear that.', 'Stay close', 'to the toilet.'], ['아, 이런.', '그렇다니 안됐네.', '멀리 가지 마', '화장실에서.']],
   'cv-0277': [['She’s quite drunk.', 'Could you make sure', 'to get her home', 'safely?'], ['그녀는 꽤 취했어요.', '꼭 부탁드려요', '그녀를 집에 데려다주세요', '안전하게?']],
-  'cv-0282': [['I', 'somehow managed', 'to get the kids to school', 'on time.'], ['나는', '어찌어찌 해냈어', '아이들을 학교에 보내는 걸', '제시간에.']],
+  'cv-0282': [['I somehow managed', 'to get the kids', 'to school', 'on time.'], ['나는 어찌어찌 해냈어', '아이들을 보내는 것을', '학교에', '제시간에.']],
   'cv-0291': [['We get', 'a lot of tourists', 'in the summer.'], ['우리 지역에는 와요', '관광객이 많이', '여름에는.']],
   'cv-0294': [['Even on the weekend', 'we don’t get', 'much foot traffic', 'these days.'], ['주말에도', '우리 가게에는 없어요', '찾아오는 손님이 많이', '요즘에는.']],
   'cv-0295': [['My apartment', 'faces the ocean,', 'so we get', 'a fresh sea breeze', 'most days.'], ['우리 아파트는', '바다를 향해서,', '그래서 들어와요', '상쾌한 바닷바람이', '거의 매일.']],

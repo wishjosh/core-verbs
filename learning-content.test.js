@@ -395,10 +395,10 @@ test('reviewed examples preserve the agreed learning intent', () => {
 
     const schoolRun = byEnglish.get('I somehow managed to get the kids to school on time.');
     assert.deepEqual(schoolRun.microChunks, [
-        'I', 'somehow managed', 'to get the kids to school', 'on time.'
+        'I somehow managed', 'to get the kids', 'to school', 'on time.'
     ]);
     assert.deepEqual(schoolRun.microOrderGlosses, [
-        '나는', '어찌어찌 해냈어', '아이들을 학교에 보내는 걸', '제시간에.'
+        '나는 어찌어찌 해냈어', '아이들을 보내는 것을', '학교에', '제시간에.'
     ]);
     assert.equal(schoolRun.naturalKo, '어찌어찌해서 애들을 제시간에 학교에 보냈어.');
 });
@@ -476,14 +476,14 @@ test('the mobile review screen keeps word-level marking without error categories
     assert.match(html, /id="daily-session-progress"/);
     assert.match(app, /adaptiveLimit - dailyLearned/);
     assert.match(app, /const DAILY_NEW_LIMIT = 12/);
-    assert.match(app, /const APP_VERSION = '30'/);
-    assert.match(html, /href="style\.css\?v=30"/);
-    assert.match(html, /src="learning-engine\.js\?v=30"/);
-    assert.match(html, /src="app\.js\?v=30"/);
+    assert.match(app, /const APP_VERSION = '31'/);
+    assert.match(html, /href="style\.css\?v=31"/);
+    assert.match(html, /src="learning-engine\.js\?v=31"/);
+    assert.match(html, /src="app\.js\?v=31"/);
     assert.match(app, /Learning\.selectCoreVerbNewCards/);
     assert.match(app, /newByVerb/);
     assert.match(app, /register\(`sw\.js\?v=\$\{APP_VERSION\}`,[^)]*updateViaCache: 'none'/);
-    assert.match(html, /Core Verbs v30/);
+    assert.match(html, /Core Verbs v31/);
     assert.match(css, /\.self-check-controls\s*\{[^}]*margin-top:\s*10px;/s);
     assert.match(html, /id="completion-title"/);
     assert.match(html, /id="btn-extra-review"[^>]*onclick="startExtraReviewSession\(\)"/);
