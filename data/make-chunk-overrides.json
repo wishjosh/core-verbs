@@ -1,709 +1,2197 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "verb": "MAKE",
   "reviewStatus": "reviewed",
-  "reviewMethod": "codex_direct",
+  "reviewMethod": "codex_theory_guided_full_review",
   "reviewCount": 100,
   "items": [
     {
       "id": "cv-0359",
-      "microChunks": ["I", "can make you", "steamed galbi,", "if you want."],
-      "microOrderGlosses": ["내가", "너에게 만들어 줄 수 있어", "갈비찜을,", "네가 원한다면."],
-      "assemblyChunks": ["I can make you", "steamed galbi,", "if you want."],
-      "orderGlosses": ["내가 너에게 만들어 줄 수 있어", "갈비찜을,", "네가 원한다면."]
+      "microChunks": [
+        "I can make you",
+        "steamed galbi,",
+        "if you want."
+      ],
+      "microOrderGlosses": [
+        "내가 만들어 줄 수 있어",
+        "갈비찜을,",
+        "원한다면."
+      ],
+      "assemblyChunks": [
+        "I can make you",
+        "steamed galbi,",
+        "if you want."
+      ],
+      "orderGlosses": [
+        "내가 만들어 줄 수 있어",
+        "갈비찜을,",
+        "원한다면."
+      ]
     },
     {
       "id": "cv-0360",
-      "microChunks": ["My wife", "made me", "this scarf."],
-      "microOrderGlosses": ["아내가", "내게 만들어 줬어요", "이 목도리를."],
-      "assemblyChunks": ["My wife made me", "this scarf."],
-      "orderGlosses": ["아내가 내게 만들어 줬어요", "이 목도리를."]
+      "microChunks": [
+        "My wife made me",
+        "this scarf."
+      ],
+      "microOrderGlosses": [
+        "아내가 내게 만들어 줬어요",
+        "이 목도리를."
+      ],
+      "assemblyChunks": [
+        "My wife made me",
+        "this scarf."
+      ],
+      "orderGlosses": [
+        "아내가 내게 만들어 줬어요",
+        "이 목도리를."
+      ]
     },
     {
       "id": "cv-0361",
-      "microChunks": ["My boyfriend", "made me", "a bracelet", "from string."],
-      "microOrderGlosses": ["남자 친구가", "내게 만들어 줬어요", "팔찌 하나를", "끈으로."],
-      "assemblyChunks": ["My boyfriend", "made me a bracelet", "from string."],
-      "orderGlosses": ["남자 친구가", "내게 팔찌를 만들어 줬어요", "끈으로."]
+      "microChunks": [
+        "My boyfriend made me",
+        "a bracelet from string."
+      ],
+      "microOrderGlosses": [
+        "남자 친구가 내게 만들어 줬어요",
+        "끈으로 팔찌를."
+      ],
+      "assemblyChunks": [
+        "My boyfriend made me",
+        "a bracelet from string."
+      ],
+      "orderGlosses": [
+        "남자 친구가 내게 만들어 줬어요",
+        "끈으로 팔찌를."
+      ]
     },
     {
       "id": "cv-0362",
-      "microChunks": ["I can", "make you tea,", "if you’d like."],
-      "microOrderGlosses": ["내가 할 수 있어요", "당신에게 차를 타 드리는 걸,", "원하신다면."],
-      "assemblyChunks": ["I can make you tea,", "if you’d like."],
-      "orderGlosses": ["내가 당신에게 차를 타 드릴게요,", "원하신다면."]
+      "microChunks": [
+        "I can make you tea,",
+        "if you’d like."
+      ],
+      "microOrderGlosses": [
+        "내가 차를 타 드릴게요",
+        "원하신다면."
+      ],
+      "assemblyChunks": [
+        "I can make you tea,",
+        "if you’d like."
+      ],
+      "orderGlosses": [
+        "내가 차를 타 드릴게요",
+        "원하신다면."
+      ]
     },
     {
       "id": "cv-0363",
-      "microChunks": ["My school teacher", "would make us", "cookies", "for Christmas."],
-      "microOrderGlosses": ["우리 학교 선생님은", "우리에게 만들어 주시곤 했어요", "쿠키를", "크리스마스 때마다."],
-      "assemblyChunks": ["My school teacher", "would make us cookies", "for Christmas."],
-      "orderGlosses": ["우리 학교 선생님은", "우리에게 쿠키를 만들어 주시곤 했어요", "크리스마스 때마다."]
+      "microChunks": [
+        "My school teacher",
+        "would make us",
+        "cookies for Christmas."
+      ],
+      "microOrderGlosses": [
+        "우리 학교 선생님은",
+        "우리에게 만들어 주시곤 했어요",
+        "쿠키를, 크리스마스 때마다."
+      ],
+      "assemblyChunks": [
+        "My school teacher",
+        "would make us",
+        "cookies for Christmas."
+      ],
+      "orderGlosses": [
+        "우리 학교 선생님은",
+        "우리에게 만들어 주시곤 했어요",
+        "쿠키를, 크리스마스 때마다."
+      ]
     },
     {
       "id": "cv-0364",
-      "microChunks": ["Let me", "make you", "something to eat."],
-      "microOrderGlosses": ["내가 할게", "너에게 만들어 주는 걸", "먹을 것을 좀."],
-      "assemblyChunks": ["Let me make you", "something to eat."],
-      "orderGlosses": ["내가 너에게 만들어 줄게", "먹을 것을 좀."]
+      "microChunks": [
+        "Let me make you",
+        "something to eat."
+      ],
+      "microOrderGlosses": [
+        "내가 너에게 만들어 줄게",
+        "먹을 것을 좀."
+      ],
+      "assemblyChunks": [
+        "Let me make you",
+        "something to eat."
+      ],
+      "orderGlosses": [
+        "내가 너에게 만들어 줄게",
+        "먹을 것을 좀."
+      ]
     },
     {
       "id": "cv-0365",
-      "microChunks": ["Check out", "my new mug.", "That’s", "my dog, Bobo."],
-      "microOrderGlosses": ["한번 봐봐", "내 새 머그잔을.", "이건", "내 강아지 보보야."],
-      "assemblyChunks": ["Check out my new mug.", "That’s my dog, Bobo."],
-      "orderGlosses": ["내 새 머그잔 한번 봐봐.", "이건 내 강아지 보보야."]
+      "microChunks": [
+        "Check out my new mug.",
+        "That’s my dog, Bobo."
+      ],
+      "microOrderGlosses": [
+        "내 새 머그잔 좀 봐.",
+        "이건 내 강아지 보보야."
+      ],
+      "assemblyChunks": [
+        "Check out my new mug.",
+        "That’s my dog, Bobo."
+      ],
+      "orderGlosses": [
+        "내 새 머그잔 좀 봐.",
+        "이건 내 강아지 보보야."
+      ]
     },
     {
       "id": "cv-0366",
-      "microChunks": ["Oh,", "that’s nice.", "My sister", "made me", "a personalized mug", "one time."],
-      "microOrderGlosses": ["오,", "멋지다.", "내 여동생도", "내게 만들어 줬어", "맞춤형 머그잔을", "예전에."],
-      "assemblyChunks": ["Oh, that’s nice.", "My sister made me", "a personalized mug", "one time."],
-      "orderGlosses": ["오, 멋지다.", "내 여동생도 내게 만들어 줬어", "맞춤형 머그잔을", "예전에."]
+      "microChunks": [
+        "Oh, that’s nice.",
+        "My sister made me",
+        "a personalized mug one time."
+      ],
+      "microOrderGlosses": [
+        "오, 멋지다.",
+        "내 여동생도 내게 만들어 줬어",
+        "예전에 맞춤형 머그잔을."
+      ],
+      "assemblyChunks": [
+        "Oh, that’s nice.",
+        "My sister made me",
+        "a personalized mug one time."
+      ],
+      "orderGlosses": [
+        "오, 멋지다.",
+        "내 여동생도 내게 만들어 줬어",
+        "예전에 맞춤형 머그잔을."
+      ]
     },
     {
       "id": "cv-0367",
-      "microChunks": ["Have you", "seen", "this YouTube channel?"],
-      "microOrderGlosses": ["너는", "봤어", "이 유튜브 채널을?"],
-      "assemblyChunks": ["Have you seen", "this YouTube channel?"],
-      "orderGlosses": ["봤어", "이 유튜브 채널을?"]
+      "microChunks": [
+        "Have you seen",
+        "this YouTube channel?"
+      ],
+      "microOrderGlosses": [
+        "봤어",
+        "이 유튜브 채널을?"
+      ],
+      "assemblyChunks": [
+        "Have you seen",
+        "this YouTube channel?"
+      ],
+      "orderGlosses": [
+        "봤어",
+        "이 유튜브 채널을?"
+      ]
     },
     {
       "id": "cv-0368",
-      "microChunks": ["Oh,", "is that", "that Canadian-Korean couple?", "Yeah,", "I love", "that channel."],
-      "microOrderGlosses": ["아,", "저게 그거야", "그 캐나다인-한국인 부부?", "응,", "나는 정말 좋아해", "그 채널을."],
-      "assemblyChunks": ["Oh, is that", "that Canadian-Korean couple?", "Yeah, I love that channel."],
-      "orderGlosses": ["아, 저게 그거야", "그 캐나다인-한국인 부부?", "응, 그 채널 정말 좋아해."]
+      "microChunks": [
+        "Oh, is that",
+        "that Canadian-Korean couple?",
+        "Yeah, I love that channel."
+      ],
+      "microOrderGlosses": [
+        "아, 이게 그거야",
+        "캐나다인-한국인 부부?",
+        "응, 이 채널 정말 좋아해."
+      ],
+      "assemblyChunks": [
+        "Oh, is that",
+        "that Canadian-Korean couple?",
+        "Yeah, I love that channel."
+      ],
+      "orderGlosses": [
+        "아, 이게 그거야",
+        "캐나다인-한국인 부부?",
+        "응, 이 채널 정말 좋아해."
+      ]
     },
     {
       "id": "cv-0369",
-      "microChunks": ["The Canadian mother-in-law", "makes them", "Korean food", "all the time.", "My own mom", "doesn’t even do that", "for me!"],
-      "microOrderGlosses": ["그 캐나다인 장모님은", "그들에게 해 줘요", "한국 음식을", "늘.", "우리 엄마는", "그것조차 해 주지 않는데", "나에게는!"],
-      "assemblyChunks": ["The Canadian mother-in-law", "makes them Korean food", "all the time.", "My own mom doesn’t even do that", "for me!"],
-      "orderGlosses": ["그 캐나다인 장모님은", "그들에게 한국 음식을 해 줘요", "늘.", "우리 엄마는 그것조차 해 주지 않는데", "나에게는!"]
+      "microChunks": [
+        "The Canadian mother-in-law",
+        "makes them Korean food",
+        "all the time.",
+        "My own mom",
+        "doesn’t even do that",
+        "for me!"
+      ],
+      "microOrderGlosses": [
+        "그 캐나다인 장모님은",
+        "그들에게 한국 음식을 해 줘요",
+        "늘.",
+        "정작 우리 엄마는",
+        "그것조차 안 해 주시는데",
+        "나한테는!"
+      ],
+      "assemblyChunks": [
+        "The Canadian mother-in-law",
+        "makes them Korean food",
+        "all the time.",
+        "My own mom",
+        "doesn’t even do that",
+        "for me!"
+      ],
+      "orderGlosses": [
+        "그 캐나다인 장모님은",
+        "그들에게 한국 음식을 해 줘요",
+        "늘.",
+        "정작 우리 엄마는",
+        "그것조차 안 해 주시는데",
+        "나한테는!"
+      ]
     },
     {
       "id": "cv-0370",
-      "microChunks": ["I know,", "she’s", "so kind", "and thoughtful."],
-      "microOrderGlosses": ["그러게,", "그분은", "정말 다정하고", "배려심도 깊어."],
-      "assemblyChunks": ["I know,", "she’s so kind and thoughtful."],
-      "orderGlosses": ["그러게,", "그분은 정말 다정하고 배려심도 깊어."]
+      "microChunks": [
+        "I know,",
+        "she’s so kind and thoughtful."
+      ],
+      "microOrderGlosses": [
+        "그러게,",
+        "그분은 정말 다정하고 배려심이 깊어."
+      ],
+      "assemblyChunks": [
+        "I know,",
+        "she’s so kind and thoughtful."
+      ],
+      "orderGlosses": [
+        "그러게,",
+        "그분은 정말 다정하고 배려심이 깊어."
+      ]
     },
     {
       "id": "cv-0371",
-      "microChunks": ["My uncle", "served", "as a cook", "in World War 2."],
-      "microOrderGlosses": ["우리 삼촌은", "복무했어요", "취사병으로", "제2차 세계대전 때."],
-      "assemblyChunks": ["My uncle served", "as a cook", "in World War 2."],
-      "orderGlosses": ["우리 삼촌은 복무했어요", "취사병으로", "제2차 세계대전 때."]
+      "microChunks": [
+        "My uncle served",
+        "as a cook",
+        "in World War 2."
+      ],
+      "microOrderGlosses": [
+        "우리 삼촌은 복무했어요",
+        "취사병으로",
+        "제2차 세계대전 때."
+      ],
+      "assemblyChunks": [
+        "My uncle served",
+        "as a cook",
+        "in World War 2."
+      ],
+      "orderGlosses": [
+        "우리 삼촌은 복무했어요",
+        "취사병으로",
+        "제2차 세계대전 때."
+      ]
     },
     {
       "id": "cv-0372",
-      "microChunks": ["I don’t cook", "much", "because it’s cheaper", "to go out", "and eat", "than to cook", "for one person."],
-      "microOrderGlosses": ["나는 요리하지 않아요", "많이는", "왜냐하면 더 싸거든요", "밖에 나가", "사 먹는 게", "요리하는 것보다", "한 사람을 위해."],
-      "assemblyChunks": ["I don’t cook much", "because it’s cheaper", "to go out and eat", "than to cook for one person."],
-      "orderGlosses": ["나는 요리를 많이 하지 않아요", "왜냐하면 더 싸거든요", "나가서 사 먹는 게", "한 사람을 위해 요리하는 것보다."]
+      "microChunks": [
+        "I don’t cook much",
+        "because it’s cheaper",
+        "to go out and eat",
+        "than to cook",
+        "for one person."
+      ],
+      "microOrderGlosses": [
+        "나는 요리를 많이 하지 않아요",
+        "그게 더 싸기 때문이에요",
+        "나가서 사 먹는 게",
+        "요리하는 것보다",
+        "혼자 먹으려고."
+      ],
+      "assemblyChunks": [
+        "I don’t cook much",
+        "because it’s cheaper",
+        "to go out and eat",
+        "than to cook",
+        "for one person."
+      ],
+      "orderGlosses": [
+        "나는 요리를 많이 하지 않아요",
+        "그게 더 싸기 때문이에요",
+        "나가서 사 먹는 게",
+        "요리하는 것보다",
+        "혼자 먹으려고."
+      ]
     },
     {
       "id": "cv-0373",
-      "microChunks": ["I don’t cook", "at all.", "It’s not", "my thing."],
-      "microOrderGlosses": ["나는 요리하지 않아요", "전혀.", "그건 아니에요", "내 취향이."],
-      "assemblyChunks": ["I don’t cook at all.", "It’s not my thing."],
-      "orderGlosses": ["나는 요리를 전혀 하지 않아요.", "그건 내 취향이 아니에요."]
+      "microChunks": [
+        "I don’t cook at all.",
+        "It’s not my thing."
+      ],
+      "microOrderGlosses": [
+        "나는 요리를 전혀 안 해요.",
+        "나와는 안 맞거든요."
+      ],
+      "assemblyChunks": [
+        "I don’t cook at all.",
+        "It’s not my thing."
+      ],
+      "orderGlosses": [
+        "나는 요리를 전혀 안 해요.",
+        "나와는 안 맞거든요."
+      ]
     },
     {
       "id": "cv-0374",
-      "microChunks": ["Women", "love", "a man", "that can cook."],
-      "microOrderGlosses": ["여자들은", "좋아해요", "한 남자를", "요리할 줄 아는."],
-      "assemblyChunks": ["Women love", "a man that can cook."],
-      "orderGlosses": ["여자들은 좋아해요", "요리할 줄 아는 남자를."]
+      "microChunks": [
+        "Women love",
+        "a man that can cook."
+      ],
+      "microOrderGlosses": [
+        "여자들은 좋아해요",
+        "요리할 줄 아는 남자를."
+      ],
+      "assemblyChunks": [
+        "Women love",
+        "a man that can cook."
+      ],
+      "orderGlosses": [
+        "여자들은 좋아해요",
+        "요리할 줄 아는 남자를."
+      ]
     },
     {
       "id": "cv-0375",
-      "microChunks": ["Having children", "has made me", "a better husband."],
-      "microOrderGlosses": ["아이들이 생긴 것이", "나를 바꿨어요", "더 좋은 남편으로."],
-      "assemblyChunks": ["Having children", "has made me a better husband."],
-      "orderGlosses": ["아이들이 생긴 것이", "나를 더 좋은 남편으로 바꿨어요."]
+      "microChunks": [
+        "Having children",
+        "has made me",
+        "a better husband."
+      ],
+      "microOrderGlosses": [
+        "아이들이 생긴 것이",
+        "나를 바꿨어요",
+        "더 좋은 남편으로."
+      ],
+      "assemblyChunks": [
+        "Having children",
+        "has made me",
+        "a better husband."
+      ],
+      "orderGlosses": [
+        "아이들이 생긴 것이",
+        "나를 바꿨어요",
+        "더 좋은 남편으로."
+      ]
     },
     {
       "id": "cv-0376",
-      "microChunks": ["The pandemic", "made", "online learning", "the new norm."],
-      "microOrderGlosses": ["팬데믹은", "자리 잡게 했어요", "온라인 학습을", "새로운 표준으로."],
-      "assemblyChunks": ["The pandemic", "made online learning the new norm."],
-      "orderGlosses": ["팬데믹은", "온라인 학습을 새로운 표준으로 자리 잡게 했어요."]
+      "microChunks": [
+        "The pandemic made",
+        "online learning",
+        "the new norm."
+      ],
+      "microOrderGlosses": [
+        "팬데믹 때문에 자리 잡았어요",
+        "온라인 학습이",
+        "새로운 표준으로."
+      ],
+      "assemblyChunks": [
+        "The pandemic made",
+        "online learning",
+        "the new norm."
+      ],
+      "orderGlosses": [
+        "팬데믹 때문에 자리 잡았어요",
+        "온라인 학습이",
+        "새로운 표준으로."
+      ]
     },
     {
       "id": "cv-0377",
-      "microChunks": ["The author's insight", "makes", "this book", "a must-read."],
-      "microOrderGlosses": ["작가의 통찰력은", "만들어요", "이 책을", "꼭 읽어야 할 책으로."],
-      "assemblyChunks": ["The author's insight", "makes this book a must-read."],
-      "orderGlosses": ["작가의 통찰력은", "이 책을 꼭 읽어야 할 책으로 만들어요."]
+      "microChunks": [
+        "The author's insight",
+        "makes this book",
+        "a must-read."
+      ],
+      "microOrderGlosses": [
+        "작가의 통찰력 덕분에",
+        "이 책은",
+        "꼭 읽어야 할 책이 돼요."
+      ],
+      "assemblyChunks": [
+        "The author's insight",
+        "makes this book",
+        "a must-read."
+      ],
+      "orderGlosses": [
+        "작가의 통찰력 덕분에",
+        "이 책은",
+        "꼭 읽어야 할 책이 돼요."
+      ]
     },
     {
       "id": "cv-0378",
-      "microChunks": ["Losing his business", "made him", "a stronger person."],
-      "microOrderGlosses": ["사업을 잃은 일이", "그를 바꿨어요", "더 강한 사람으로."],
-      "assemblyChunks": ["Losing his business", "made him a stronger person."],
-      "orderGlosses": ["사업을 잃은 일이", "그를 더 강한 사람으로 바꿨어요."]
+      "microChunks": [
+        "Losing his business",
+        "made him",
+        "a stronger person."
+      ],
+      "microOrderGlosses": [
+        "사업을 잃은 일이",
+        "그를 바꿨어요",
+        "더 강한 사람으로."
+      ],
+      "assemblyChunks": [
+        "Losing his business",
+        "made him",
+        "a stronger person."
+      ],
+      "orderGlosses": [
+        "사업을 잃은 일이",
+        "그를 바꿨어요",
+        "더 강한 사람으로."
+      ]
     },
     {
       "id": "cv-0379",
-      "microChunks": ["Competing", "with my older brother", "made me", "a better athlete."],
-      "microOrderGlosses": ["경쟁한 것이", "형과", "나를 성장시켰어요", "더 나은 선수로."],
-      "assemblyChunks": ["Competing with my older brother", "made me a better athlete."],
-      "orderGlosses": ["형과 경쟁한 것이", "나를 더 나은 선수로 성장시켰어요."]
+      "microChunks": [
+        "Competing with my older brother",
+        "made me",
+        "a better athlete."
+      ],
+      "microOrderGlosses": [
+        "형과 경쟁한 것이",
+        "나를 성장시켰어요",
+        "더 나은 선수로."
+      ],
+      "assemblyChunks": [
+        "Competing with my older brother",
+        "made me",
+        "a better athlete."
+      ],
+      "orderGlosses": [
+        "형과 경쟁한 것이",
+        "나를 성장시켰어요",
+        "더 나은 선수로."
+      ]
     },
     {
       "id": "cv-0380",
-      "microChunks": ["The restaurants alone", "make", "New York City", "the top city", "among tourists."],
-      "microOrderGlosses": ["식당들만으로도", "만들어요", "뉴욕을", "최고의 도시로", "관광객들 사이에서."],
-      "assemblyChunks": ["The restaurants alone", "make New York City the top city", "among tourists."],
-      "orderGlosses": ["식당들만으로도", "뉴욕을 최고의 도시로 만들어요", "관광객들 사이에서."]
+      "microChunks": [
+        "The restaurants alone",
+        "make New York City",
+        "the top city among tourists."
+      ],
+      "microOrderGlosses": [
+        "식당들만으로도",
+        "뉴욕을 끌어올려요",
+        "관광객에게 가장 인기 있는 도시로."
+      ],
+      "assemblyChunks": [
+        "The restaurants alone",
+        "make New York City",
+        "the top city among tourists."
+      ],
+      "orderGlosses": [
+        "식당들만으로도",
+        "뉴욕을 끌어올려요",
+        "관광객에게 가장 인기 있는 도시로."
+      ]
     },
     {
       "id": "cv-0381",
-      "microChunks": ["He's", "super easy", "to work with."],
-      "microOrderGlosses": ["그 사람은", "정말 편해요", "함께 일하기에."],
-      "assemblyChunks": ["He's super easy", "to work with."],
-      "orderGlosses": ["그 사람은 정말 편해요", "함께 일하기에."]
+      "microChunks": [
+        "He's super easy",
+        "to work with."
+      ],
+      "microOrderGlosses": [
+        "그 사람은 정말 편해요",
+        "함께 일하기에."
+      ],
+      "assemblyChunks": [
+        "He's super easy",
+        "to work with."
+      ],
+      "orderGlosses": [
+        "그 사람은 정말 편해요",
+        "함께 일하기에."
+      ]
     },
     {
       "id": "cv-0382",
-      "microChunks": ["That alone", "makes him", "a good fit", "for our team."],
-      "microOrderGlosses": ["그것만으로도", "그를 그렇게 만들어요", "잘 맞는 사람으로", "우리 팀에."],
-      "assemblyChunks": ["That alone", "makes him a good fit", "for our team."],
-      "orderGlosses": ["그것만으로도", "그를 잘 맞는 사람으로 만들어요", "우리 팀에."]
+      "microChunks": [
+        "That alone makes him",
+        "a good fit",
+        "for our team."
+      ],
+      "microOrderGlosses": [
+        "그것만으로도 그는",
+        "아주 잘 맞는 사람이에요",
+        "우리 팀에."
+      ],
+      "assemblyChunks": [
+        "That alone makes him",
+        "a good fit",
+        "for our team."
+      ],
+      "orderGlosses": [
+        "그것만으로도 그는",
+        "아주 잘 맞는 사람이에요",
+        "우리 팀에."
+      ]
     },
     {
       "id": "cv-0383",
-      "microChunks": ["I'm thinking", "of getting", "the pro model."],
-      "microOrderGlosses": ["나는 생각 중이야", "사는 것을", "프로 모델을."],
-      "assemblyChunks": ["I'm thinking of getting", "the pro model."],
-      "orderGlosses": ["나는 살까 생각 중이야", "프로 모델을."]
+      "microChunks": [
+        "I'm thinking of getting",
+        "the pro model."
+      ],
+      "microOrderGlosses": [
+        "나는 살까 생각 중이야",
+        "프로 모델을."
+      ],
+      "assemblyChunks": [
+        "I'm thinking of getting",
+        "the pro model."
+      ],
+      "orderGlosses": [
+        "나는 살까 생각 중이야",
+        "프로 모델을."
+      ]
     },
     {
       "id": "cv-0384",
-      "microChunks": ["It's", "more expensive", "though."],
-      "microOrderGlosses": ["그게", "더 비싸긴 해", "그렇지만."],
-      "assemblyChunks": ["It's more expensive", "though."],
-      "orderGlosses": ["그게 더 비싸긴 해", "그렇지만."]
+      "microChunks": [
+        "It's more expensive",
+        "though."
+      ],
+      "microOrderGlosses": [
+        "그게 더 비싸긴 해요",
+        "그렇지만."
+      ],
+      "assemblyChunks": [
+        "It's more expensive",
+        "though."
+      ],
+      "orderGlosses": [
+        "그게 더 비싸긴 해요",
+        "그렇지만."
+      ]
     },
     {
       "id": "cv-0385",
-      "microChunks": ["True,", "but the battery life", "makes it", "a better choice", "for me."],
-      "microOrderGlosses": ["맞아,", "하지만 배터리 수명은", "그 제품을 그렇게 만들어요", "더 나은 선택으로", "나에게."],
-      "assemblyChunks": ["True,", "but the battery life", "makes it a better choice", "for me."],
-      "orderGlosses": ["맞아,", "하지만 배터리 수명은", "그 제품을 더 나은 선택으로 만들어요", "나에게."]
+      "microChunks": [
+        "True,",
+        "but the battery life",
+        "makes it a better choice",
+        "for me."
+      ],
+      "microOrderGlosses": [
+        "맞아,",
+        "하지만 배터리 수명 덕분에",
+        "그 제품이 더 나은 선택이 돼요",
+        "나에게는."
+      ],
+      "assemblyChunks": [
+        "True,",
+        "but the battery life",
+        "makes it a better choice",
+        "for me."
+      ],
+      "orderGlosses": [
+        "맞아,",
+        "하지만 배터리 수명 덕분에",
+        "그 제품이 더 나은 선택이 돼요",
+        "나에게는."
+      ]
     },
     {
       "id": "cv-0386",
-      "microChunks": ["Yeah,", "especially if", "you're on your phone", "all day."],
-      "microOrderGlosses": ["응,", "특히 만약", "네가 휴대폰을 쓰고 있다면", "하루 종일."],
-      "assemblyChunks": ["Yeah,", "especially if you're on your phone", "all day."],
-      "orderGlosses": ["응,", "특히 네가 휴대폰을 쓰고 있다면", "하루 종일."]
+      "microChunks": [
+        "Yeah,",
+        "especially if you're on your phone",
+        "all day."
+      ],
+      "microOrderGlosses": [
+        "응,",
+        "특히 휴대폰을 쓰고 있다면",
+        "하루 종일."
+      ],
+      "assemblyChunks": [
+        "Yeah,",
+        "especially if you're on your phone",
+        "all day."
+      ],
+      "orderGlosses": [
+        "응,",
+        "특히 휴대폰을 쓰고 있다면",
+        "하루 종일."
+      ]
     },
     {
       "id": "cv-0387",
-      "microChunks": ["He is", "irritating", "to work with."],
-      "microOrderGlosses": ["그 사람은", "짜증 나요", "함께 일하기에."],
-      "assemblyChunks": ["He is irritating", "to work with."],
-      "orderGlosses": ["그 사람은 짜증 나요", "함께 일하기에."]
+      "microChunks": [
+        "He is irritating",
+        "to work with."
+      ],
+      "microOrderGlosses": [
+        "그 사람은 꽤 짜증 나요",
+        "같이 일하다 보면."
+      ],
+      "assemblyChunks": [
+        "He is irritating",
+        "to work with."
+      ],
+      "orderGlosses": [
+        "그 사람은 꽤 짜증 나요",
+        "같이 일하다 보면."
+      ]
     },
     {
       "id": "cv-0388",
-      "microChunks": ["I'm", "not much fun", "to drink with."],
-      "microOrderGlosses": ["나는", "별로 재미없는 사람이에요", "함께 술 마시기에는."],
-      "assemblyChunks": ["I'm not much fun", "to drink with."],
-      "orderGlosses": ["나는 별로 재미없는 사람이에요", "함께 술 마시기에는."]
+      "microChunks": [
+        "I'm not much fun",
+        "to drink with."
+      ],
+      "microOrderGlosses": [
+        "나는 별로 재미없는 사람이에요",
+        "함께 술 마시기에는."
+      ],
+      "assemblyChunks": [
+        "I'm not much fun",
+        "to drink with."
+      ],
+      "orderGlosses": [
+        "나는 별로 재미없는 사람이에요",
+        "함께 술 마시기에는."
+      ]
     },
     {
       "id": "cv-0389",
-      "microChunks": ["Curly hair", "is difficult", "to style."],
-      "microOrderGlosses": ["곱슬머리는", "어려워요", "스타일링하기가."],
-      "assemblyChunks": ["Curly hair is difficult", "to style."],
-      "orderGlosses": ["곱슬머리는 어려워요", "스타일링하기가."]
+      "microChunks": [
+        "Curly hair is difficult",
+        "to style."
+      ],
+      "microOrderGlosses": [
+        "곱슬머리는 어려워요",
+        "스타일링하기가."
+      ],
+      "assemblyChunks": [
+        "Curly hair is difficult",
+        "to style."
+      ],
+      "orderGlosses": [
+        "곱슬머리는 어려워요",
+        "스타일링하기가."
+      ]
     },
     {
       "id": "cv-0390",
-      "microChunks": ["Long hair", "takes a while", "to dry."],
-      "microOrderGlosses": ["긴 머리는", "시간이 좀 걸려요", "마르는 데."],
-      "assemblyChunks": ["Long hair takes a while", "to dry."],
-      "orderGlosses": ["긴 머리는 시간이 좀 걸려요", "마르는 데."]
+      "microChunks": [
+        "Long hair",
+        "takes a while",
+        "to dry."
+      ],
+      "microOrderGlosses": [
+        "긴 머리는",
+        "시간이 좀 걸려요",
+        "마르는 데."
+      ],
+      "assemblyChunks": [
+        "Long hair",
+        "takes a while",
+        "to dry."
+      ],
+      "orderGlosses": [
+        "긴 머리는",
+        "시간이 좀 걸려요",
+        "마르는 데."
+      ]
     },
     {
       "id": "cv-0391",
-      "microChunks": ["Taxis", "are hard to find", "around Gangnam station", "on Friday nights."],
-      "microOrderGlosses": ["택시는", "잡기 어려워요", "강남역 근처에서", "금요일 밤마다."],
-      "assemblyChunks": ["Taxis are hard to find", "around Gangnam station", "on Friday nights."],
-      "orderGlosses": ["택시는 잡기 어려워요", "강남역 근처에서", "금요일 밤마다."]
+      "microChunks": [
+        "Taxis are hard to find",
+        "around Gangnam station",
+        "on Friday nights."
+      ],
+      "microOrderGlosses": [
+        "택시는 잡기 어려워요",
+        "강남역 근처에서",
+        "금요일 밤마다."
+      ],
+      "assemblyChunks": [
+        "Taxis are hard to find",
+        "around Gangnam station",
+        "on Friday nights."
+      ],
+      "orderGlosses": [
+        "택시는 잡기 어려워요",
+        "강남역 근처에서",
+        "금요일 밤마다."
+      ]
     },
     {
       "id": "cv-0392",
-      "microChunks": ["I", "made myself", "go", "to the gym", "today."],
-      "microOrderGlosses": ["나는", "나 자신을 억지로 시켰어요", "가도록", "헬스장에", "오늘."],
-      "assemblyChunks": ["I made myself go", "to the gym today."],
-      "orderGlosses": ["나는 억지로라도 갔어요", "오늘 헬스장에."]
+      "microChunks": [
+        "I made myself go",
+        "to the gym today."
+      ],
+      "microOrderGlosses": [
+        "나는 억지로라도 갔어요",
+        "오늘 헬스장에."
+      ],
+      "assemblyChunks": [
+        "I made myself go",
+        "to the gym today."
+      ],
+      "orderGlosses": [
+        "나는 억지로라도 갔어요",
+        "오늘 헬스장에."
+      ]
     },
     {
       "id": "cv-0393",
-      "microChunks": ["You can’t", "make me", "go."],
-      "microOrderGlosses": ["당신은 못 해", "나를 억지로 시키는 걸", "가도록."],
-      "assemblyChunks": ["You can’t", "make me go."],
-      "orderGlosses": ["당신은 못 해", "나를 억지로 가게 하는 걸."]
+      "microChunks": [
+        "You can’t make me",
+        "go."
+      ],
+      "microOrderGlosses": [
+        "나를 억지로 시킬 수 없어",
+        "가라고."
+      ],
+      "assemblyChunks": [
+        "You can’t make me",
+        "go."
+      ],
+      "orderGlosses": [
+        "나를 억지로 시킬 수 없어",
+        "가라고."
+      ]
     },
     {
       "id": "cv-0394",
-      "microChunks": ["They can’t", "make you", "stay", "at the office", "until 11 p.m."],
-      "microOrderGlosses": ["그들은 못 해", "너를 억지로 시키는 걸", "남도록", "사무실에", "밤 11시까지."],
-      "assemblyChunks": ["They can’t make you", "stay at the office", "until 11 p.m."],
-      "orderGlosses": ["그들은 너를 억지로 시킬 수 없어", "사무실에 남도록", "밤 11시까지."]
+      "microChunks": [
+        "They can’t make you",
+        "stay at the office",
+        "until 11 p.m."
+      ],
+      "microOrderGlosses": [
+        "그들은 당신에게 강요할 수 없어",
+        "사무실에 남으라고",
+        "밤 11시까지."
+      ],
+      "assemblyChunks": [
+        "They can’t make you",
+        "stay at the office",
+        "until 11 p.m."
+      ],
+      "orderGlosses": [
+        "그들은 당신에게 강요할 수 없어",
+        "사무실에 남으라고",
+        "밤 11시까지."
+      ]
     },
     {
       "id": "cv-0395",
-      "microChunks": ["My parents", "made me", "study too much,", "so I", "don’t make", "my children", "do anything."],
-      "microOrderGlosses": ["우리 부모님은", "나를 시켰어요", "너무 많이 공부하게,", "그래서 나는", "시키지 않아요", "내 아이들에게", "아무것도 하라고."],
-      "assemblyChunks": ["My parents made me", "study too much,", "so I don’t make", "my children do anything."],
-      "orderGlosses": ["우리 부모님은 나를 시켰어요", "너무 많이 공부하게,", "그래서 나는 시키지 않아요", "내 아이들에게 아무것도 하라고."]
+      "microChunks": [
+        "My parents made me",
+        "study too much,",
+        "so I don’t make my children",
+        "do anything."
+      ],
+      "microOrderGlosses": [
+        "우리 부모님은 나에게 시켰어요",
+        "너무 많이 공부하게,",
+        "그래서 나는 아이들에게 강요하지 않아요",
+        "무엇이든 하라고."
+      ],
+      "assemblyChunks": [
+        "My parents made me",
+        "study too much,",
+        "so I don’t make my children",
+        "do anything."
+      ],
+      "orderGlosses": [
+        "우리 부모님은 나에게 시켰어요",
+        "너무 많이 공부하게,",
+        "그래서 나는 아이들에게 강요하지 않아요",
+        "무엇이든 하라고."
+      ]
     },
     {
       "id": "cv-0396",
-      "microChunks": ["My husband", "made me", "carry all the bags", "by myself."],
-      "microOrderGlosses": ["내 남편은", "나를 시켰어요", "가방을 전부 들게", "나 혼자서."],
-      "assemblyChunks": ["My husband made me", "carry all the bags", "by myself."],
-      "orderGlosses": ["내 남편은 나를 시켰어요", "가방을 전부 들게", "나 혼자서."]
+      "microChunks": [
+        "My husband made me",
+        "carry all the bags",
+        "by myself."
+      ],
+      "microOrderGlosses": [
+        "내 남편은 나에게 시켰어요",
+        "가방을 전부 들게",
+        "나 혼자서."
+      ],
+      "assemblyChunks": [
+        "My husband made me",
+        "carry all the bags",
+        "by myself."
+      ],
+      "orderGlosses": [
+        "내 남편은 나에게 시켰어요",
+        "가방을 전부 들게",
+        "나 혼자서."
+      ]
     },
     {
       "id": "cv-0397",
-      "microChunks": ["Mom", "made me", "finish my vegetables."],
-      "microOrderGlosses": ["엄마가", "나를 시켰어요", "채소를 다 먹게."],
-      "assemblyChunks": ["Mom made me", "finish my vegetables."],
-      "orderGlosses": ["엄마가 나를 시켰어요", "채소를 다 먹게."]
+      "microChunks": [
+        "Mom made me",
+        "finish my vegetables."
+      ],
+      "microOrderGlosses": [
+        "엄마가 나를 시켰어요",
+        "채소를 다 먹게."
+      ],
+      "assemblyChunks": [
+        "Mom made me",
+        "finish my vegetables."
+      ],
+      "orderGlosses": [
+        "엄마가 나를 시켰어요",
+        "채소를 다 먹게."
+      ]
     },
     {
       "id": "cv-0398",
-      "microChunks": ["Good morning,", "Michelle.", "How’s work", "going?"],
-      "microOrderGlosses": ["좋은 아침이야,", "미셸.", "일은 어떻게", "되어 가?"],
-      "assemblyChunks": ["Good morning, Michelle.", "How’s work going?"],
-      "orderGlosses": ["좋은 아침이야, 미셸.", "일은 어떻게 되어 가?"]
+      "microChunks": [
+        "Good morning, Michelle.",
+        "How’s work going?"
+      ],
+      "microOrderGlosses": [
+        "좋은 아침, 미셸.",
+        "일은 어떻게 돼 가?"
+      ],
+      "assemblyChunks": [
+        "Good morning, Michelle.",
+        "How’s work going?"
+      ],
+      "orderGlosses": [
+        "좋은 아침, 미셸.",
+        "일은 어떻게 돼 가?"
+      ]
     },
     {
       "id": "cv-0399",
-      "microChunks": ["It’s tough.", "My boss", "makes me", "upload", "new online video content", "every week."],
-      "microOrderGlosses": ["힘들어.", "내 상사는", "나를 시켜", "올리도록", "새 온라인 영상을", "매주."],
-      "assemblyChunks": ["It’s tough.", "My boss makes me", "upload new online video content", "every week."],
-      "orderGlosses": ["힘들어.", "내 상사는 나를 시켜", "새 온라인 영상을 올리도록", "매주."]
+      "microChunks": [
+        "It’s tough.",
+        "My boss makes me",
+        "upload new online video content",
+        "every week."
+      ],
+      "microOrderGlosses": [
+        "힘들어.",
+        "상사가 나에게 시켜",
+        "새 온라인 영상을 올리게",
+        "매주."
+      ],
+      "assemblyChunks": [
+        "It’s tough.",
+        "My boss makes me",
+        "upload new online video content",
+        "every week."
+      ],
+      "orderGlosses": [
+        "힘들어.",
+        "상사가 나에게 시켜",
+        "새 온라인 영상을 올리게",
+        "매주."
+      ]
     },
     {
       "id": "cv-0400",
-      "microChunks": ["Your girlfriend", "is already", "making you wear", "matching outfits?"],
-      "microOrderGlosses": ["네 여자친구가", "벌써", "시키고 있어", "커플 룩을 입으라고?"],
-      "assemblyChunks": ["Your girlfriend is already", "making you wear matching outfits?"],
-      "orderGlosses": ["네 여자친구가 벌써", "커플 룩을 입으라고 시키고 있어?"]
+      "microChunks": [
+        "Your girlfriend",
+        "is already making you",
+        "wear matching outfits?"
+      ],
+      "microOrderGlosses": [
+        "네 여자친구가",
+        "벌써 너에게 시키고 있어",
+        "커플 룩을 입으라고?"
+      ],
+      "assemblyChunks": [
+        "Your girlfriend is already",
+        "making you wear",
+        "matching outfits?"
+      ],
+      "orderGlosses": [
+        "네 여자친구가 벌써",
+        "시키고 있어",
+        "커플 룩을 입으라고?"
+      ]
     },
     {
       "id": "cv-0401",
-      "microChunks": ["She doesn’t", "make me", "wear them.", "I want to."],
-      "microOrderGlosses": ["그녀가 그러는 건 아니야", "나를 억지로 시키는 건", "그것들을 입도록.", "내가 원해서 입는 거야."],
-      "assemblyChunks": ["She doesn’t make me", "wear them.", "I want to."],
-      "orderGlosses": ["그녀가 나를 억지로 시키는 건 아니야", "그것들을 입도록.", "내가 원해서 입는 거야."]
+      "microChunks": [
+        "She doesn’t make me",
+        "wear them.",
+        "I want to."
+      ],
+      "microOrderGlosses": [
+        "그녀가 나에게 시키는 건 아니에요",
+        "그걸 입으라고.",
+        "내가 원해서 입어요."
+      ],
+      "assemblyChunks": [
+        "She doesn’t make me",
+        "wear them.",
+        "I want to."
+      ],
+      "orderGlosses": [
+        "그녀가 나에게 시키는 건 아니에요",
+        "그걸 입으라고.",
+        "내가 원해서 입어요."
+      ]
     },
     {
       "id": "cv-0402",
-      "microChunks": ["You guys", "have been dating", "for less than a week.", "Isn’t that", "a little fast?"],
-      "microOrderGlosses": ["너희 둘은", "사귀고 있어", "일주일도 안 되게.", "그건 그렇지 않아", "조금 빠르다고?"],
-      "assemblyChunks": ["You guys have been dating", "for less than a week.", "Isn’t that a little fast?"],
-      "orderGlosses": ["너희 둘은 사귀고 있어", "일주일도 안 되게.", "그건 조금 빠르지 않아?"]
+      "microChunks": [
+        "You guys have been dating",
+        "for less than a week.",
+        "Isn’t that a little fast?"
+      ],
+      "microOrderGlosses": [
+        "두 사람은 사귀고 있어요",
+        "일주일도 안 되게.",
+        "그건 좀 빠르지 않나요?"
+      ],
+      "assemblyChunks": [
+        "You guys have been dating",
+        "for less than a week.",
+        "Isn’t that a little fast?"
+      ],
+      "orderGlosses": [
+        "두 사람은 사귀고 있어요",
+        "일주일도 안 되게.",
+        "그건 좀 빠르지 않나요?"
+      ]
     },
     {
       "id": "cv-0403",
-      "microChunks": ["Depends", "on the couple,", "I guess.", "We like it."],
-      "microOrderGlosses": ["달라", "커플에 따라,", "내 생각에는.", "우리는 그게 좋아."],
-      "assemblyChunks": ["Depends on the couple,", "I guess.", "We like it."],
-      "orderGlosses": ["커플에 따라 달라,", "내 생각에는.", "우리는 그게 좋아."]
+      "microChunks": [
+        "Depends on the couple,",
+        "I guess.",
+        "We like it."
+      ],
+      "microOrderGlosses": [
+        "커플마다 달라요,",
+        "내 생각에는.",
+        "우리는 그게 좋아요."
+      ],
+      "assemblyChunks": [
+        "Depends on the couple,",
+        "I guess.",
+        "We like it."
+      ],
+      "orderGlosses": [
+        "커플마다 달라요,",
+        "내 생각에는.",
+        "우리는 그게 좋아요."
+      ]
     },
     {
       "id": "cv-0404",
-      "microChunks": ["Back when", "we were kids,", "my brother", "made me", "clean", "his room—", "for ten years!"],
-      "microOrderGlosses": ["그 옛날", "우리가 어렸을 때,", "우리 형은", "나를 시켰어요", "청소하도록", "자기 방을—", "무려 10년 동안!"],
-      "assemblyChunks": ["Back when we were kids,", "my brother made me", "clean his room—", "for ten years!"],
-      "orderGlosses": ["우리가 어렸던 그 옛날,", "우리 형은 나를 시켰어요", "자기 방을 청소하도록—", "무려 10년 동안!"]
+      "microChunks": [
+        "Back when we were kids,",
+        "my brother",
+        "made me clean",
+        "his room—",
+        "for ten years!"
+      ],
+      "microOrderGlosses": [
+        "우리가 어렸을 때,",
+        "우리 형은",
+        "나에게 청소를 시켰어요",
+        "자기 방을,",
+        "무려 10년 동안!"
+      ],
+      "assemblyChunks": [
+        "Back when we were kids,",
+        "my brother",
+        "made me clean",
+        "his room—",
+        "for ten years!"
+      ],
+      "orderGlosses": [
+        "우리가 어렸을 때,",
+        "우리 형은",
+        "나에게 청소를 시켰어요",
+        "자기 방을,",
+        "무려 10년 동안!"
+      ]
     },
     {
       "id": "cv-0405",
-      "microChunks": ["My parents", "made me", "walk to school", "when I was", "a kid."],
-      "microOrderGlosses": ["부모님은", "나를 시키셨어요", "학교까지 걸어가도록", "내가", "어렸을 때."],
-      "assemblyChunks": ["My parents made me", "walk to school", "when I was a kid."],
-      "orderGlosses": ["부모님은 나를 시키셨어요", "학교까지 걸어가도록", "내가 어렸을 때."]
+      "microChunks": [
+        "My parents made me",
+        "walk to school",
+        "when I was a kid."
+      ],
+      "microOrderGlosses": [
+        "부모님은 나에게 시키셨어요",
+        "학교까지 걸어가도록",
+        "내가 어렸을 때."
+      ],
+      "assemblyChunks": [
+        "My parents made me",
+        "walk to school",
+        "when I was a kid."
+      ],
+      "orderGlosses": [
+        "부모님은 나에게 시키셨어요",
+        "학교까지 걸어가도록",
+        "내가 어렸을 때."
+      ]
     },
     {
       "id": "cv-0406",
-      "microChunks": ["I got", "the airline", "to upgrade", "my seat", "to first class."],
-      "microOrderGlosses": ["나는 움직였어요", "항공사 측을", "업그레이드하도록", "내 좌석을", "일등석으로."],
-      "assemblyChunks": ["I got the airline", "to upgrade my seat", "to first class."],
-      "orderGlosses": ["나는 항공사 측에 부탁했어요", "내 좌석을 업그레이드하도록", "일등석으로."]
+      "microChunks": [
+        "I got the airline",
+        "to upgrade my seat",
+        "to first class."
+      ],
+      "microOrderGlosses": [
+        "나는 항공사 측에 요청했어요",
+        "내 좌석을 업그레이드하도록",
+        "일등석으로."
+      ],
+      "assemblyChunks": [
+        "I got the airline",
+        "to upgrade my seat",
+        "to first class."
+      ],
+      "orderGlosses": [
+        "나는 항공사 측에 요청했어요",
+        "내 좌석을 업그레이드하도록",
+        "일등석으로."
+      ]
     },
     {
       "id": "cv-0407",
-      "microChunks": ["I got Sarah", "to fill in", "for me", "at work", "so I could", "take the day off."],
-      "microOrderGlosses": ["나는 사라에게 부탁했어요", "대신 일하도록", "나를 대신해", "직장에서", "그래서 내가 할 수 있게", "하루를 쉬는 걸."],
-      "assemblyChunks": ["I got Sarah to fill in", "for me at work", "so I could take the day off."],
-      "orderGlosses": ["나는 사라에게 대신 일해 달라고 했어요", "직장에서 나를 대신해", "그래서 내가 하루를 쉴 수 있게."]
+      "microChunks": [
+        "I got Sarah",
+        "to fill in for me at work",
+        "so I could take the day off."
+      ],
+      "microOrderGlosses": [
+        "사라에게 부탁했어요",
+        "직장에서 나를 대신해 달라고",
+        "그래서 내가 하루 휴가를 낼 수 있게."
+      ],
+      "assemblyChunks": [
+        "I got Sarah",
+        "to fill in for me at work",
+        "so I could take the day off."
+      ],
+      "orderGlosses": [
+        "사라에게 부탁했어요",
+        "직장에서 나를 대신해 달라고",
+        "그래서 내가 하루 휴가를 낼 수 있게."
+      ]
     },
     {
       "id": "cv-0408",
-      "microChunks": ["My boss", "had me", "go out", "and pick up", "the coffee order", "before the meeting."],
-      "microOrderGlosses": ["내 상사는", "나를 시켰어요", "밖에 나가서", "그리고 받아 오도록", "주문한 커피를", "회의 전에."],
-      "assemblyChunks": ["My boss had me", "go out and pick up", "the coffee order", "before the meeting."],
-      "orderGlosses": ["내 상사는 나를 시켰어요", "밖에 나가서 받아 오도록", "주문한 커피를", "회의 전에."]
+      "microChunks": [
+        "My boss had",
+        "me go out",
+        "and pick up",
+        "the coffee order",
+        "before the meeting."
+      ],
+      "microOrderGlosses": [
+        "내 상사가 시켰어요",
+        "내가 밖에 나가서",
+        "그리고 받아 오도록",
+        "주문한 커피를",
+        "회의 전에."
+      ],
+      "assemblyChunks": [
+        "My boss had",
+        "me go out",
+        "and pick up",
+        "the coffee order",
+        "before the meeting."
+      ],
+      "orderGlosses": [
+        "내 상사가 시켰어요",
+        "내가 밖에 나가서",
+        "그리고 받아 오도록",
+        "주문한 커피를",
+        "회의 전에."
+      ]
     },
     {
       "id": "cv-0409",
-      "microChunks": ["The teacher", "had me", "pick up", "the homework", "from the class."],
-      "microOrderGlosses": ["선생님은", "나를 시키셨어요", "걷어 오도록", "숙제를", "반 아이들에게서."],
-      "assemblyChunks": ["The teacher had me", "pick up the homework", "from the class."],
-      "orderGlosses": ["선생님은 나를 시키셨어요", "숙제를 걷어 오도록", "반 아이들에게서."]
+      "microChunks": [
+        "The teacher had me",
+        "pick up the homework",
+        "from the class."
+      ],
+      "microOrderGlosses": [
+        "선생님은 나에게 시키셨어요",
+        "숙제를 걷어 오도록",
+        "반 아이들에게서."
+      ],
+      "assemblyChunks": [
+        "The teacher had me",
+        "pick up the homework",
+        "from the class."
+      ],
+      "orderGlosses": [
+        "선생님은 나에게 시키셨어요",
+        "숙제를 걷어 오도록",
+        "반 아이들에게서."
+      ]
     },
     {
       "id": "cv-0410",
-      "microChunks": ["Sitting", "in traffic", "makes me", "feel anxious."],
-      "microOrderGlosses": ["앉아 있는 것이", "교통 체증 속에", "나를 그렇게 만들어요", "불안하게 느끼도록."],
-      "assemblyChunks": ["Sitting in traffic", "makes me feel anxious."],
-      "orderGlosses": ["교통 체증 속에 앉아 있으면", "나는 불안해져요."]
+      "microChunks": [
+        "Sitting in traffic",
+        "makes me feel anxious."
+      ],
+      "microOrderGlosses": [
+        "교통 체증 속에 앉아 있으면",
+        "나는 불안해져요."
+      ],
+      "assemblyChunks": [
+        "Sitting in traffic",
+        "makes me feel anxious."
+      ],
+      "orderGlosses": [
+        "교통 체증 속에 앉아 있으면",
+        "나는 불안해져요."
+      ]
     },
     {
       "id": "cv-0411",
-      "microChunks": ["Running", "usually makes me", "feel better."],
-      "microOrderGlosses": ["달리기는", "보통 나를 그렇게 만들어요", "기분이 나아지도록."],
-      "assemblyChunks": ["Running", "usually makes me feel better."],
-      "orderGlosses": ["달리기는", "보통 내 기분을 나아지게 해요."]
+      "microChunks": [
+        "Running usually",
+        "makes me feel better."
+      ],
+      "microOrderGlosses": [
+        "달리기를 하면 보통",
+        "기분이 나아져요."
+      ],
+      "assemblyChunks": [
+        "Running usually",
+        "makes me feel better."
+      ],
+      "orderGlosses": [
+        "달리기를 하면 보통",
+        "기분이 나아져요."
+      ]
     },
     {
       "id": "cv-0412",
-      "microChunks": ["You’re making me", "feel terrible."],
-      "microOrderGlosses": ["너는 지금 나를 그렇게 만들고 있어", "기분이 너무 안 좋게."],
-      "assemblyChunks": ["You’re making me feel terrible."],
-      "orderGlosses": ["너 때문에 지금 내 기분이 너무 안 좋아."]
+      "microChunks": [
+        "You’re making me feel terrible."
+      ],
+      "microOrderGlosses": [
+        "너 때문에 지금 내 기분이 너무 안 좋아."
+      ],
+      "assemblyChunks": [
+        "You’re making me feel terrible."
+      ],
+      "orderGlosses": [
+        "너 때문에 지금 내 기분이 너무 안 좋아."
+      ]
     },
     {
       "id": "cv-0413",
-      "microChunks": ["My girlfriend", "is the only one", "who can", "make me laugh."],
-      "microOrderGlosses": ["내 여자 친구는", "유일한 사람이에요", "할 수 있는", "나를 웃게 하는 걸."],
-      "assemblyChunks": ["My girlfriend is the only one", "who can make me laugh."],
-      "orderGlosses": ["내 여자 친구는 유일한 사람이에요", "나를 웃게 할 수 있는."]
+      "microChunks": [
+        "My girlfriend is",
+        "the only one",
+        "who can make me laugh."
+      ],
+      "microOrderGlosses": [
+        "내 여자친구는",
+        "유일한 사람이에요",
+        "나를 웃게 해 주는."
+      ],
+      "assemblyChunks": [
+        "My girlfriend is",
+        "the only one",
+        "who can make me laugh."
+      ],
+      "orderGlosses": [
+        "내 여자친구는",
+        "유일한 사람이에요",
+        "나를 웃게 해 주는."
+      ]
     },
     {
       "id": "cv-0414",
-      "microChunks": ["Horror movies", "make me laugh.", "I don’t know", "why."],
-      "microOrderGlosses": ["공포 영화는", "나를 웃게 해요.", "나는 모르겠어요", "왜인지."],
-      "assemblyChunks": ["Horror movies make me laugh.", "I don’t know why."],
-      "orderGlosses": ["공포 영화는 나를 웃게 해요.", "왜인지는 모르겠어요."]
+      "microChunks": [
+        "Horror movies make me laugh.",
+        "I don’t know why."
+      ],
+      "microOrderGlosses": [
+        "공포 영화를 보면 나는 웃게 돼요.",
+        "왜인지는 모르겠어요."
+      ],
+      "assemblyChunks": [
+        "Horror movies make me laugh.",
+        "I don’t know why."
+      ],
+      "orderGlosses": [
+        "공포 영화를 보면 나는 웃게 돼요.",
+        "왜인지는 모르겠어요."
+      ]
     },
     {
       "id": "cv-0415",
-      "microChunks": ["My surgery", "made me realize", "how important", "health is."],
-      "microOrderGlosses": ["내 수술 경험은", "내게 깨닫게 했어요", "얼마나 중요한지", "건강이."],
-      "assemblyChunks": ["My surgery made me realize", "how important health is."],
-      "orderGlosses": ["수술을 겪고 나는 깨달았어요", "건강이 얼마나 중요한지."]
+      "microChunks": [
+        "My surgery made me realize",
+        "how important health is."
+      ],
+      "microOrderGlosses": [
+        "수술을 겪고 나는 깨달았어요",
+        "건강이 얼마나 중요한지."
+      ],
+      "assemblyChunks": [
+        "My surgery made me realize",
+        "how important health is."
+      ],
+      "orderGlosses": [
+        "수술을 겪고 나는 깨달았어요",
+        "건강이 얼마나 중요한지."
+      ]
     },
     {
       "id": "cv-0416",
-      "microChunks": ["Did", "talking to your husband", "help", "at all?"],
-      "microOrderGlosses": ["혹시", "남편과 이야기한 것이", "도움이 됐나요", "조금이라도?"],
-      "assemblyChunks": ["Did talking to your husband", "help at all?"],
-      "orderGlosses": ["남편과 이야기한 것이", "조금이라도 도움이 됐나요?"]
+      "microChunks": [
+        "Did talking to your husband",
+        "help at all?"
+      ],
+      "microOrderGlosses": [
+        "남편과 이야기한 것이",
+        "조금이라도 도움이 됐나요?"
+      ],
+      "assemblyChunks": [
+        "Did talking to your husband",
+        "help at all?"
+      ],
+      "orderGlosses": [
+        "남편과 이야기한 것이",
+        "조금이라도 도움이 됐나요?"
+      ]
     },
     {
       "id": "cv-0417",
-      "microChunks": ["Not really.", "Venting", "didn’t make me", "feel any better."],
-      "microOrderGlosses": ["별로 그렇지 않았어요.", "화를 쏟아 낸 것은", "나를 만들지 못했어요", "조금이라도 기분이 나아지게."],
-      "assemblyChunks": ["Not really.", "Venting didn’t make me", "feel any better."],
-      "orderGlosses": ["별로 그렇지 않았어요.", "화를 쏟아 내도 나를 만들지는 못했어요", "조금이라도 기분이 나아지게."]
+      "microChunks": [
+        "Not really.",
+        "Venting didn’t make me feel any better."
+      ],
+      "microOrderGlosses": [
+        "별로 그렇지 않았어요.",
+        "화를 쏟아 내도 기분이 전혀 나아지지 않았어요."
+      ],
+      "assemblyChunks": [
+        "Not really.",
+        "Venting didn’t make me feel any better."
+      ],
+      "orderGlosses": [
+        "별로 그렇지 않았어요.",
+        "화를 쏟아 내도 기분이 전혀 나아지지 않았어요."
+      ]
     },
     {
       "id": "cv-0418",
-      "microChunks": ["How’s freelance life going", "so far?"],
-      "microOrderGlosses": ["프리랜서 생활은 어떻게 되어 가나요", "지금까지?"],
-      "assemblyChunks": ["How’s freelance life going so far?"],
-      "orderGlosses": ["지금까지 프리랜서 생활은 어때요?"]
+      "microChunks": [
+        "How’s freelance life",
+        "going so far?"
+      ],
+      "microOrderGlosses": [
+        "프리랜서 생활은",
+        "지금까지 어떻게 되어 가나요?"
+      ],
+      "assemblyChunks": [
+        "How’s freelance life",
+        "going so far?"
+      ],
+      "orderGlosses": [
+        "프리랜서 생활은",
+        "지금까지 어떻게 되어 가나요?"
+      ]
     },
     {
       "id": "cv-0419",
-      "microChunks": ["It’s going OK,", "but I miss", "the steady paycheck", "sometimes."],
-      "microOrderGlosses": ["그럭저럭 잘돼 가요,", "하지만 나는 그리워져요", "안정적인 급여가", "가끔은."],
-      "assemblyChunks": ["It’s going OK,", "but I miss the steady paycheck", "sometimes."],
-      "orderGlosses": ["그럭저럭 잘돼 가요,", "하지만 안정적인 급여가 그리워져요", "가끔은."]
+      "microChunks": [
+        "It’s going OK,",
+        "but I miss the steady paycheck",
+        "sometimes."
+      ],
+      "microOrderGlosses": [
+        "그럭저럭 잘돼 가요,",
+        "하지만 안정적인 월급이 그리워요",
+        "가끔은."
+      ],
+      "assemblyChunks": [
+        "It’s going OK,",
+        "but I miss the steady paycheck",
+        "sometimes."
+      ],
+      "orderGlosses": [
+        "그럭저럭 잘돼 가요,",
+        "하지만 안정적인 월급이 그리워요",
+        "가끔은."
+      ]
     },
     {
       "id": "cv-0420",
-      "microChunks": ["I", "get that."],
-      "microOrderGlosses": ["나는", "그 마음을 이해해요."],
-      "assemblyChunks": ["I get that."],
-      "orderGlosses": ["그 마음 이해해요."]
+      "microChunks": [
+        "I get that."
+      ],
+      "microOrderGlosses": [
+        "그 마음 이해해요."
+      ],
+      "assemblyChunks": [
+        "I get that."
+      ],
+      "orderGlosses": [
+        "그 마음 이해해요."
+      ]
     },
     {
       "id": "cv-0421",
-      "microChunks": ["Working", "for myself", "made me realize", "that unreliable income", "can make you feel", "insecure."],
-      "microOrderGlosses": ["혼자", "일해 본 경험이", "깨닫게 했어요", "불안정한 수입이", "사람을 만들 수 있다는 걸", "불안하게."],
-      "assemblyChunks": ["Working for myself", "made me realize", "that unreliable income", "can make you feel insecure."],
-      "orderGlosses": ["혼자 일해 본 경험이", "내게 깨닫게 했어요", "불안정한 수입이", "사람을 불안하게 만들 수 있다는 걸."]
+      "microChunks": [
+        "Working for myself",
+        "made me realize",
+        "that unreliable income",
+        "can make you feel insecure."
+      ],
+      "microOrderGlosses": [
+        "혼자 일해 본 경험이",
+        "내게 깨닫게 했어요",
+        "불안정한 수입이",
+        "사람을 불안하게 만들 수 있다는 걸."
+      ],
+      "assemblyChunks": [
+        "Working for myself",
+        "made me realize",
+        "that unreliable income",
+        "can make you feel insecure."
+      ],
+      "orderGlosses": [
+        "혼자 일해 본 경험이",
+        "내게 깨닫게 했어요",
+        "불안정한 수입이",
+        "사람을 불안하게 만들 수 있다는 걸."
+      ]
     },
     {
       "id": "cv-0422",
-      "microChunks": ["People", "don’t go", "to the movies", "that often", "anymore."],
-      "microOrderGlosses": ["사람들은", "가지 않아요", "영화관에", "그렇게 자주", "이제는 더 이상."],
-      "assemblyChunks": ["People don’t go", "to the movies", "that often anymore."],
-      "orderGlosses": ["사람들은 가지 않아요", "영화관에", "이제는 그렇게 자주."]
+      "microChunks": [
+        "People don’t go",
+        "to the movies",
+        "that often anymore."
+      ],
+      "microOrderGlosses": [
+        "사람들은 가지 않아요",
+        "영화관에",
+        "이제는 그렇게 자주."
+      ],
+      "assemblyChunks": [
+        "People don’t go",
+        "to the movies",
+        "that often anymore."
+      ],
+      "orderGlosses": [
+        "사람들은 가지 않아요",
+        "영화관에",
+        "이제는 그렇게 자주."
+      ]
     },
     {
       "id": "cv-0423",
-      "microChunks": ["Do you want", "to go", "see a movie?"],
-      "microOrderGlosses": ["너는 원해", "가서", "영화를 보는 걸?"],
-      "assemblyChunks": ["Do you want", "to go see a movie?"],
-      "orderGlosses": ["너는 원해", "영화를 보러 가는 걸?"]
+      "microChunks": [
+        "Do you want",
+        "to go see a movie?"
+      ],
+      "microOrderGlosses": [
+        "같이 갈래요",
+        "영화 보러?"
+      ],
+      "assemblyChunks": [
+        "Do you want",
+        "to go see a movie?"
+      ],
+      "orderGlosses": [
+        "같이 갈래요",
+        "영화 보러?"
+      ]
     },
     {
       "id": "cv-0424",
-      "microChunks": ["That", "sounds fun.", "Do you know", "what’s playing?"],
-      "microOrderGlosses": ["그거", "재미있겠다.", "너는 알아", "무엇을 상영 중인지?"],
-      "assemblyChunks": ["That sounds fun.", "Do you know what’s playing?"],
-      "orderGlosses": ["그거 재미있겠다.", "무엇을 상영 중인지 알아?"]
+      "microChunks": [
+        "That sounds fun.",
+        "Do you know what’s playing?"
+      ],
+      "microOrderGlosses": [
+        "그거 재미있겠다.",
+        "무엇을 상영 중인지 알아?"
+      ],
+      "assemblyChunks": [
+        "That sounds fun.",
+        "Do you know what’s playing?"
+      ],
+      "orderGlosses": [
+        "그거 재미있겠다.",
+        "무엇을 상영 중인지 알아?"
+      ]
     },
     {
       "id": "cv-0425",
-      "microChunks": ["The new Marvel movie", "just came out.", "Do you wanna", "see it", "with me?"],
-      "microOrderGlosses": ["새 마블 영화가", "막 개봉했어.", "너는 원해", "그걸 보는 걸", "나와 함께?"],
-      "assemblyChunks": ["The new Marvel movie just came out.", "Do you wanna see it", "with me?"],
-      "orderGlosses": ["새 마블 영화가 막 개봉했어.", "그걸 보고 싶어", "나와 함께?"]
+      "microChunks": [
+        "The new Marvel movie",
+        "just came out.",
+        "Do you wanna see it",
+        "with me?"
+      ],
+      "microOrderGlosses": [
+        "새 마블 영화가",
+        "막 개봉했어.",
+        "그걸 볼래",
+        "나와 함께?"
+      ],
+      "assemblyChunks": [
+        "The new Marvel movie",
+        "just came out.",
+        "Do you wanna see it",
+        "with me?"
+      ],
+      "orderGlosses": [
+        "새 마블 영화가",
+        "막 개봉했어.",
+        "그걸 볼래",
+        "나와 함께?"
+      ]
     },
     {
       "id": "cv-0426",
-      "microChunks": ["I’m not much", "of a movie-goer.", "I usually", "just stick to", "YouTube."],
-      "microOrderGlosses": ["나는 그다지 아니에요", "영화관을 즐겨 찾는 사람은.", "나는 보통", "그냥 한 가지만 봐요", "유튜브를."],
-      "assemblyChunks": ["I’m not much of a movie-goer.", "I usually just stick to YouTube."],
-      "orderGlosses": ["나는 영화관을 그다지 즐겨 찾는 사람이 아니에요.", "나는 보통 유튜브만 봐요."]
+      "microChunks": [
+        "I’m not much of a movie-goer.",
+        "I usually just stick to YouTube."
+      ],
+      "microOrderGlosses": [
+        "영화관을 즐겨 찾는 편은 아니에요.",
+        "보통은 그냥 유튜브만 봐요."
+      ],
+      "assemblyChunks": [
+        "I’m not much of a movie-goer.",
+        "I usually just stick to YouTube."
+      ],
+      "orderGlosses": [
+        "영화관을 즐겨 찾는 편은 아니에요.",
+        "보통은 그냥 유튜브만 봐요."
+      ]
     },
     {
       "id": "cv-0427",
-      "microChunks": ["They", "made it", "to the finals."],
-      "microOrderGlosses": ["그들은", "해냈어요", "결승까지 가는 걸."],
-      "assemblyChunks": ["They made it", "to the finals."],
-      "orderGlosses": ["그들은 해냈어요", "결승까지 가는 걸."]
+      "microChunks": [
+        "They made it",
+        "to the finals."
+      ],
+      "microOrderGlosses": [
+        "그들은 진출했어요",
+        "결승까지."
+      ],
+      "assemblyChunks": [
+        "They made it",
+        "to the finals."
+      ],
+      "orderGlosses": [
+        "그들은 진출했어요",
+        "결승까지."
+      ]
     },
     {
       "id": "cv-0428",
-      "microChunks": ["Hey, guys.", "I don’t think", "I can", "make it", "to lunch."],
-      "microOrderGlosses": ["얘들아, 안녕.", "나는 생각하지 않아", "내가 할 수 있다고", "참석하는 걸", "점심 자리에."],
-      "assemblyChunks": ["Hey, guys.", "I don’t think I can", "make it to lunch."],
-      "orderGlosses": ["얘들아, 안녕.", "나는 내가 할 수 있을 것 같지 않아", "점심 자리에 가는 걸."]
+      "microChunks": [
+        "Hey, guys.",
+        "I don’t think",
+        "I can make it to lunch."
+      ],
+      "microOrderGlosses": [
+        "얘들아.",
+        "아무래도",
+        "점심 자리에 못 갈 것 같아."
+      ],
+      "assemblyChunks": [
+        "Hey, guys.",
+        "I don’t think",
+        "I can make it to lunch."
+      ],
+      "orderGlosses": [
+        "얘들아.",
+        "아무래도",
+        "점심 자리에 못 갈 것 같아."
+      ]
     },
     {
       "id": "cv-0429",
-      "microChunks": ["We’re having", "a party", "tomorrow;", "do you think", "you can", "make it?"],
-      "microOrderGlosses": ["우리는 열어", "파티를", "내일;", "너는 생각해", "네가 할 수 있다고", "오는 걸?"],
-      "assemblyChunks": ["We’re having a party tomorrow;", "do you think you can", "make it?"],
-      "orderGlosses": ["우리 내일 파티를 해;", "너는 네가 할 수 있을 것 같아", "오는 걸?"]
+      "microChunks": [
+        "We’re having a party tomorrow;",
+        "do you think you can make it?"
+      ],
+      "microOrderGlosses": [
+        "우리 내일 파티를 해;",
+        "올 수 있을 것 같아?"
+      ],
+      "assemblyChunks": [
+        "We’re having a party tomorrow;",
+        "do you think you can make it?"
+      ],
+      "orderGlosses": [
+        "우리 내일 파티를 해;",
+        "올 수 있을 것 같아?"
+      ]
     },
     {
       "id": "cv-0430",
-      "microChunks": ["I barely", "made it", "to the airport", "on time,", "only to", "have my flight delayed."],
-      "microOrderGlosses": ["나는 가까스로", "도착했어요", "공항에", "제시간에,", "그런데 결국", "내 항공편이 지연됐죠."],
-      "assemblyChunks": ["I barely made it", "to the airport", "on time,", "only to have", "my flight delayed."],
-      "orderGlosses": ["나는 가까스로 도착했어요", "공항에", "제시간에,", "그런데 결국 겪게 됐죠", "내 항공편이 지연되는 일을."]
+      "microChunks": [
+        "I barely made it",
+        "to the airport",
+        "on time,",
+        "only to have my flight delayed."
+      ],
+      "microOrderGlosses": [
+        "가까스로 도착했어요",
+        "공항에",
+        "제시간에,",
+        "그런데 결국 항공편이 지연됐죠."
+      ],
+      "assemblyChunks": [
+        "I barely made it",
+        "to the airport",
+        "on time,",
+        "only to have my flight delayed."
+      ],
+      "orderGlosses": [
+        "가까스로 도착했어요",
+        "공항에",
+        "제시간에,",
+        "그런데 결국 항공편이 지연됐죠."
+      ]
     },
     {
       "id": "cv-0431",
-      "microChunks": ["I get irritable", "on days", "when I can’t", "make it", "to the gym."],
-      "microOrderGlosses": ["나는 예민해져요", "그런 날에는", "내가 할 수 없을 때", "가는 걸", "헬스장에."],
-      "assemblyChunks": ["I get irritable", "on days when I can’t", "make it to the gym."],
-      "orderGlosses": ["나는 예민해져요", "내가 할 수 없는 날에는", "헬스장에 가는 걸."]
+      "microChunks": [
+        "I get irritable",
+        "on days",
+        "when I can’t make it to the gym."
+      ],
+      "microOrderGlosses": [
+        "나는 예민해져요",
+        "그런 날에는",
+        "헬스장에 못 갈 때."
+      ],
+      "assemblyChunks": [
+        "I get irritable",
+        "on days",
+        "when I can’t make it to the gym."
+      ],
+      "orderGlosses": [
+        "나는 예민해져요",
+        "그런 날에는",
+        "헬스장에 못 갈 때."
+      ]
     },
     {
       "id": "cv-0432",
-      "microChunks": ["We couldn’t", "make it", "to the next round."],
-      "microOrderGlosses": ["우리는 못했어요", "진출하는 걸", "다음 라운드까지."],
-      "assemblyChunks": ["We couldn’t make it", "to the next round."],
-      "orderGlosses": ["우리는 진출하지 못했어요", "다음 라운드까지."]
+      "microChunks": [
+        "We couldn’t make it",
+        "to the next round."
+      ],
+      "microOrderGlosses": [
+        "우리는 진출하지 못했어요",
+        "다음 라운드까지."
+      ],
+      "assemblyChunks": [
+        "We couldn’t make it",
+        "to the next round."
+      ],
+      "orderGlosses": [
+        "우리는 진출하지 못했어요",
+        "다음 라운드까지."
+      ]
     },
     {
       "id": "cv-0433",
-      "microChunks": ["Baskin-Robbins", "closes", "in ten minutes."],
-      "microOrderGlosses": ["배스킨라빈스는", "문을 닫아", "10분 뒤에."],
-      "assemblyChunks": ["Baskin-Robbins closes", "in ten minutes."],
-      "orderGlosses": ["배스킨라빈스는 문을 닫아", "10분 뒤에."]
+      "microChunks": [
+        "Baskin-Robbins closes",
+        "in ten minutes."
+      ],
+      "microOrderGlosses": [
+        "배스킨라빈스는 문을 닫아요",
+        "10분 뒤에."
+      ],
+      "assemblyChunks": [
+        "Baskin-Robbins closes",
+        "in ten minutes."
+      ],
+      "orderGlosses": [
+        "배스킨라빈스는 문을 닫아요",
+        "10분 뒤에."
+      ]
     },
     {
       "id": "cv-0434",
-      "microChunks": ["Do you think", "we can", "make it", "there", "in time?"],
-      "microOrderGlosses": ["너는 생각해", "우리가 할 수 있다고", "도착하는 걸", "그곳에", "제시간에?"],
-      "assemblyChunks": ["Do you think we can", "make it there in time?"],
-      "orderGlosses": ["우리가 할 수 있을 것 같아", "그곳에 제시간에 도착하는 걸?"]
+      "microChunks": [
+        "Do you think",
+        "we can make it there",
+        "in time?"
+      ],
+      "microOrderGlosses": [
+        "어떻게 생각해",
+        "우리가 거기 도착할 수 있을까",
+        "제시간에?"
+      ],
+      "assemblyChunks": [
+        "Do you think",
+        "we can make it there",
+        "in time?"
+      ],
+      "orderGlosses": [
+        "어떻게 생각해",
+        "우리가 거기 도착할 수 있을까",
+        "제시간에?"
+      ]
     },
     {
       "id": "cv-0435",
-      "microChunks": ["How’s it going,", "Mina?"],
-      "microOrderGlosses": ["어떻게 지내,", "미나야?"],
-      "assemblyChunks": ["How’s it going, Mina?"],
-      "orderGlosses": ["미나야, 어떻게 지내?"]
+      "microChunks": [
+        "How’s it going, Mina?"
+      ],
+      "microOrderGlosses": [
+        "미나야, 오늘은 어떻게 지내?"
+      ],
+      "assemblyChunks": [
+        "How’s it going, Mina?"
+      ],
+      "orderGlosses": [
+        "미나야, 오늘은 어떻게 지내?"
+      ]
     },
     {
       "id": "cv-0436",
-      "microChunks": ["Not too bad,", "thanks.", "How about you?"],
-      "microOrderGlosses": ["그리 나쁘지 않아,", "고마워.", "너는 어때?"],
-      "assemblyChunks": ["Not too bad, thanks.", "How about you?"],
-      "orderGlosses": ["그리 나쁘지 않아, 고마워.", "너는 어때?"]
+      "microChunks": [
+        "Not too bad, thanks.",
+        "How about you?"
+      ],
+      "microOrderGlosses": [
+        "나쁘지 않아, 고마워.",
+        "너는 어때?"
+      ],
+      "assemblyChunks": [
+        "Not too bad, thanks.",
+        "How about you?"
+      ],
+      "orderGlosses": [
+        "나쁘지 않아, 고마워.",
+        "너는 어때?"
+      ]
     },
     {
       "id": "cv-0437",
-      "microChunks": ["Pretty good!", "Do you think", "you can", "make it", "this weekend?"],
-      "microOrderGlosses": ["꽤 좋아!", "너는 생각해", "네가 할 수 있다고", "오는 걸", "이번 주말에?"],
-      "assemblyChunks": ["Pretty good!", "Do you think you can", "make it this weekend?"],
-      "orderGlosses": ["꽤 좋아!", "너는 네가 할 수 있을 것 같아", "이번 주말에 오는 걸?"]
+      "microChunks": [
+        "Pretty good!",
+        "Do you think you can make it",
+        "this weekend?"
+      ],
+      "microOrderGlosses": [
+        "꽤 좋아!",
+        "올 수 있을 것 같아",
+        "이번 주말에?"
+      ],
+      "assemblyChunks": [
+        "Pretty good!",
+        "Do you think you can make it",
+        "this weekend?"
+      ],
+      "orderGlosses": [
+        "꽤 좋아!",
+        "올 수 있을 것 같아",
+        "이번 주말에?"
+      ]
     },
     {
       "id": "cv-0438",
-      "microChunks": ["I’ll try", "my best!", "What time", "are we meeting,", "by the way?"],
-      "microOrderGlosses": ["나는 해 볼게", "최선을 다해!", "몇 시에", "우리 만나지,", "그나저나?"],
-      "assemblyChunks": ["I’ll try my best!", "What time are we meeting,", "by the way?"],
-      "orderGlosses": ["최선을 다해 볼게!", "우리 몇 시에 만나지,", "그나저나?"]
+      "microChunks": [
+        "I’ll try my best!",
+        "What time are we meeting,",
+        "by the way?"
+      ],
+      "microOrderGlosses": [
+        "최선을 다해 볼게!",
+        "우리 몇 시에 만나지,",
+        "그나저나?"
+      ],
+      "assemblyChunks": [
+        "I’ll try my best!",
+        "What time are we meeting,",
+        "by the way?"
+      ],
+      "orderGlosses": [
+        "최선을 다해 볼게!",
+        "우리 몇 시에 만나지,",
+        "그나저나?"
+      ]
     },
     {
       "id": "cv-0439",
-      "microChunks": ["If you", "keep practicing,", "you’ll make it", "as a great musician."],
-      "microOrderGlosses": ["네가", "계속 연습하면,", "너는 성공할 거야", "훌륭한 음악가로."],
-      "assemblyChunks": ["If you keep practicing,", "you’ll make it as", "a great musician."],
-      "orderGlosses": ["네가 계속 연습하면,", "너는 그 길에서 성공할 거야", "훌륭한 음악가로."]
+      "microChunks": [
+        "If you keep practicing,",
+        "you’ll make it",
+        "as a great musician."
+      ],
+      "microOrderGlosses": [
+        "계속 연습하면,",
+        "너는 성공할 거야",
+        "훌륭한 음악가로."
+      ],
+      "assemblyChunks": [
+        "If you keep practicing,",
+        "you’ll make it",
+        "as a great musician."
+      ],
+      "orderGlosses": [
+        "계속 연습하면,",
+        "너는 성공할 거야",
+        "훌륭한 음악가로."
+      ]
     },
     {
       "id": "cv-0440",
-      "microChunks": ["His name", "didn’t make it", "onto the final list."],
-      "microOrderGlosses": ["그의 이름은", "오르지 못했어요", "최종 명단에."],
-      "assemblyChunks": ["His name didn’t make it", "onto the final list."],
-      "orderGlosses": ["그의 이름은 오르지 못했어요", "최종 명단에."]
+      "microChunks": [
+        "His name didn’t make it",
+        "onto the final list."
+      ],
+      "microOrderGlosses": [
+        "그의 이름은 오르지 못했어요",
+        "최종 명단에."
+      ],
+      "assemblyChunks": [
+        "His name didn’t make it",
+        "onto the final list."
+      ],
+      "orderGlosses": [
+        "그의 이름은 오르지 못했어요",
+        "최종 명단에."
+      ]
     },
     {
       "id": "cv-0441",
-      "microChunks": ["Only the best students", "make it", "into this university."],
-      "microOrderGlosses": ["오직 최고의 학생들만", "해내요", "이 대학에 들어가는 걸."],
-      "assemblyChunks": ["Only the best students", "make it into this university."],
-      "orderGlosses": ["오직 최고의 학생들만", "이 대학에 들어갈 수 있어요."]
+      "microChunks": [
+        "Only the best students",
+        "make it into this university."
+      ],
+      "microOrderGlosses": [
+        "오직 최고의 학생들만",
+        "이 대학에 들어갈 수 있어요."
+      ],
+      "assemblyChunks": [
+        "Only the best students",
+        "make it into this university."
+      ],
+      "orderGlosses": [
+        "오직 최고의 학생들만",
+        "이 대학에 들어갈 수 있어요."
+      ]
     },
     {
       "id": "cv-0442",
-      "microChunks": ["I was thinking", "of quitting", "every week.", "I’m so glad", "I kept studying,", "and that", "I made it", "to the end", "of the semester."],
-      "microOrderGlosses": ["나는 생각했어요", "포기할까 하고", "매주.", "나는 정말 기뻐요", "내가 공부를 계속했고,", "그리고 이 점도", "내가 버텨 도달했다는 것", "끝까지", "그 학기의."],
-      "assemblyChunks": ["I was thinking of quitting", "every week.", "I’m so glad", "I kept studying,", "and that I made it", "to the end of the semester."],
-      "orderGlosses": ["나는 포기할까 생각했어요", "매주.", "나는 정말 기뻐요", "내가 공부를 계속했고,", "그리고 내가 버텨 도달했다는 것도", "학기 말까지."]
+      "microChunks": [
+        "I was thinking of quitting",
+        "every week.",
+        "I’m so glad",
+        "I kept studying,",
+        "and that I made it",
+        "to the end of the semester."
+      ],
+      "microOrderGlosses": [
+        "포기할까 생각했어요",
+        "매주.",
+        "정말 다행이에요",
+        "공부를 계속했고,",
+        "그리고 버텼다는 것도",
+        "학기 끝까지."
+      ],
+      "assemblyChunks": [
+        "I was thinking of quitting",
+        "every week.",
+        "I’m so glad",
+        "I kept studying,",
+        "and that I made it",
+        "to the end of the semester."
+      ],
+      "orderGlosses": [
+        "포기할까 생각했어요",
+        "매주.",
+        "정말 다행이에요",
+        "공부를 계속했고,",
+        "그리고 버텼다는 것도",
+        "학기 끝까지."
+      ]
     },
     {
       "id": "cv-0443",
-      "microChunks": ["The conference", "is a little over", "two weeks away,", "and we need", "to verify", "our guest list.", "Please respond", "and let me know", "ASAP", "if you CANNOT", "make it."],
-      "microOrderGlosses": ["회의는", "조금 넘게", "2주가 남았고,", "그리고 우리는 해야 합니다", "확인하는 걸", "참석자 명단을.", "회신해 주세요", "그리고 알려 주세요", "최대한 빨리", "참석할 수 없다면", "그 자리에."],
-      "assemblyChunks": ["The conference is a little over two weeks away,", "and we need to verify our guest list.", "Please respond", "and let me know ASAP", "if you CANNOT make it."],
-      "orderGlosses": ["회의는 2주 조금 넘게 남았고,", "우리는 참석자 명단을 확인해야 합니다.", "회신해 주세요", "그리고 최대한 빨리 알려 주세요", "참석할 수 없다면."]
+      "microChunks": [
+        "The conference is a little over two weeks away,",
+        "and we need to verify",
+        "our guest list.",
+        "Please respond",
+        "and let me know ASAP",
+        "if you CANNOT make it."
+      ],
+      "microOrderGlosses": [
+        "회의까지 2주 조금 넘게 남았고,",
+        "확인해야 합니다",
+        "참석자 명단을.",
+        "회신해 주세요",
+        "그리고 최대한 빨리 알려 주세요",
+        "참석할 수 없다면."
+      ],
+      "assemblyChunks": [
+        "The conference is a little over two weeks away,",
+        "and we need to verify",
+        "our guest list.",
+        "Please respond",
+        "and let me know ASAP",
+        "if you CANNOT make it."
+      ],
+      "orderGlosses": [
+        "회의까지 2주 조금 넘게 남았고,",
+        "확인해야 합니다",
+        "참석자 명단을.",
+        "회신해 주세요",
+        "그리고 최대한 빨리 알려 주세요",
+        "참석할 수 없다면."
+      ]
     },
     {
       "id": "cv-0444",
-      "microChunks": ["Those two", "would make", "a great couple."],
-      "microOrderGlosses": ["그 두 사람은", "될 것 같아요", "아주 잘 어울리는 커플이."],
-      "assemblyChunks": ["Those two would make", "a great couple."],
-      "orderGlosses": ["그 두 사람이라면 될 것 같아요", "아주 잘 어울리는 커플이."]
+      "microChunks": [
+        "Those two",
+        "would make a great couple."
+      ],
+      "microOrderGlosses": [
+        "그 두 사람은",
+        "아주 잘 어울리는 커플이 될 거예요."
+      ],
+      "assemblyChunks": [
+        "Those two",
+        "would make a great couple."
+      ],
+      "orderGlosses": [
+        "그 두 사람은",
+        "아주 잘 어울리는 커플이 될 거예요."
+      ]
     },
     {
       "id": "cv-0445",
-      "microChunks": ["Of course,", "you will make", "a good teacher."],
-      "microOrderGlosses": ["당연히,", "당신은 될 거예요", "좋은 선생님이."],
-      "assemblyChunks": ["Of course,", "you will make a good teacher."],
-      "orderGlosses": ["당연히,", "당신은 좋은 선생님이 될 거예요."]
+      "microChunks": [
+        "Of course,",
+        "you will make",
+        "a good teacher."
+      ],
+      "microOrderGlosses": [
+        "당연히,",
+        "당신은 될 거예요",
+        "좋은 선생님이."
+      ],
+      "assemblyChunks": [
+        "Of course,",
+        "you will make",
+        "a good teacher."
+      ],
+      "orderGlosses": [
+        "당연히,",
+        "당신은 될 거예요",
+        "좋은 선생님이."
+      ]
     },
     {
       "id": "cv-0446",
-      "microChunks": ["He", "would make", "a great actor."],
-      "microOrderGlosses": ["그는", "될 자질이 있어요", "훌륭한 배우가."],
-      "assemblyChunks": ["He would make", "a great actor."],
-      "orderGlosses": ["그라면 될 자질이 있어요", "훌륭한 배우가."]
+      "microChunks": [
+        "He would make",
+        "a great actor."
+      ],
+      "microOrderGlosses": [
+        "그라면 될 수 있어요",
+        "훌륭한 배우가."
+      ],
+      "assemblyChunks": [
+        "He would make",
+        "a great actor."
+      ],
+      "orderGlosses": [
+        "그라면 될 수 있어요",
+        "훌륭한 배우가."
+      ]
     },
     {
       "id": "cv-0447",
-      "microChunks": ["You’ll", "make", "a great coach."],
-      "microOrderGlosses": ["당신은", "될 거예요", "훌륭한 코치가."],
-      "assemblyChunks": ["You’ll make", "a great coach."],
-      "orderGlosses": ["당신은 될 거예요", "훌륭한 코치가."]
+      "microChunks": [
+        "You’ll make a great coach."
+      ],
+      "microOrderGlosses": [
+        "당신은 훌륭한 코치가 될 거예요."
+      ],
+      "assemblyChunks": [
+        "You’ll make a great coach."
+      ],
+      "orderGlosses": [
+        "당신은 훌륭한 코치가 될 거예요."
+      ]
     },
     {
       "id": "cv-0448",
-      "microChunks": ["This site", "will make", "an excellent refinery."],
-      "microOrderGlosses": ["이 부지는", "될 거예요", "훌륭한 정유소가."],
-      "assemblyChunks": ["This site will make", "an excellent refinery."],
-      "orderGlosses": ["이 부지는 될 거예요", "훌륭한 정유소가."]
+      "microChunks": [
+        "This site will make",
+        "an excellent refinery."
+      ],
+      "microOrderGlosses": [
+        "이 부지는 될 거예요",
+        "훌륭한 정유소가."
+      ],
+      "assemblyChunks": [
+        "This site will make",
+        "an excellent refinery."
+      ],
+      "orderGlosses": [
+        "이 부지는 될 거예요",
+        "훌륭한 정유소가."
+      ]
     },
     {
       "id": "cv-0449",
-      "microChunks": ["My grandma", "always used to", "tell me", "to learn to cook.", "Otherwise,", "I wouldn’t make", "a good wife."],
-      "microOrderGlosses": ["우리 할머니는", "늘 그러시곤 했어요", "나에게 말씀하시기를", "요리를 배우라고.", "그렇지 않으면,", "나는 되지 못할 거라고", "좋은 아내가."],
-      "assemblyChunks": ["My grandma always used to tell me", "to learn to cook.", "Otherwise, I wouldn’t make", "a good wife."],
-      "orderGlosses": ["우리 할머니는 늘 나에게 말씀하시곤 했어요", "요리를 배우라고.", "그렇지 않으면 나는 되지 못할 거라고", "좋은 아내가."]
+      "microChunks": [
+        "My grandma always",
+        "used to tell me",
+        "to learn to cook.",
+        "Otherwise,",
+        "I wouldn’t make a good wife."
+      ],
+      "microOrderGlosses": [
+        "우리 할머니는 늘",
+        "내게 말씀하곤 하셨어요",
+        "요리를 배우라고.",
+        "그러지 않으면,",
+        "좋은 아내가 되지 못할 거라고."
+      ],
+      "assemblyChunks": [
+        "My grandma always",
+        "used to tell me",
+        "to learn to cook.",
+        "Otherwise,",
+        "I wouldn’t make a good wife."
+      ],
+      "orderGlosses": [
+        "우리 할머니는 늘",
+        "내게 말씀하곤 하셨어요",
+        "요리를 배우라고.",
+        "그러지 않으면,",
+        "좋은 아내가 되지 못할 거라고."
+      ]
     },
     {
       "id": "cv-0450",
-      "microChunks": ["I can’t", "put this book down.", "It", "would make", "a great movie."],
-      "microOrderGlosses": ["나는 못 하겠어", "이 책을 내려놓는 걸.", "그 책은", "될 것 같아", "멋진 영화가."],
-      "assemblyChunks": ["I can’t put this book down.", "It would make", "a great movie."],
-      "orderGlosses": ["나는 이 책을 도저히 내려놓을 수 없어.", "그 책은 될 것 같아", "멋진 영화가."]
+      "microChunks": [
+        "I can’t put this book down.",
+        "It would make a great movie."
+      ],
+      "microOrderGlosses": [
+        "이 책을 도저히 내려놓을 수가 없어.",
+        "멋진 영화가 될 거야."
+      ],
+      "assemblyChunks": [
+        "I can’t put this book down.",
+        "It would make a great movie."
+      ],
+      "orderGlosses": [
+        "이 책을 도저히 내려놓을 수가 없어.",
+        "멋진 영화가 될 거야."
+      ]
     },
     {
       "id": "cv-0451",
-      "microChunks": ["Really?", "What’s it called?", "Maybe I’ll", "check it out."],
-      "microOrderGlosses": ["정말?", "제목이 뭐야?", "어쩌면 나는", "한번 봐야겠다."],
-      "assemblyChunks": ["Really?", "What’s it called?", "Maybe I’ll check it out."],
-      "orderGlosses": ["정말?", "제목이 뭐야?", "나도 한번 봐야겠다."]
+      "microChunks": [
+        "Really?",
+        "What’s it called?",
+        "Maybe I’ll check it out."
+      ],
+      "microOrderGlosses": [
+        "정말?",
+        "제목이 뭐야?",
+        "나도 한번 봐야겠다."
+      ],
+      "assemblyChunks": [
+        "Really?",
+        "What’s it called?",
+        "Maybe I’ll check it out."
+      ],
+      "orderGlosses": [
+        "정말?",
+        "제목이 뭐야?",
+        "나도 한번 봐야겠다."
+      ]
     },
     {
       "id": "cv-0452",
-      "microChunks": ["I want", "to practice", "my English listening", "more.", "Any suggestions?"],
-      "microOrderGlosses": ["나는 원해요", "연습하는 걸", "내 영어 듣기를", "좀 더.", "추천할 것이 있나요?"],
-      "assemblyChunks": ["I want to practice", "my English listening more.", "Any suggestions?"],
-      "orderGlosses": ["나는 연습하고 싶어요", "영어 듣기를 좀 더.", "추천할 것이 있나요?"]
+      "microChunks": [
+        "I want to practice",
+        "my English listening",
+        "more.",
+        "Any suggestions?"
+      ],
+      "microOrderGlosses": [
+        "나는 연습하고 싶어요",
+        "영어 듣기를",
+        "좀 더.",
+        "추천할 만한 게 있나요?"
+      ],
+      "assemblyChunks": [
+        "I want to practice",
+        "my English listening",
+        "more.",
+        "Any suggestions?"
+      ],
+      "orderGlosses": [
+        "나는 연습하고 싶어요",
+        "영어 듣기를",
+        "좀 더.",
+        "추천할 만한 게 있나요?"
+      ]
     },
     {
       "id": "cv-0453",
-      "microChunks": ["Try watching", "Heartstopper.", "It’ll make", "great listening material."],
-      "microOrderGlosses": ["한번 봐 보세요", "하트스토퍼를.", "그 작품은 될 거예요", "훌륭한 듣기 자료가."],
-      "assemblyChunks": ["Try watching Heartstopper.", "It’ll make great listening material."],
-      "orderGlosses": ["하트스토퍼를 한번 봐 보세요.", "그 작품은 훌륭한 듣기 자료가 될 거예요."]
+      "microChunks": [
+        "Try watching Heartstopper.",
+        "It’ll make great listening material."
+      ],
+      "microOrderGlosses": [
+        "<하트스토퍼>를 한번 봐 보세요.",
+        "그 작품은 훌륭한 듣기 자료가 될 거예요."
+      ],
+      "assemblyChunks": [
+        "Try watching Heartstopper.",
+        "It’ll make great listening material."
+      ],
+      "orderGlosses": [
+        "<하트스토퍼>를 한번 봐 보세요.",
+        "그 작품은 훌륭한 듣기 자료가 될 거예요."
+      ]
     },
     {
       "id": "cv-0454",
-      "microChunks": ["Really?", "Why", "that show?"],
-      "microOrderGlosses": ["정말요?", "왜", "그 드라마인가요?"],
-      "assemblyChunks": ["Really?", "Why that show?"],
-      "orderGlosses": ["정말요?", "왜 그 드라마인가요?"]
+      "microChunks": [
+        "Really?",
+        "Why that show?"
+      ],
+      "microOrderGlosses": [
+        "정말요?",
+        "왜 그 드라마인가요?"
+      ],
+      "assemblyChunks": [
+        "Really?",
+        "Why that show?"
+      ],
+      "orderGlosses": [
+        "정말요?",
+        "왜 그 드라마인가요?"
+      ]
     },
     {
       "id": "cv-0455",
-      "microChunks": ["The language", "is natural", "and conversational—", "perfect", "for learners."],
-      "microOrderGlosses": ["그 작품의 언어는", "자연스럽고", "대화체라—", "안성맞춤이에요", "학습자들에게."],
-      "assemblyChunks": ["The language is", "natural and conversational—", "perfect for learners."],
-      "orderGlosses": ["그 작품의 언어는", "자연스럽고 대화체라—", "학습자들에게 안성맞춤이에요."]
+      "microChunks": [
+        "The language is",
+        "natural and conversational—",
+        "perfect for learners."
+      ],
+      "microOrderGlosses": [
+        "그 작품의 언어는",
+        "자연스럽고 대화체라",
+        "학습자에게 안성맞춤이에요."
+      ],
+      "assemblyChunks": [
+        "The language is",
+        "natural and conversational—",
+        "perfect for learners."
+      ],
+      "orderGlosses": [
+        "그 작품의 언어는",
+        "자연스럽고 대화체라",
+        "학습자에게 안성맞춤이에요."
+      ]
     },
     {
       "id": "cv-0456",
-      "microChunks": ["They suggested", "a bunch of places", "to eat", "at the front desk."],
-      "microOrderGlosses": ["그들이 추천해 줬어요", "여러 곳을", "식사할 만한", "프런트에서."],
-      "assemblyChunks": ["They suggested", "a bunch of places to eat", "at the front desk."],
-      "orderGlosses": ["그들이 추천해 줬어요", "식사할 만한 여러 곳을", "프런트에서."]
+      "microChunks": [
+        "They suggested",
+        "a bunch of places to eat",
+        "at the front desk."
+      ],
+      "microOrderGlosses": [
+        "추천해 줬어요",
+        "먹을 만한 곳을 여러 군데",
+        "프런트에서."
+      ],
+      "assemblyChunks": [
+        "They suggested",
+        "a bunch of places to eat",
+        "at the front desk."
+      ],
+      "orderGlosses": [
+        "추천해 줬어요",
+        "먹을 만한 곳을 여러 군데",
+        "프런트에서."
+      ]
     },
     {
       "id": "cv-0457",
-      "microChunks": ["What", "do you suggest", "I wear?"],
-      "microOrderGlosses": ["무엇을", "당신은 권하나요", "내가 입기를?"],
-      "assemblyChunks": ["What do you suggest", "I wear?"],
-      "orderGlosses": ["무엇을 권하나요", "내가 입기를?"]
+      "microChunks": [
+        "What do you suggest",
+        "I wear?"
+      ],
+      "microOrderGlosses": [
+        "무엇을 권하나요",
+        "내가 입으면 좋을지?"
+      ],
+      "assemblyChunks": [
+        "What do you suggest",
+        "I wear?"
+      ],
+      "orderGlosses": [
+        "무엇을 권하나요",
+        "내가 입으면 좋을지?"
+      ]
     },
     {
       "id": "cv-0458",
-      "microChunks": ["What", "would you recommend", "I wear", "to the interview?"],
-      "microOrderGlosses": ["무엇을", "당신은 권하겠어요", "내가 입기를", "면접에?"],
-      "assemblyChunks": ["What would you recommend", "I wear to the interview?"],
-      "orderGlosses": ["무엇을 권하겠어요", "내가 면접에 입기를?"]
+      "microChunks": [
+        "What would you recommend",
+        "I wear to the interview?"
+      ],
+      "microOrderGlosses": [
+        "무엇을 권하시겠어요",
+        "내가 면접에 입으면 좋을지?"
+      ],
+      "assemblyChunks": [
+        "What would you recommend",
+        "I wear to the interview?"
+      ],
+      "orderGlosses": [
+        "무엇을 권하시겠어요",
+        "내가 면접에 입으면 좋을지?"
+      ]
     }
   ]
 }

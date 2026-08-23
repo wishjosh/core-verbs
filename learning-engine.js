@@ -466,7 +466,7 @@
             ? card.microChunks.map(chunk => String(chunk).trim()).filter(Boolean)
             : [];
         const hasStoredMicroChunks = storedMicroChunks.length && joinChunks(storedMicroChunks) === sentence;
-        // 869문장 모두에서 직접 저장한 최소 의미 청크를 첫 학습 단위로 사용한다.
+        // 869문장 모두에서 직접 저장한 형태·의미 발판 청크를 첫 학습 단위로 사용한다.
         // 영어와 한국어를 실행 중에 기계적으로 나누지 않고, 1:1로 대응시켜 둔
         // microChunks와 microOrderGlosses만 사용한다.
         const microChunks = hasStoredMicroChunks ? storedMicroChunks : [...baseChunks];

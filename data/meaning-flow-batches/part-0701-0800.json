@@ -1,5 +1,5 @@
 {
-  "rulesVersion": 1,
+  "rulesVersion": 2,
   "reviewStatus": "reviewed",
   "items": [
     {
@@ -106,15 +106,13 @@
       "id": "cv-0708",
       "english": "I have new aches and pains all the time these days. We’re getting old.",
       "assemblyChunks": [
-        "I have new",
-        "aches and pains",
+        "I have new aches and pains",
         "all the time",
         "these days.",
         "We’re getting old."
       ],
       "orderGlosses": [
-        "새로 생겼어",
-        "쑤시고 아픈 데가",
+        "새로 쑤시고 아픈 데가 생겨요",
         "늘",
         "요즘에는.",
         "우리 늙어가네."
@@ -219,14 +217,12 @@
       "english": "Excuse me, where should these expense reports go when I’m done?",
       "assemblyChunks": [
         "Excuse me,",
-        "where should",
-        "these expense reports go",
+        "where should these expense reports go",
         "when I’m done?"
       ],
       "orderGlosses": [
         "실례합니다,",
-        "어디에 둬야 하나요",
-        "이 경비 보고서들을",
+        "이 경비 보고서들을 어디에 둬야 하나요",
         "제가 끝낸 뒤에?"
       ]
     },
@@ -513,21 +509,19 @@
         "네,",
         "그 점은 죄송하지만,",
         "저희는 예약을 받지 않아요",
-        "저 자리들은."
+        "그 자리들에 대해서는."
       ]
     },
     {
       "id": "cv-0740",
       "english": "I signed up for a Pilates class at the gym.",
       "assemblyChunks": [
-        "I signed up",
-        "for a Pilates class",
+        "I signed up for a Pilates class",
         "at the gym."
       ],
       "orderGlosses": [
-        "나는 신청했어",
-        "필라테스 수업을",
-        "헬스장에서 하는."
+        "필라테스 수업을 신청했어",
+        "헬스장에서."
       ]
     },
     {
@@ -558,12 +552,10 @@
       "id": "cv-0744",
       "english": "My mom has been wanting to meet you.",
       "assemblyChunks": [
-        "My mom has been wanting",
-        "to meet you."
+        "My mom has been wanting to meet you."
       ],
       "orderGlosses": [
-        "우리 엄마는 계속 만나고 싶어 하셨어",
-        "너를."
+        "우리 엄마는 계속 너를 만나고 싶어 하셨어."
       ]
     },
     {
@@ -571,13 +563,11 @@
       "english": "I’ve been wanting to try that new cafe next to the palace.",
       "assemblyChunks": [
         "I’ve been wanting",
-        "to try that new cafe",
-        "next to the palace."
+        "to try that new cafe next to the palace."
       ],
       "orderGlosses": [
         "계속 가 보고 싶었어",
-        "그 새로 생긴 카페에",
-        "궁 바로 옆의."
+        "궁 바로 옆의 그 새 카페에."
       ]
     },
     {
@@ -611,13 +601,11 @@
       "english": "The app says I need to update my password.",
       "assemblyChunks": [
         "The app says",
-        "I need to update",
-        "my password."
+        "I need to update my password."
       ],
       "orderGlosses": [
-        "앱에서 알려 줘",
-        "내가 바꿔야 한다고",
-        "비밀번호를."
+        "앱에 나와요",
+        "비밀번호를 바꿔야 한다고."
       ]
     },
     {
@@ -637,13 +625,11 @@
       "english": "What does it say on the back of the book?",
       "assemblyChunks": [
         "What does it say",
-        "on the back",
-        "of the book?"
+        "on the back of the book?"
       ],
       "orderGlosses": [
         "뭐라고 적혀 있어",
-        "뒤쪽에",
-        "그 책의?"
+        "책 뒤표지에?"
       ]
     },
     {
@@ -714,15 +700,13 @@
       "assemblyChunks": [
         "Further down,",
         "it says",
-        "they should have it back",
-        "in stock",
+        "they should have it back in stock",
         "next week."
       ],
       "orderGlosses": [
         "더 아래쪽에는,",
         "적혀 있어",
         "그 상품이 다시 들어올 거라고",
-        "재고로",
         "다음 주에."
       ]
     },
@@ -1048,13 +1032,11 @@
       "id": "cv-0784",
       "english": "My boss refuses to let me work from home.",
       "assemblyChunks": [
-        "My boss refuses",
-        "to let me work",
+        "My boss refuses to let me work",
         "from home."
       ],
       "orderGlosses": [
-        "내 상사는 거부해",
-        "내가 근무하도록 허락하기를",
+        "내 상사는 제가 일하는 걸 허락하지 않아요",
         "집에서."
       ]
     },
@@ -1163,14 +1145,14 @@
       "english": "I know! I thought they were going to kick us out, though.",
       "assemblyChunks": [
         "I know!",
-        "I thought they were",
-        "going to kick us out,",
+        "I thought",
+        "they were going to kick us out,",
         "though."
       ],
       "orderGlosses": [
         "그러게!",
-        "나는 그들이 그러는 줄 알았어",
-        "우리를 쫓아내려고,",
+        "나는 생각했어",
+        "그들이 우리를 쫓아내려는 줄,",
         "그런데 말이야."
       ]
     },
@@ -1262,12 +1244,10 @@
       "id": "cv-0800",
       "english": "I can’t let nasty comments discourage me.",
       "assemblyChunks": [
-        "I can’t let",
-        "nasty comments discourage me."
+        "I can’t let nasty comments discourage me."
       ],
       "orderGlosses": [
-        "그냥 둘 수 없어",
-        "악플이 나를 기죽이도록."
+        "악플이 나를 기죽이게 둘 순 없어."
       ]
     }
   ]

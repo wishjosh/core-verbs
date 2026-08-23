@@ -1,5 +1,5 @@
 {
-  "rulesVersion": 1,
+  "rulesVersion": 2,
   "reviewStatus": "reviewed",
   "items": [
     {
@@ -18,12 +18,12 @@
       "id": "cv-0003",
       "english": "I have some friends living in Chicago.",
       "assemblyChunks": [
-        "I have some friends",
-        "living in Chicago."
+        "I have",
+        "some friends living in Chicago."
       ],
       "orderGlosses": [
-        "나는 친구들이 몇 명 있어요",
-        "시카고에 사는."
+        "친구가 몇 명 있어요",
+        "시카고에 사는 친구들이요."
       ]
     },
     {
@@ -246,7 +246,7 @@
         "the steak, please."
       ],
       "orderGlosses": [
-        "저는 먹을게요",
+        "주문할게요",
         "스테이크로 부탁해요."
       ]
     },
@@ -305,13 +305,11 @@
       "english": "Just a banana. I was in a rush.",
       "assemblyChunks": [
         "Just a banana.",
-        "I was in",
-        "a rush."
+        "I was in a rush."
       ],
       "orderGlosses": [
-        "그냥 바나나 하나.",
-        "나는 그때",
-        "아주 급했거든."
+        "그냥 바나나 하나요.",
+        "급했거든요."
       ]
     },
     {
@@ -343,8 +341,8 @@
       "english": "Oh, me too! Want to grab something together today?",
       "assemblyChunks": [
         "Oh, me too!",
-        "Want to grab",
-        "something together today?"
+        "Want to grab something",
+        "together today?"
       ],
       "orderGlosses": [
         "오, 나도요!",
@@ -523,13 +521,11 @@
       "english": "Are you still planning to go to art school?",
       "assemblyChunks": [
         "Are you still planning",
-        "to go to",
-        "art school?"
+        "to go to art school?"
       ],
       "orderGlosses": [
-        "너는 아직도 계획하고 있니",
-        "진학하는 걸",
-        "예술 학교에?"
+        "아직 계획하고 있나요",
+        "예술 학교에 진학할 생각인가요?"
       ]
     },
     {
@@ -580,12 +576,10 @@
       "id": "cv-0044",
       "english": "Want to talk about it?",
       "assemblyChunks": [
-        "Want to talk",
-        "about it?"
+        "Want to talk about it?"
       ],
       "orderGlosses": [
-        "이야기하고 싶어",
-        "그 일에 대해?"
+        "그 일에 관해 이야기할래?"
       ]
     },
     {
@@ -621,16 +615,12 @@
       "english": "I think my phone fell out of my pocket while I was getting off the bus.",
       "assemblyChunks": [
         "I think",
-        "my phone fell out",
-        "of my pocket",
-        "while I was",
-        "getting off the bus."
+        "my phone fell out of my pocket",
+        "while I was getting off the bus."
       ],
       "orderGlosses": [
         "아무래도",
-        "휴대폰이 빠진 것 같아요",
-        "주머니에서",
-        "내가 한창",
+        "휴대폰이 주머니에서 빠진 것 같아요",
         "버스에서 내리던 중에."
       ]
     },
@@ -768,15 +758,13 @@
       "id": "cv-0057",
       "english": "Oh, Costco is having a sale on Samsonite luggage right now.",
       "assemblyChunks": [
-        "Oh, Costco is having",
-        "a sale",
+        "Oh, Costco is having a sale",
         "on Samsonite luggage",
         "right now."
       ],
       "orderGlosses": [
-        "아, 코스트코가 하고 있어요",
-        "할인을",
-        "샘소나이트 여행 가방을 대상으로",
+        "아, 코스트코가 세일 중이에요",
+        "샘소나이트 여행 가방을",
         "바로 지금."
       ]
     },
@@ -784,13 +772,11 @@
       "id": "cv-0058",
       "english": "How is life in Brazil treating you, Junho?",
       "assemblyChunks": [
-        "How is life",
-        "in Brazil treating you,",
+        "How is life in Brazil treating you,",
         "Junho?"
       ],
       "orderGlosses": [
-        "요즘 어떻게 지내요",
-        "브라질 생활은,",
+        "브라질 생활은 어떠세요,",
         "준호 씨?"
       ]
     },
@@ -932,15 +918,11 @@
       "id": "cv-0070",
       "english": "I have some chores to do in the afternoon.",
       "assemblyChunks": [
-        "I have",
-        "some chores",
-        "to do",
+        "I have some chores to do",
         "in the afternoon."
       ],
       "orderGlosses": [
-        "내게 있어요",
-        "집안일이 좀",
-        "해야 할",
+        "할 집안일이 좀 있어요",
         "오후에."
       ]
     },
@@ -948,43 +930,31 @@
       "id": "cv-0071",
       "english": "I have tons of work to do.",
       "assemblyChunks": [
-        "I have",
-        "tons of work",
-        "to do."
+        "I have tons of work to do."
       ],
       "orderGlosses": [
-        "내게 있어요",
-        "일이 산더미처럼",
-        "해야 할."
+        "해야 할 일이 산더미예요."
       ]
     },
     {
       "id": "cv-0072",
       "english": "I have a few emails to reply to.",
       "assemblyChunks": [
-        "I have",
-        "a few emails",
-        "to reply to."
+        "I have a few emails to reply to."
       ],
       "orderGlosses": [
-        "처리할 게 있어요",
-        "이메일 몇 통이",
-        "답장해야 할."
+        "답장해야 할 이메일이 몇 통 있어요."
       ]
     },
     {
       "id": "cv-0073",
       "english": "I have some errands to run this afternoon.",
       "assemblyChunks": [
-        "I have",
-        "some errands",
-        "to run",
+        "I have some errands to run",
         "this afternoon."
       ],
       "orderGlosses": [
-        "내게 있어요",
-        "볼일이 몇 가지",
-        "봐야 할",
+        "봐야 할 볼일이 몇 가지 있어요",
         "오늘 오후에."
       ]
     },
@@ -992,15 +962,11 @@
       "id": "cv-0074",
       "english": "We have a project to finish by Friday.",
       "assemblyChunks": [
-        "We have",
-        "a project",
-        "to finish",
+        "We have a project to finish",
         "by Friday."
       ],
       "orderGlosses": [
-        "우리에게 있어요",
-        "프로젝트 하나가",
-        "끝내야 할",
+        "끝내야 할 프로젝트가 있어요",
         "금요일까지."
       ]
     },
@@ -1008,14 +974,10 @@
       "id": "cv-0075",
       "english": "I have some Christmas shopping to do.",
       "assemblyChunks": [
-        "I have",
-        "some Christmas shopping",
-        "to do."
+        "I have some Christmas shopping to do."
       ],
       "orderGlosses": [
-        "내게 있어요",
-        "크리스마스 쇼핑이 좀",
-        "해야 할."
+        "해야 할 크리스마스 쇼핑이 좀 있어요."
       ]
     },
     {
@@ -1040,14 +1002,12 @@
       "assemblyChunks": [
         "Yes,",
         "sorry I'm late.",
-        "I had something",
-        "to take care of."
+        "I had something to take care of."
       ],
       "orderGlosses": [
         "네,",
         "늦어서 미안해요.",
-        "내게 뭔가 있었어요",
-        "처리해야 할."
+        "처리할 일이 있었어요."
       ]
     },
     {
@@ -1081,15 +1041,13 @@
         "I just sold",
         "five pairs of pants",
         "on Joonggonara,",
-        "so I have a lot",
-        "of packages to ship."
+        "so I have a lot of packages to ship."
       ],
       "orderGlosses": [
-        "방금 팔았어",
+        "방금 팔았어요",
         "바지 다섯 벌을",
         "중고나라에서,",
-        "그래서 내가 갖게 됐어",
-        "보내야 할 소포가 아주 많이."
+        "그래서 보낼 소포가 아주 많아요."
       ]
     },
     {
@@ -1111,8 +1069,8 @@
       "english": "My dad needs to take better care of his health.",
       "assemblyChunks": [
         "My dad",
-        "needs to take better care",
-        "of his health."
+        "needs to take better care of",
+        "his health."
       ],
       "orderGlosses": [
         "우리 아빠는",
@@ -1124,13 +1082,11 @@
       "id": "cv-0084",
       "english": "I have some work to take care of before I start my vacation.",
       "assemblyChunks": [
-        "I have some work",
-        "to take care of",
+        "I have some work to take care of",
         "before I start my vacation."
       ],
       "orderGlosses": [
-        "나는 일이 좀 있어요",
-        "처리해야 할",
+        "처리할 일이 좀 있어요",
         "휴가를 시작하기 전에."
       ]
     },
@@ -1168,13 +1124,11 @@
       "id": "cv-0087",
       "english": "The Gion district in Kyoto has a charming vibe.",
       "assemblyChunks": [
-        "The Gion district",
-        "in Kyoto",
+        "The Gion district in Kyoto",
         "has a charming vibe."
       ],
       "orderGlosses": [
-        "기온 거리는",
-        "교토에 있는,",
+        "교토의 기온 거리는",
         "매력적인 분위기가 있어요."
       ]
     },
@@ -1343,13 +1297,11 @@
       "english": "The Namsan Hyatt has a great night view.",
       "assemblyChunks": [
         "The Namsan Hyatt",
-        "has a great",
-        "night view."
+        "has a great night view."
       ],
       "orderGlosses": [
         "남산 하얏트는",
-        "아주 멋진",
-        "야경이 있어요."
+        "야경이 아주 멋져요."
       ]
     }
   ]

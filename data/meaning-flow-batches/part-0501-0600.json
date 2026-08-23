@@ -1,18 +1,18 @@
 {
-  "rulesVersion": 1,
+  "rulesVersion": 2,
   "reviewStatus": "reviewed",
   "items": [
     {
       "id": "cv-0501",
       "english": "I didn’t think my boss would actually take my advice, but he did!",
       "assemblyChunks": [
-        "I didn’t think my boss",
-        "would actually take my advice,",
+        "I didn’t think",
+        "my boss would actually take my advice,",
         "but he did!"
       ],
       "orderGlosses": [
-        "나는 생각지 못했어, 내 상사가",
-        "정말 내 조언을 받아들일 줄은,",
+        "생각지 못했어",
+        "상사가 정말 내 조언을 받아들일 줄은,",
         "그런데 정말 받아들였어!"
       ]
     },
@@ -20,29 +20,25 @@
       "id": "cv-0502",
       "english": "I’m sorry I have to quit so suddenly, but I need to take this opportunity.",
       "assemblyChunks": [
-        "I’m sorry I have",
-        "to quit so suddenly,",
-        "but I need",
-        "to take this opportunity."
+        "I’m sorry",
+        "I have to quit so suddenly,",
+        "but I need to take this opportunity."
       ],
       "orderGlosses": [
-        "미안해요, 제가",
+        "미안해요",
         "이렇게 갑자기 그만둬야 해서,",
-        "하지만 저는 꼭",
-        "이 기회를 잡아야 해요."
+        "하지만 이 기회는 꼭 잡아야 해요."
       ]
     },
     {
       "id": "cv-0503",
       "english": "If I don’t take a chance now, it might be too late.",
       "assemblyChunks": [
-        "If I don’t take",
-        "a chance now,",
+        "If I don’t take a chance now,",
         "it might be too late."
       ],
       "orderGlosses": [
-        "내가 잡지 않으면",
-        "지금 이 기회를,",
+        "지금 기회를 잡지 않으면,",
         "너무 늦을지도 몰라요."
       ]
     },
@@ -118,16 +114,12 @@
       "id": "cv-0510",
       "english": "My brother can’t make ends meet, so I’m going to lend him some money.",
       "assemblyChunks": [
-        "My brother can’t",
-        "make ends meet,",
-        "so I’m going",
-        "to lend him some money."
+        "My brother can’t make ends meet,",
+        "so I’m going to lend him some money."
       ],
       "orderGlosses": [
-        "내 동생은 못하고 있어",
-        "생활비를 감당하는 걸,",
-        "그래서 내가",
-        "돈을 좀 빌려주려고 해."
+        "내 동생은 생활비를 감당하지 못해서,",
+        "내가 돈을 좀 빌려주려고 해."
       ]
     },
     {
@@ -164,14 +156,12 @@
       "id": "cv-0513",
       "english": "I have a lot of bills to pay every month. It’s impossible to save.",
       "assemblyChunks": [
-        "I have a lot of",
-        "bills to pay",
+        "I have a lot of bills to pay",
         "every month.",
         "It’s impossible to save."
       ],
       "orderGlosses": [
-        "내게는 아주 많아요",
-        "내야 할 고지서가",
+        "내야 할 고지서가 아주 많아요",
         "매달.",
         "저축은 불가능해요."
       ]
@@ -221,26 +211,22 @@
       "english": "It doesn’t take much to make a bad first impression.",
       "assemblyChunks": [
         "It doesn’t take much",
-        "to make",
-        "a bad first impression."
+        "to make a bad first impression."
       ],
       "orderGlosses": [
         "별로 많은 게 필요하지 않아",
-        "남기는 데",
-        "나쁜 첫인상을."
+        "나쁜 첫인상을 남기는 데."
       ]
     },
     {
       "id": "cv-0519",
       "english": "It took a lot of blood, sweat, and tears to finish my book.",
       "assemblyChunks": [
-        "It took a lot",
-        "of blood, sweat, and tears",
+        "It took a lot of blood, sweat, and tears",
         "to finish my book."
       ],
       "orderGlosses": [
-        "정말 많이 들었어",
-        "피땀과 눈물이",
+        "정말 많은 피땀과 눈물이 들었어",
         "내 책을 끝내는 데."
       ]
     },
@@ -278,13 +264,11 @@
       "id": "cv-0522",
       "english": "The team’s been doing so much better since Vincent took over.",
       "assemblyChunks": [
-        "The team’s been doing",
-        "so much better",
+        "The team’s been doing so much better",
         "since Vincent took over."
       ],
       "orderGlosses": [
-        "팀은 계속 해오고 있어",
-        "훨씬 더 잘",
+        "팀 성과가 훨씬 좋아졌어요",
         "빈센트가 맡은 뒤로."
       ]
     },
@@ -319,13 +303,11 @@
       "english": "Agreed. He knows how to bring people together.",
       "assemblyChunks": [
         "Agreed.",
-        "He knows how to bring",
-        "people together."
+        "He knows how to bring people together."
       ],
       "orderGlosses": [
         "동감해.",
-        "그는 모으는 법을 알아",
-        "사람들을 하나로."
+        "그는 사람들을 하나로 모으는 법을 알아."
       ]
     },
     {
@@ -368,14 +350,12 @@
       "id": "cv-0529",
       "english": "My cousin spent a great deal of time in Chile, so she speaks Spanish.",
       "assemblyChunks": [
-        "My cousin spent",
-        "a great deal of time",
+        "My cousin spent a great deal of time",
         "in Chile,",
         "so she speaks Spanish."
       ],
       "orderGlosses": [
-        "내 사촌은 보냈어",
-        "아주 많은 시간을",
+        "내 사촌은 아주 오랜 시간을 보냈어",
         "칠레에서,",
         "그래서 스페인어를 해."
       ]
@@ -400,14 +380,12 @@
       "assemblyChunks": [
         "Yeah, actually.",
         "My cousin is a developer",
-        "with a great deal",
-        "of knowledge and experience."
+        "with a great deal of knowledge and experience."
       ],
       "orderGlosses": [
         "응, 사실은.",
         "내 사촌이 개발자야",
-        "아주 풍부한",
-        "지식과 경험을 갖춘."
+        "지식과 경험이 아주 풍부한."
       ]
     },
     {
@@ -578,12 +556,12 @@
       "id": "cv-0544",
       "english": "Some say painting is a relaxing hobby.",
       "assemblyChunks": [
-        "Some say painting",
-        "is a relaxing hobby."
+        "Some say",
+        "painting is a relaxing hobby."
       ],
       "orderGlosses": [
-        "어떤 사람들은 말해, 그림 그리기가",
-        "마음이 편해지는 취미라고."
+        "어떤 사람들은 말해",
+        "그림 그리기가 마음이 편해지는 취미라고."
       ]
     },
     {
@@ -604,15 +582,13 @@
       "assemblyChunks": [
         "Working on the farm",
         "is demanding,",
-        "but it puts me",
-        "at ease",
+        "but it puts me at ease",
         "to work with my hands."
       ],
       "orderGlosses": [
         "농장에서 일하는 건",
         "힘들지만,",
-        "하지만 그 덕분에",
-        "마음이 편해져요",
+        "그래도 마음이 편해져요",
         "손으로 일하면."
       ]
     },
@@ -658,14 +634,14 @@
       "id": "cv-0550",
       "english": "Watching you walk around the house all day stresses me out.",
       "assemblyChunks": [
-        "Watching you walk around",
-        "the house all day",
+        "Watching you walk around the house",
+        "all day",
         "stresses me out."
       ],
       "orderGlosses": [
-        "네가 돌아다니는 걸 보면",
-        "온 집 안을 하루 종일",
-        "나는 너무 스트레스받아."
+        "네가 집 안을 돌아다니는 걸 보면",
+        "하루 종일",
+        "정말 스트레스받아."
       ]
     },
     {
@@ -682,12 +658,10 @@
       "id": "cv-0552",
       "english": "I’ll take that as a compliment.",
       "assemblyChunks": [
-        "I’ll take",
-        "that as a compliment."
+        "I’ll take that as a compliment."
       ],
       "orderGlosses": [
-        "나는 받아들일게",
-        "그 말을 칭찬으로."
+        "그 말은 칭찬으로 받아들일게."
       ]
     },
     {
@@ -695,13 +669,11 @@
       "english": "My son failed his test, and he’s taking it really hard.",
       "assemblyChunks": [
         "My son failed his test,",
-        "and he’s taking it",
-        "really hard."
+        "and he’s taking it really hard."
       ],
       "orderGlosses": [
         "아들이 시험에 떨어졌고,",
-        "그래서 그는 힘들어하고 있어",
-        "몹시."
+        "그 일을 몹시 힘들어하고 있어."
       ]
     },
     {
@@ -757,13 +729,11 @@
       "english": "Internet trolls. He takes YouTube comments so personally.",
       "assemblyChunks": [
         "Internet trolls.",
-        "He takes YouTube comments",
-        "so personally."
+        "He takes YouTube comments so personally."
       ],
       "orderGlosses": [
         "악플러들 때문이지.",
-        "그는 유튜브 댓글을 받아들여",
-        "너무 개인적인 공격으로."
+        "그는 유튜브 댓글을 너무 개인적으로 받아들여."
       ]
     },
     {
@@ -902,13 +872,11 @@
       "id": "cv-0569",
       "english": "I do a lot of admin work at my job.",
       "assemblyChunks": [
-        "I do a lot",
-        "of admin work",
+        "I do a lot of admin work",
         "at my job."
       ],
       "orderGlosses": [
-        "나는 많이 해요",
-        "일반 행정 업무를",
+        "일반 행정 업무를 많이 해요",
         "직장에서."
       ]
     },
@@ -943,13 +911,11 @@
       "english": "I do the grocery shopping when my husband is out of town.",
       "assemblyChunks": [
         "I do the grocery shopping",
-        "when my husband",
-        "is out of town."
+        "when my husband is out of town."
       ],
       "orderGlosses": [
         "내가 장을 봐",
-        "남편이",
-        "다른 지역에 가 있을 때."
+        "남편이 다른 지역에 가 있을 때."
       ]
     },
     {
@@ -1028,8 +994,8 @@
       "assemblyChunks": [
         "Sure, I’ll take it,",
         "but I don’t like",
-        "paying for",
-        "things I can do myself."
+        "paying for things",
+        "I can do myself."
       ],
       "orderGlosses": [
         "그래, 그 명함은 받을게,",
@@ -1071,13 +1037,11 @@
       "english": "Online banking saves us a trip to the bank.",
       "assemblyChunks": [
         "Online banking",
-        "saves us a trip",
-        "to the bank."
+        "saves us a trip to the bank."
       ],
       "orderGlosses": [
         "온라인 뱅킹은",
-        "우리가 한 번 가지 않아도 되게 해요",
-        "은행에."
+        "은행에 한 번 가지 않아도 되게 해요."
       ]
     },
     {
@@ -1150,12 +1114,12 @@
       "id": "cv-0588",
       "english": "My cat likes to knock things off the table.",
       "assemblyChunks": [
-        "My cat likes to",
-        "knock things off the table."
+        "My cat likes",
+        "to knock things off the table."
       ],
       "orderGlosses": [
-        "우리 고양이는 즐겨",
-        "테이블의 물건을 쳐서 떨어뜨려."
+        "우리 고양이는 좋아해",
+        "테이블의 물건을 쳐서 떨어뜨리는 걸."
       ]
     },
     {
@@ -1163,8 +1127,8 @@
       "english": "I like to study, but I’m not cut out for the medical field.",
       "assemblyChunks": [
         "I like to study,",
-        "but I’m not cut out",
-        "for the medical field."
+        "but I’m not cut out for",
+        "the medical field."
       ],
       "orderGlosses": [
         "나는 공부하는 걸 좋아하지만,",
@@ -1233,16 +1197,14 @@
       "english": "Yeah, but he likes to spend most of the session talking about politics, and I can’t stand it anymore.",
       "assemblyChunks": [
         "Yeah,",
-        "but he likes to spend",
-        "most of the session",
+        "but he likes to spend most of the session",
         "talking about politics,",
         "and I can’t stand it",
         "anymore."
       ],
       "orderGlosses": [
         "응,",
-        "그런데 그는 시간을 보내길 좋아해",
-        "수업 대부분을",
+        "그런데 그는 수업 대부분을 보내길 좋아해",
         "정치 얘기를 하면서,",
         "그리고 나는 그걸 참을 수 없어",
         "더는."
@@ -1300,18 +1262,14 @@
       "id": "cv-0600",
       "english": "I hate when they put corn on cheese pizza without any warning on the menu.",
       "assemblyChunks": [
-        "I hate when",
-        "they put corn",
-        "on cheese pizza",
-        "without any warning",
-        "on the menu."
+        "I hate",
+        "when they put corn on cheese pizza",
+        "without any warning on the menu."
       ],
       "orderGlosses": [
-        "나는 정말 싫어",
-        "옥수수를 올릴 때가",
-        "치즈 피자 위에",
-        "아무런 안내도 없이",
-        "메뉴에."
+        "정말 싫어요",
+        "치즈 피자에 옥수수를 올려놓는 게",
+        "메뉴에 아무런 안내도 없이."
       ]
     }
   ]

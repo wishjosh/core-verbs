@@ -1,5 +1,5 @@
 {
-  "rulesVersion": 1,
+  "rulesVersion": 2,
   "reviewStatus": "reviewed",
   "items": [
     {
@@ -55,13 +55,11 @@
       "english": "Can I get the same thing they’re having?",
       "assemblyChunks": [
         "Can I get",
-        "the same thing",
-        "they’re having?"
+        "the same thing they’re having?"
       ],
       "orderGlosses": [
         "저도 받을 수 있을까요",
-        "같은 메뉴를",
-        "저분들이 드시는?"
+        "저분들이 드시는 것과 같은 메뉴를?"
       ]
     },
     {
@@ -209,14 +207,12 @@
       "english": "Well, I’d like to get to where you are. Do you have any advice?",
       "assemblyChunks": [
         "Well,",
-        "I’d like to get",
-        "to where you are.",
+        "I’d like to get to where you are.",
         "Do you have any advice?"
       ],
       "orderGlosses": [
         "음,",
-        "저도 도달하고 싶어요",
-        "팀장님이 있는 자리까지.",
+        "저도 팀장님이 있는 자리까지 가고 싶어요.",
         "조언해 주실 게 있나요?"
       ]
     },
@@ -306,12 +302,10 @@
       "id": "cv-0225",
       "english": "I don’t get this math problem.",
       "assemblyChunks": [
-        "I don’t get",
-        "this math problem."
+        "I don’t get this math problem."
       ],
       "orderGlosses": [
-        "나는 이해가 안 돼",
-        "이 수학 문제를."
+        "이 수학 문제를 이해 못하겠어."
       ]
     },
     {
@@ -381,13 +375,11 @@
       "english": "It’s Sarah’s birthday. I need to get her flowers.",
       "assemblyChunks": [
         "It’s Sarah’s birthday.",
-        "I need to get her",
-        "flowers."
+        "I need to get her flowers."
       ],
       "orderGlosses": [
         "오늘은 사라의 생일이야.",
-        "사라에게 사 줘야 해",
-        "꽃을."
+        "사라에게 꽃을 사 줘야 해."
       ]
     },
     {
@@ -488,14 +480,14 @@
       "assemblyChunks": [
         "I’m moving",
         "to the U.S.",
-        "I got",
-        "a job there."
+        "I got a job",
+        "there."
       ],
       "orderGlosses": [
         "나는 이사 가",
         "미국으로.",
-        "나는 구했거든",
-        "거기서 일자리를."
+        "일자리를 구했거든",
+        "거기서."
       ]
     },
     {
@@ -576,13 +568,11 @@
       "id": "cv-0247",
       "english": "How was dinner with your boss last night?",
       "assemblyChunks": [
-        "How was dinner",
-        "with your boss",
+        "How was dinner with your boss",
         "last night?"
       ],
       "orderGlosses": [
-        "저녁 식사는 어땠어요",
-        "상사와 함께한",
+        "상사와 저녁 식사는 어땠어요",
         "어젯밤?"
       ]
     },
@@ -617,18 +607,14 @@
       "english": "That’s good, but you should keep in mind that it gets a bit noisy at night with all the bars nearby.",
       "assemblyChunks": [
         "That’s good,",
-        "but you should",
-        "keep in mind",
-        "that it gets",
-        "a bit noisy",
+        "but you should keep in mind",
+        "that it gets a bit noisy",
         "at night",
         "with all the bars nearby."
       ],
       "orderGlosses": [
         "그건 좋지만,",
-        "그래도 꼭",
-        "염두에 두세요",
-        "그곳이",
+        "그래도 염두에 두세요",
         "조금 시끄러워진다는 걸",
         "밤에는",
         "근처에 술집이 많아서."
@@ -655,13 +641,11 @@
       "english": "OK, I have some quieter places to show you.",
       "assemblyChunks": [
         "OK,",
-        "I have some quieter places",
-        "to show you."
+        "I have some quieter places to show you."
       ],
       "orderGlosses": [
         "좋아요,",
-        "좀 더 조용한 곳들이 있어요",
-        "당신께 보여 드릴."
+        "보여 드릴 더 조용한 곳들이 있어요."
       ]
     },
     {
@@ -687,17 +671,13 @@
       "english": "I don’t think you should read any more articles from the Economist. All it does is make your English awkward.",
       "assemblyChunks": [
         "I don’t think",
-        "you should read",
-        "any more articles",
-        "from the Economist.",
+        "you should read any more articles from the Economist.",
         "All it does is",
         "make your English awkward."
       ],
       "orderGlosses": [
         "좋지 않을 것 같아요",
-        "당신이 읽는 건",
-        "기사를 더",
-        "이코노미스트의.",
+        "이코노미스트 기사를 더 읽는 건.",
         "그게 하는 일이라곤",
         "당신의 영어를 어색하게 만드는 것뿐이에요."
       ]
@@ -772,13 +752,11 @@
       "id": "cv-0260",
       "english": "If you don’t cut down on sugar, you’re going to get diabetes.",
       "assemblyChunks": [
-        "If you don’t cut down",
-        "on sugar,",
+        "If you don’t cut down on sugar,",
         "you’re going to get diabetes."
       ],
       "orderGlosses": [
-        "줄이지 않으면",
-        "설탕을,",
+        "설탕을 줄이지 않으면,",
         "당뇨병에 걸리게 될 거야."
       ]
     },
@@ -787,13 +765,11 @@
       "english": "My mom got cancer when I was in middle school.",
       "assemblyChunks": [
         "My mom got cancer",
-        "when I was",
-        "in middle school."
+        "when I was in middle school."
       ],
       "orderGlosses": [
         "엄마가 암에 걸리셨어",
-        "내가 다닐 때",
-        "중학교에."
+        "내가 중학생이었을 때."
       ]
     },
     {
@@ -802,15 +778,13 @@
       "assemblyChunks": [
         "I try to read",
         "a lot",
-        "so I won’t get",
-        "dementia",
+        "so I won’t get dementia",
         "when I’m older."
       ],
       "orderGlosses": [
-        "나는 책을 읽으려고 해",
+        "책을 읽으려고 해",
         "많이",
-        "그래서 걸리지 않도록",
-        "치매에",
+        "치매에 걸리지 않도록",
         "나이 들었을 때."
       ]
     },
@@ -942,14 +916,10 @@
       "id": "cv-0272",
       "english": "I need to get these groceries home.",
       "assemblyChunks": [
-        "I need to get",
-        "these groceries",
-        "home."
+        "I need to get these groceries home."
       ],
       "orderGlosses": [
-        "나는 가져가야 해",
-        "이 장 본 것들을",
-        "집으로."
+        "이 장 본 것들을 집으로 가져가야 해."
       ]
     },
     {
@@ -1062,13 +1032,11 @@
       "id": "cv-0280",
       "english": "What a crazy morning! I overslept.",
       "assemblyChunks": [
-        "What a crazy",
-        "morning!",
+        "What a crazy morning!",
         "I overslept."
       ],
       "orderGlosses": [
-        "정말 정신없는",
-        "아침이야!",
+        "정말 정신없는 아침이야!",
         "나 늦잠 잤어."
       ]
     },
@@ -1091,14 +1059,12 @@
       "english": "I somehow managed to get the kids to school on time.",
       "assemblyChunks": [
         "I somehow managed",
-        "to get the kids",
-        "to school",
+        "to get the kids to school",
         "on time."
       ],
       "orderGlosses": [
         "어떻게든 해냈어",
-        "아이들을 데려다주는 걸",
-        "학교에",
+        "아이들을 학교에 데려다주는 걸",
         "제시간에."
       ]
     },
@@ -1106,17 +1072,15 @@
       "id": "cv-0283",
       "english": "Wow, you got extra sleep and no one was late. Perfect.",
       "assemblyChunks": [
-        "Wow, you got",
-        "extra sleep",
-        "and no one",
-        "was late.",
+        "Wow,",
+        "you got extra sleep",
+        "and no one was late.",
         "Perfect."
       ],
       "orderGlosses": [
-        "와, 너는",
+        "와,",
         "잠도 더 잤고",
-        "아무도",
-        "늦지 않았네.",
+        "아무도 늦지 않았네.",
         "완벽하다."
       ]
     },
@@ -1208,14 +1172,12 @@
       "id": "cv-0291",
       "english": "We get a lot of tourists in the summer.",
       "assemblyChunks": [
-        "We get",
-        "a lot of tourists",
+        "We get a lot of tourists",
         "in the summer."
       ],
       "orderGlosses": [
-        "우리 지역에는 와요",
-        "관광객이 많이",
-        "여름에."
+        "관광객이 많이 와요",
+        "여름에는."
       ]
     },
     {
@@ -1251,14 +1213,12 @@
       "english": "Even on the weekend we don’t get much foot traffic these days.",
       "assemblyChunks": [
         "Even on the weekend",
-        "we don’t get much",
-        "foot traffic",
+        "we don’t get much foot traffic",
         "these days."
       ],
       "orderGlosses": [
         "주말에도",
-        "많지 않아요",
-        "찾아오는 손님이",
+        "찾아오는 손님이 많지 않아요",
         "요즘에는."
       ]
     },
@@ -1267,14 +1227,12 @@
       "english": "My apartment faces the ocean, so we get a fresh sea breeze most days.",
       "assemblyChunks": [
         "My apartment faces the ocean,",
-        "so we get",
-        "a fresh sea breeze",
+        "so we get a fresh sea breeze",
         "most days."
       ],
       "orderGlosses": [
         "우리 아파트는 바다를 향하고 있어서,",
-        "우리 집에는 들어와요",
-        "상쾌한 바닷바람이",
+        "상쾌한 바닷바람이 들어와요",
         "거의 매일."
       ]
     },
@@ -1338,12 +1296,10 @@
       "id": "cv-0300",
       "english": "But aren’t there walk-ins?",
       "assemblyChunks": [
-        "But aren’t there",
-        "walk-ins?"
+        "But aren’t there walk-ins?"
       ],
       "orderGlosses": [
-        "그런데 있지 않아",
-        "예약 없이 오는 손님들도?"
+        "그런데 예약 없이 오는 손님들도 있지 않아?"
       ]
     }
   ]

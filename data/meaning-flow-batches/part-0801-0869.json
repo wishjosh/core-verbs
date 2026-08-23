@@ -1,5 +1,5 @@
 {
-  "rulesVersion": 1,
+  "rulesVersion": 2,
   "reviewStatus": "reviewed",
   "items": [
     {
@@ -35,13 +35,11 @@
       "english": "Don’t let the breakup mess with your studies.",
       "assemblyChunks": [
         "Don’t let",
-        "the breakup mess with",
-        "your studies."
+        "the breakup mess with your studies."
       ],
       "orderGlosses": [
         "그냥 두지 마",
-        "그 이별이 망치도록",
-        "네 공부를."
+        "그 이별이 네 공부를 망치도록."
       ]
     },
     {
@@ -75,13 +73,11 @@
       "english": "Andrew, why aren’t you going on more dates?",
       "assemblyChunks": [
         "Andrew,",
-        "why aren’t you going",
-        "on more dates?"
+        "why aren’t you going on more dates?"
       ],
       "orderGlosses": [
         "앤드루,",
-        "왜 더 나가지 않는 거야",
-        "데이트하러?"
+        "왜 데이트를 더 하지 않는 거야?"
       ]
     },
     {
@@ -189,14 +185,12 @@
       "english": "I applied to YouTube, but I haven’t heard anything back, yet.",
       "assemblyChunks": [
         "I applied to YouTube,",
-        "but I haven’t heard",
-        "anything back,",
+        "but I haven’t heard anything back,",
         "yet."
       ],
       "orderGlosses": [
-        "나는 유튜브에 지원했고,",
-        "하지만 받지 못했어요",
-        "아무 답도",
+        "유튜브에 지원했지만,",
+        "아무 답도 받지 못했어요,",
         "아직."
       ]
     },
@@ -205,13 +199,11 @@
       "english": "Have you applied to any schools on the East Coast?",
       "assemblyChunks": [
         "Have you applied",
-        "to any schools",
-        "on the East Coast?"
+        "to any schools on the East Coast?"
       ],
       "orderGlosses": [
         "지원한 적 있나요",
-        "학교 어디에라도",
-        "미 동부 쪽의?"
+        "미 동부 쪽 학교 어디에라도?"
       ]
     },
     {
@@ -320,14 +312,12 @@
       "assemblyChunks": [
         "Hey, Jiho,",
         "you should apply for",
-        "the position",
-        "in San Francisco."
+        "the position in San Francisco."
       ],
       "orderGlosses": [
         "있잖아, 지호야,",
         "지원해 보는 게 좋겠어",
-        "그 자리에",
-        "샌프란시스코에 있는."
+        "샌프란시스코에 있는 그 자리에."
       ]
     },
     {
@@ -335,13 +325,11 @@
       "english": "You think so? I don’t think I’d get it.",
       "assemblyChunks": [
         "You think so?",
-        "I don’t think",
-        "I’d get it."
+        "I don’t think I’d get it."
       ],
       "orderGlosses": [
         "그렇게 생각해?",
-        "못할 것 같아",
-        "내가 그 자리를 얻는 건."
+        "내가 될 것 같진 않아."
       ]
     },
     {
@@ -401,15 +389,13 @@
       "english": "Guys, I don’t think I can make it this week.",
       "assemblyChunks": [
         "Guys,",
-        "I don’t think",
-        "I can make it",
+        "I don’t think I can make it",
         "this week."
       ],
       "orderGlosses": [
         "얘들아,",
-        "못할 것 같아",
-        "내가 참석하기는",
-        "이번 주에."
+        "참석할 수 없을 것 같아",
+        "이번 주에는."
       ]
     },
     {
@@ -481,13 +467,11 @@
       "english": "Go ahead and give yourself a pat on the back.",
       "assemblyChunks": [
         "Go ahead",
-        "and give yourself",
-        "a pat on the back."
+        "and give yourself a pat on the back."
       ],
       "orderGlosses": [
         "어서 해 봐",
-        "그리고 스스로에게",
-        "잘했다고 칭찬을."
+        "그리고 스스로 잘했다고 칭찬해."
       ]
     },
     {
@@ -533,15 +517,13 @@
       "english": "Hey, just to give you a heads-up—a couple people are coming over tonight.",
       "assemblyChunks": [
         "Hey,",
-        "just to",
-        "give you a heads-up—",
+        "just to give you a heads-up—",
         "a couple people",
         "are coming over tonight."
       ],
       "orderGlosses": [
         "있잖아,",
-        "그냥 이러려고",
-        "너에게 미리 알려 주려고",
+        "미리 알려 두는데",
         "두어 명이",
         "오늘 밤 놀러 올 거야."
       ]
@@ -620,15 +602,13 @@
         "we found a buyer,",
         "and we hope to move",
         "into your place",
-        "by the end",
-        "of the month."
+        "by the end of the month."
       ],
       "orderGlosses": [
         "상황을 알려 드리자면,",
         "저희 집 구매자를 찾았고,",
         "저희는 이사하고 싶어요",
         "당신 댁으로",
-        "늦어도",
         "이달 말까지."
       ]
     },
@@ -733,13 +713,11 @@
       "english": "I don’t keep emails that are more than a year old.",
       "assemblyChunks": [
         "I don’t keep",
-        "emails that are",
-        "more than a year old."
+        "emails that are more than a year old."
       ],
       "orderGlosses": [
         "보관하지 않아요",
-        "그런 이메일들을",
-        "1년이 넘은."
+        "1년이 넘은 이메일은."
       ]
     },
     {
@@ -764,14 +742,12 @@
       "assemblyChunks": [
         "No, no, that’s OK.",
         "Just keep it",
-        "until I see",
-        "you next time."
+        "until I see you next time."
       ],
       "orderGlosses": [
         "아니야, 아니야, 괜찮아.",
         "그냥 가지고 있어",
-        "다시 만날 때까지",
-        "다음에 너를."
+        "다음에 만날 때까지."
       ]
     },
     {
@@ -791,13 +767,11 @@
       "english": "True. I’ll have to get my luggage out.",
       "assemblyChunks": [
         "True.",
-        "I’ll have to get",
-        "my luggage out."
+        "I’ll have to get my luggage out."
       ],
       "orderGlosses": [
         "맞아.",
-        "꺼내야겠어",
-        "여행용 가방을."
+        "여행용 가방을 꺼내야겠어."
       ]
     },
     {
@@ -856,12 +830,10 @@
       "id": "cv-0867",
       "english": "The pilot turned the plane around.",
       "assemblyChunks": [
-        "The pilot turned",
-        "the plane around."
+        "The pilot turned the plane around."
       ],
       "orderGlosses": [
-        "조종사가 돌렸어요",
-        "비행기의 기수를 반대쪽으로."
+        "조종사가 비행기의 기수를 돌렸어요."
       ]
     },
     {

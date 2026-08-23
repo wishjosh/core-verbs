@@ -1,5 +1,5 @@
 {
-  "rulesVersion": 1,
+  "rulesVersion": 2,
   "reviewStatus": "reviewed",
   "items": [
     {
@@ -7,15 +7,13 @@
       "english": "Nope. We don’t get much foot traffic, even on Saturdays now.",
       "assemblyChunks": [
         "Nope.",
-        "We don’t get",
-        "much foot traffic,",
+        "We don’t get much foot traffic,",
         "even on Saturdays",
         "now."
       ],
       "orderGlosses": [
         "아니.",
-        "우리 가게에는 많지 않아",
-        "찾아오는 손님이,",
+        "찾아오는 손님이 많지 않아,",
         "토요일에도",
         "요즘은."
       ]
@@ -167,14 +165,12 @@
       "english": "You got us tickets to the John Lee concert? How?",
       "assemblyChunks": [
         "You got us",
-        "tickets",
-        "to the John Lee concert?",
+        "tickets to the John Lee concert?",
         "How?"
       ],
       "orderGlosses": [
-        "네가 우리에게 구해 왔다고",
-        "표를",
-        "존 리 콘서트에 갈?",
+        "우리에게 구해 줬다고",
+        "존 리 콘서트 표를?",
         "어떻게?"
       ]
     },
@@ -237,17 +233,13 @@
       "english": "They were fully booked, but the server managed to get us a booth with a view of the river.",
       "assemblyChunks": [
         "They were fully booked,",
-        "but the server managed",
-        "to get us a booth",
-        "with a view",
-        "of the river."
+        "but the server managed to get us",
+        "a booth with a view of the river."
       ],
       "orderGlosses": [
         "예약이 다 찼는데,",
-        "직원이 어렵게 해냈어",
-        "우리에게 부스석을 마련해 주는 걸",
-        "전망이 있는 자리로",
-        "강이 보이도록."
+        "그래도 직원이 우리에게 마련해 줬어",
+        "강이 보이는 부스석을."
       ]
     },
     {
@@ -372,26 +364,22 @@
       "id": "cv-0327",
       "english": "I need to get my windshield replaced on my car.",
       "assemblyChunks": [
-        "I need to get",
-        "my windshield replaced",
+        "I need to get my windshield replaced",
         "on my car."
       ],
       "orderGlosses": [
-        "교체를 맡겨야 해",
-        "앞유리를",
-        "내 차의."
+        "앞유리를 교체해야 해",
+        "내 차에 있는 거예요."
       ]
     },
     {
       "id": "cv-0329",
       "english": "I need to get this document signed.",
       "assemblyChunks": [
-        "I need to get",
-        "this document signed."
+        "I need to get this document signed."
       ],
       "orderGlosses": [
-        "받아야 해",
-        "이 서류에 서명을."
+        "이 서류에 서명을 받아야 해."
       ]
     },
     {
@@ -446,8 +434,8 @@
       ],
       "orderGlosses": [
         "물론이죠.",
-        "걸릴 거예요, 고작",
-        "약 30분 정도."
+        "걸리는 건 고작",
+        "약 30분 정도예요."
       ]
     },
     {
@@ -476,8 +464,8 @@
       ],
       "orderGlosses": [
         "정말요?",
-        "나는 아직 느껴져요",
-        "조금 더 다듬어야 할 것 같다고."
+        "아직 그런 느낌이 들어요",
+        "조금 더 다듬어야 할 것 같다는."
       ]
     },
     {
@@ -516,14 +504,12 @@
       "id": "cv-0338",
       "english": "That sounds like a better plan to me.",
       "assemblyChunks": [
-        "That sounds",
-        "like a better plan",
+        "That sounds like a better plan",
         "to me."
       ],
       "orderGlosses": [
-        "그게 느껴져요",
-        "더 나은 계획처럼",
-        "제 생각에는."
+        "더 나은 계획 같아요",
+        "제게는."
       ]
     },
     {
@@ -544,14 +530,10 @@
       "id": "cv-0340",
       "english": "That sounds like a perfect place for you.",
       "assemblyChunks": [
-        "That sounds",
-        "like a perfect place",
-        "for you."
+        "That sounds like a perfect place for you."
       ],
       "orderGlosses": [
-        "그곳이 느껴져요",
-        "딱 맞는 장소처럼",
-        "당신에게."
+        "그곳이 당신에게 딱 맞는 것 같아요."
       ]
     },
     {
@@ -596,14 +578,12 @@
       "id": "cv-0344",
       "english": "I can’t get myself to wake up at a decent time.",
       "assemblyChunks": [
-        "I can’t get myself",
-        "to wake up",
+        "I can’t get myself to wake up",
         "at a decent time."
       ],
       "orderGlosses": [
-        "나는 도무지 나 자신을 못 움직이겠어요",
-        "일어나도록",
-        "제시간에."
+        "도무지 일어나질 못하겠어요",
+        "적당한 시간에."
       ]
     },
     {
@@ -646,13 +626,11 @@
       "id": "cv-0348",
       "english": "How am I going to finish all this work?",
       "assemblyChunks": [
-        "How am I going",
-        "to finish",
+        "How am I going to finish",
         "all this work?"
       ],
       "orderGlosses": [
-        "나는 어떻게 해야 하죠",
-        "끝내려면",
+        "어떻게 끝내죠",
         "이 많은 일을?"
       ]
     },
@@ -702,8 +680,8 @@
       "assemblyChunks": [
         "I know,",
         "but I don’t want",
-        "to make a big deal",
-        "out of it."
+        "to make a big deal out of",
+        "it."
       ],
       "orderGlosses": [
         "알아요,",
@@ -723,9 +701,9 @@
       ],
       "orderGlosses": [
         "그래도,",
-        "네가 해야 해",
-        "그 사람이 물어내게",
-        "그 손해를!"
+        "넌 꼭",
+        "그 사람이 물어내게 해야 해",
+        "손해를!"
       ]
     },
     {
@@ -767,28 +745,22 @@
       "english": "Did you know Sarah is a real estate agent now?",
       "assemblyChunks": [
         "Did you know",
-        "Sarah is",
-        "a real estate agent",
-        "now?"
+        "Sarah is a real estate agent now?"
       ],
       "orderGlosses": [
         "알고 있었어",
-        "사라가",
-        "부동산 중개인이라는 걸",
-        "이제?"
+        "사라가 이제 부동산 중개인이라는 걸?"
       ]
     },
     {
       "id": "cv-0358",
       "english": "The girl from that K-pop group? That’s random.",
       "assemblyChunks": [
-        "The girl from",
-        "that K-pop group?",
+        "The girl from that K-pop group?",
         "That’s random."
       ],
       "orderGlosses": [
-        "그 여자 말이야",
-        "그 K-pop 그룹 출신?",
+        "그 K-pop 그룹의 여자애?",
         "정말 뜬금없네."
       ]
     },
@@ -1163,14 +1135,12 @@
       "english": "Yeah, especially if you're on your phone all day.",
       "assemblyChunks": [
         "Yeah,",
-        "especially if you're",
-        "on your phone",
+        "especially if you're on your phone",
         "all day."
       ],
       "orderGlosses": [
         "응,",
-        "특히 네가",
-        "휴대폰을 쓰고 있다면",
+        "특히 휴대폰을 쓰고 있다면",
         "하루 종일."
       ]
     },
@@ -1282,15 +1252,13 @@
       "assemblyChunks": [
         "My parents made me",
         "study too much,",
-        "so I don’t make",
-        "my children",
+        "so I don’t make my children",
         "do anything."
       ],
       "orderGlosses": [
         "우리 부모님은 나에게 시켰어요",
         "너무 많이 공부하게,",
-        "그래서 나는 강요하지 않아요",
-        "내 아이들에게",
+        "그래서 나는 아이들에게 강요하지 않아요",
         "무엇이든 하라고."
       ]
     },

@@ -1,5 +1,5 @@
 {
-  "rulesVersion": 1,
+  "rulesVersion": 2,
   "reviewStatus": "reviewed",
   "items": [
     {
@@ -61,15 +61,15 @@
         "Yeah,",
         "and the second place",
         "has parking,",
-        "but it’s next to",
-        "a busy street."
+        "but it’s",
+        "next to a busy street."
       ],
       "orderGlosses": [
         "응,",
         "그리고 두 번째 집은",
         "주차할 곳이 있지만,",
-        "바로 옆에 있어",
-        "붐비는 거리가."
+        "그 집은",
+        "붐비는 도로 바로 옆이에요."
       ]
     },
     {
@@ -134,28 +134,24 @@
       "assemblyChunks": [
         "It’s great",
         "to have you back.",
-        "We missed you",
-        "a lot."
+        "We missed you a lot."
       ],
       "orderGlosses": [
         "정말 좋아요",
-        "당신이 돌아오니.",
-        "많이 그리워했어요",
-        "당신을."
+        "당신이 돌아와서.",
+        "당신이 많이 그리웠어요."
       ]
     },
     {
       "id": "cv-0111",
       "english": "Do you have any cash on you?",
       "assemblyChunks": [
-        "Do you have",
-        "any cash",
+        "Do you have any cash",
         "on you?"
       ],
       "orderGlosses": [
-        "지금 있나요",
-        "현금이 조금이라도",
-        "수중에?"
+        "현금 좀 가지고 있나요",
+        "지금?"
       ]
     },
     {
@@ -222,14 +218,12 @@
       "assemblyChunks": [
         "Of course.",
         "I’ll be there.",
-        "Who else are you",
-        "having over?"
+        "Who else are you having over?"
       ],
       "orderGlosses": [
         "물론이죠.",
         "저도 갈게요.",
-        "그 밖에 누구를",
-        "집에 초대하나요?"
+        "그 밖에 누구를 집에 초대하나요?"
       ]
     },
     {
@@ -238,14 +232,12 @@
       "assemblyChunks": [
         "A couple friends",
         "from high school,",
-        "but mostly",
-        "work people."
+        "but mostly work people."
       ],
       "orderGlosses": [
         "친구 두어 명은",
         "고등학교 때 친구들이고,",
-        "하지만 대부분은",
-        "회사 사람들이에요."
+        "대부분은 회사 사람들이에요."
       ]
     },
     {
@@ -298,14 +290,12 @@
       "id": "cv-0121",
       "english": "I need a few minutes to finish this.",
       "assemblyChunks": [
-        "I need",
-        "a few minutes",
+        "I need a few minutes",
         "to finish this."
       ],
       "orderGlosses": [
-        "나는 필요해요",
-        "몇 분이",
-        "이걸 마무리하려면."
+        "몇 분만 필요해요",
+        "이걸 마무리하는 데."
       ]
     },
     {
@@ -326,13 +316,13 @@
       "id": "cv-0123",
       "english": "My son made several mistakes on the test.",
       "assemblyChunks": [
-        "My son made",
-        "several mistakes",
+        "My son",
+        "made several mistakes",
         "on the test."
       ],
       "orderGlosses": [
-        "내 아들은 저질렀어요",
-        "실수를 여러 개",
+        "내 아들은",
+        "실수를 여러 개 했어요",
         "시험에서."
       ]
     },
@@ -408,8 +398,8 @@
       "assemblyChunks": [
         "Have him stop by",
         "my office",
-        "and I’ll take a look",
-        "at his resume."
+        "and I’ll take a look at",
+        "his resume."
       ],
       "orderGlosses": [
         "그분에게 들르라고 하세요",
@@ -423,11 +413,13 @@
       "english": "I was thinking of having Andrew proofread my draft.",
       "assemblyChunks": [
         "I was thinking of",
-        "having Andrew proofread my draft."
+        "having Andrew proofread",
+        "my draft."
       ],
       "orderGlosses": [
-        "고민하고 있었어요",
-        "앤드루에게 내 초안을 검토받을까 하고."
+        "생각하고 있었어요",
+        "앤드루에게 검토를 맡길까 하고",
+        "내 초안을."
       ]
     },
     {
@@ -452,13 +444,13 @@
       "id": "cv-0132",
       "english": "You should have Nicholas check it out. He’s good with computers.",
       "assemblyChunks": [
-        "You should have",
-        "Nicholas check it out.",
+        "You should have Nicholas",
+        "check it out.",
         "He’s good with computers."
       ],
       "orderGlosses": [
-        "맡겨 보는 게 좋아요",
-        "니콜라스가 그 컴퓨터를 살펴보도록.",
+        "니콜라스에게 부탁해 보세요",
+        "그 컴퓨터를 살펴보라고.",
         "그 친구는 컴퓨터를 잘 다뤄요."
       ]
     },
@@ -467,14 +459,12 @@
       "english": "Kim&Kim Law Office; how may I direct your call?",
       "assemblyChunks": [
         "Kim&Kim Law Office;",
-        "how",
-        "may I direct",
+        "how may I direct",
         "your call?"
       ],
       "orderGlosses": [
         "김앤김 법률 사무소입니다;",
-        "어디로",
-        "전화를 연결해",
+        "어디로 연결해",
         "드릴까요?"
       ]
     },
@@ -497,15 +487,13 @@
       "english": "Yes, I’m a client of hers—Kevin Lee. Could you have her call me back, please?",
       "assemblyChunks": [
         "Yes,",
-        "I’m a client of hers—",
-        "Kevin Lee.",
+        "I’m a client of hers—Kevin Lee.",
         "Could you have her",
         "call me back, please?"
       ],
       "orderGlosses": [
         "네,",
-        "그 변호사님의 의뢰인입니다",
-        "케빈 리예요.",
+        "그 변호사님의 의뢰인 케빈 리입니다.",
         "그분에게 부탁해 주시겠어요",
         "제게 다시 전화해 달라고?"
       ]
@@ -569,13 +557,11 @@
       "english": "My boyfriend got a ticket to the concert.",
       "assemblyChunks": [
         "My boyfriend",
-        "got a ticket",
-        "to the concert."
+        "got a ticket to the concert."
       ],
       "orderGlosses": [
         "내 남자 친구가",
-        "표를 구했어요",
-        "그 콘서트에 갈."
+        "그 콘서트 표를 구했어요."
       ]
     },
     {
@@ -630,12 +616,12 @@
       "id": "cv-0147",
       "english": "Where can I get a coffee around here?",
       "assemblyChunks": [
-        "Where can I get",
-        "a coffee around here?"
+        "Where can I get a coffee",
+        "around here?"
       ],
       "orderGlosses": [
-        "어디에서 살 수 있나요",
-        "커피 한 잔을 이 근처에서?"
+        "어디서 커피를 살 수 있나요",
+        "이 근처에서?"
       ]
     },
     {
@@ -730,15 +716,13 @@
       "id": "cv-0155",
       "english": "The new hybrid model has three times less carbon emissions than the previous version.",
       "assemblyChunks": [
-        "The new hybrid model",
-        "has three times less",
-        "carbon emissions",
+        "The new hybrid model has",
+        "three times less carbon emissions",
         "than the previous version."
       ],
       "orderGlosses": [
-        "신형 하이브리드 모델은",
-        "배출해요, 세 배나 적게",
-        "탄소를",
+        "신형 하이브리드 모델은 배출해요",
+        "탄소를 세 배나 적게",
         "이전 모델보다."
       ]
     },
@@ -761,15 +745,13 @@
       "english": "This sandwich has more than double the calories of a Big Mac.",
       "assemblyChunks": [
         "This sandwich",
-        "has more than double",
-        "the calories",
+        "has more than double the calories",
         "of a Big Mac."
       ],
       "orderGlosses": [
         "이 샌드위치는",
-        "두 배 넘게 많아요",
-        "열량이",
-        "빅맥 한 개보다."
+        "열량이 두 배 넘게 많아요",
+        "빅맥보다."
       ]
     },
     {
@@ -889,14 +871,12 @@
       "english": "I’m so excited to go to that restaurant for my birthday.",
       "assemblyChunks": [
         "I’m so excited",
-        "to go to",
-        "that restaurant",
+        "to go to that restaurant",
         "for my birthday."
       ],
       "orderGlosses": [
-        "나는 정말 기대돼요",
-        "가려고 하니",
-        "그 식당에",
+        "정말 기대돼요",
+        "그 식당에 가는 게",
         "내 생일을 맞아."
       ]
     },
@@ -953,13 +933,11 @@
       "english": "Did you get tickets to the Taylor Swift concert?",
       "assemblyChunks": [
         "Did you get",
-        "tickets",
-        "to the Taylor Swift concert?"
+        "tickets to the Taylor Swift concert?"
       ],
       "orderGlosses": [
         "구했어요",
-        "표를",
-        "테일러 스위프트 콘서트용으로?"
+        "테일러 스위프트 콘서트 표를?"
       ]
     },
     {
@@ -1067,7 +1045,7 @@
       ],
       "orderGlosses": [
         "시간이 늦었지만,",
-        "나는 피곤하다고 느끼지 않아."
+        "전 피곤하지 않아요."
       ]
     },
     {
@@ -1220,14 +1198,12 @@
       "id": "cv-0191",
       "english": "We live in the same area, so we get coffee every once in a while.",
       "assemblyChunks": [
-        "We live in",
-        "the same area,",
+        "We live in the same area,",
         "so we get coffee",
         "every once in a while."
       ],
       "orderGlosses": [
-        "우리는 살아요",
-        "같은 동네에,",
+        "우리는 같은 동네에 살고,",
         "그래서 함께 커피를 마셔요",
         "가끔씩."
       ]

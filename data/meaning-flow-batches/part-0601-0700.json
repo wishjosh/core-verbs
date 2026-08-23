@@ -1,5 +1,5 @@
 {
-  "rulesVersion": 1,
+  "rulesVersion": 2,
   "reviewStatus": "reviewed",
   "items": [
     {
@@ -208,14 +208,12 @@
       "id": "cv-0617",
       "english": "Do you see the difference between the two options?",
       "assemblyChunks": [
-        "Do you see",
-        "the difference",
+        "Do you see the difference",
         "between the two options?"
       ],
       "orderGlosses": [
-        "보이나요",
-        "차이가",
-        "두 선택지 사이에?"
+        "차이가 보이나요",
+        "두 선택지를 비교했을 때요?"
       ]
     },
     {
@@ -267,13 +265,11 @@
       "english": "I know a good place not far from here.",
       "assemblyChunks": [
         "I know",
-        "a good place",
-        "not far from here."
+        "a good place not far from here."
       ],
       "orderGlosses": [
         "내가 알아요",
-        "괜찮은 곳을",
-        "여기서 멀지 않은."
+        "여기서 멀지 않은 괜찮은 곳을."
       ]
     },
     {
@@ -398,14 +394,12 @@
       "id": "cv-0632",
       "english": "I saw some people filming a news report on my street yesterday.",
       "assemblyChunks": [
-        "I saw some people",
-        "filming a news report",
+        "I saw some people filming a news report",
         "on my street",
         "yesterday."
       ],
       "orderGlosses": [
-        "나는 사람 몇 명을 봤어",
-        "뉴스 리포트를 촬영하는",
+        "뉴스 리포트를 촬영하는 사람 몇 명을 봤어",
         "우리 동네에서",
         "어제."
       ]
@@ -464,13 +458,13 @@
       "id": "cv-0637",
       "english": "Wait, I smell something cooking. Smells great.",
       "assemblyChunks": [
-        "Wait, I smell",
-        "something cooking.",
+        "Wait,",
+        "I smell something cooking.",
         "Smells great."
       ],
       "orderGlosses": [
-        "잠깐, 냄새가 느껴져",
-        "뭔가 요리하는 냄새.",
+        "잠깐,",
+        "뭔가 요리하는 냄새가 나.",
         "냄새 좋다."
       ]
     },
@@ -547,15 +541,13 @@
         "Acupuncture",
         "really works",
         "for me.",
-        "Why don’t you give it",
-        "a shot?"
+        "Why don’t you give it a shot?"
       ],
       "orderGlosses": [
         "침은",
         "정말 효과가 있어",
         "나에게.",
-        "당신도 해 보는 게 어때",
-        "한번?"
+        "당신도 한번 해 보는 게 어때?"
       ]
     },
     {
@@ -618,13 +610,11 @@
       "id": "cv-0649",
       "english": "Don’t we have a wedding to go to at 4?",
       "assemblyChunks": [
-        "Don’t we have",
-        "a wedding to go to",
+        "Don’t we have a wedding to go to",
         "at 4?"
       ],
       "orderGlosses": [
-        "우리 있지 않니",
-        "가야 할 결혼식이",
+        "우리 가야 할 결혼식 있지 않아",
         "4시에?"
       ]
     },
@@ -669,15 +659,13 @@
       "english": "Maybe not today, but if you trained for it, you could. Give it a shot!",
       "assemblyChunks": [
         "Maybe not today,",
-        "but if you trained",
-        "for it,",
+        "but if you trained for it,",
         "you could.",
         "Give it a shot!"
       ],
       "orderGlosses": [
         "오늘 당장은 아닐지라도,",
-        "하지만 네가 훈련한다면",
-        "그에 맞춰,",
+        "하지만 그에 맞춰 훈련한다면,",
         "할 수 있을 거야.",
         "도전해 봐!"
       ]
@@ -737,13 +725,11 @@
       "english": "Let me have a try—I went to the gym today.",
       "assemblyChunks": [
         "Let me have a try—",
-        "I went to",
-        "the gym today."
+        "I went to the gym today."
       ],
       "orderGlosses": [
         "내가 한번 해 볼게",
-        "나는 다녀왔거든",
-        "오늘 헬스장에."
+        "나 오늘 헬스장 다녀왔거든."
       ]
     },
     {
@@ -757,7 +743,7 @@
       ],
       "orderGlosses": [
         "연애는",
-        "그런 방식으로 굴러가지 않아",
+        "그런 식으로 통하지 않아",
         "이제는.",
         "시대가 바뀌었어."
       ]
@@ -766,13 +752,13 @@
       "id": "cv-0660",
       "english": "You can’t force someone to love you—it doesn’t work that way.",
       "assemblyChunks": [
-        "You can’t force",
-        "someone to love you—",
+        "You can’t force someone",
+        "to love you—",
         "it doesn’t work that way."
       ],
       "orderGlosses": [
-        "강요할 수 없어",
-        "누군가가 너를 사랑하게",
+        "누군가를 억지로 만들 순 없어",
+        "너를 사랑하게",
         "사랑은 그런 식으로 되지 않아."
       ]
     },
@@ -795,13 +781,11 @@
       "english": "Sorry, but the app doesn’t work that way.",
       "assemblyChunks": [
         "Sorry,",
-        "but the app doesn’t work",
-        "that way."
+        "but the app doesn’t work that way."
       ],
       "orderGlosses": [
         "죄송하지만,",
-        "앱은 작동하지 않아요",
-        "그런 방식으로."
+        "그 앱은 그런 식으로 쓰는 게 아니에요."
       ]
     },
     {
@@ -901,17 +885,15 @@
       "english": "Not a problem. If something comes up, though, is it possible for me to get my deposit back?",
       "assemblyChunks": [
         "Not a problem.",
-        "If something comes up,",
-        "though, is it possible",
-        "for me",
-        "to get my deposit back?"
+        "If something comes up, though,",
+        "is it possible for me to get",
+        "my deposit back?"
       ],
       "orderGlosses": [
         "괜찮습니다.",
-        "무슨 일이 생기면,",
-        "그런데 가능할까요",
-        "제가",
-        "계약금을 돌려받는 게?"
+        "그런데 무슨 일이 생기면,",
+        "제가 돌려받을 수 있을까요",
+        "계약금을?"
       ]
     },
     {
@@ -1176,14 +1158,12 @@
       "id": "cv-0691",
       "english": "There is something about old pop songs that I find so comforting.",
       "assemblyChunks": [
-        "There is something",
-        "about old pop songs",
+        "There is something about old pop songs",
         "that I find so comforting."
       ],
       "orderGlosses": [
-        "뭔가 있어요",
-        "옛날 팝송에는",
-        "내 마음을 아주 편안하게 하는."
+        "옛날 팝송에는 뭔가 있어요",
+        "내 마음을 아주 편안하게 하는 게."
       ]
     },
     {
@@ -1195,7 +1175,7 @@
       ],
       "orderGlosses": [
         "라면에는 뭔가 있어요",
-        "내 속을 불편하게 하는."
+        "내 속을 불편하게 하는 게."
       ]
     },
     {
@@ -1206,8 +1186,8 @@
         "feels so familiar."
       ],
       "orderGlosses": [
-        "이곳에는 뭔가 있어요",
-        "아주 익숙하게 느껴지는."
+        "이곳의 뭔가가",
+        "아주 익숙하게 느껴져요."
       ]
     },
     {
@@ -1218,8 +1198,8 @@
         "bothers me."
       ],
       "orderGlosses": [
-        "그의 태도에는 뭔가 있어요",
-        "나를 거슬리게 하는."
+        "그의 태도에서 느껴지는 뭔가가",
+        "나를 거슬리게 해요."
       ]
     },
     {
@@ -1293,13 +1273,11 @@
       "english": "He went crazy when the Dodgers won the World Series.",
       "assemblyChunks": [
         "He went crazy",
-        "when the Dodgers won",
-        "the World Series."
+        "when the Dodgers won the World Series."
       ],
       "orderGlosses": [
         "그는 열광했어",
-        "다저스가 우승했을 때",
-        "월드 시리즈에서."
+        "다저스가 월드 시리즈에서 우승했을 때."
       ]
     }
   ]

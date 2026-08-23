@@ -30,7 +30,7 @@ function obviousDraftChunkIssues(item) {
         const words = chunk.toLowerCase().replace(/[^a-z'\s]/g, ' ').trim().split(/\s+/).filter(Boolean);
         const last = words.at(-1);
         if (determiners.has(last)) issues.push(`${index + 1}: determiner`);
-        if (connectors.has(last) && !/^(yeah|yes|no|well|okay|ok|right)\s+(and|but|or)$/i.test(words.join(' '))) {
+        if (connectors.has(last) && words.length > 1 && !/^(yeah|yes|no|well|okay|ok|right)\s+(and|but|or)$/i.test(words.join(' '))) {
             issues.push(`${index + 1}: connector`);
         }
         if (words.length === 1 && prepositions.has(words[0])) issues.push(`${index + 1}: lone preposition`);
@@ -43,7 +43,7 @@ function obviousDraftChunkIssues(item) {
 
 test('stores the complete 50-day, 869-sentence learning set', () => {
     assert.equal(content.schemaVersion, 1);
-    assert.equal(content.chunkRulesVersion, 2);
+    assert.equal(content.chunkRulesVersion, 3);
     assert.equal(content.total, 869);
     assert.equal(content.items.length, 869);
     assert.equal(new Set(content.items.map(item => item.id)).size, 869);
@@ -51,10 +51,10 @@ test('stores the complete 50-day, 869-sentence learning set', () => {
 });
 
 test('stores directly reviewed two-level chunk progression for all 100 MAKE-unit sentences', () => {
-    assert.equal(makeChunkOverrides.schemaVersion, 1);
+    assert.equal(makeChunkOverrides.schemaVersion, 2);
     assert.equal(makeChunkOverrides.verb, 'MAKE');
     assert.equal(makeChunkOverrides.reviewStatus, 'reviewed');
-    assert.equal(makeChunkOverrides.reviewMethod, 'codex_direct');
+    assert.equal(makeChunkOverrides.reviewMethod, 'codex_theory_guided_full_review');
     assert.equal(makeChunkOverrides.reviewCount, 100);
     assert.equal(makeChunkOverrides.items.length, 100);
     assert.equal(new Set(makeChunkOverrides.items.map(item => item.id)).size, 100);
@@ -71,7 +71,7 @@ test('stores directly reviewed two-level chunk progression for all 100 MAKE-unit
         assert.equal(joinChunks(override.assemblyChunks), source.english, `${override.id} phrase`);
         assert.equal(override.microChunks.length, override.microOrderGlosses.length, override.id);
         assert.equal(override.assemblyChunks.length, override.orderGlosses.length, override.id);
-        assert.ok(override.microChunks.length > override.assemblyChunks.length, override.id);
+        assert.ok(override.microChunks.length >= override.assemblyChunks.length, override.id);
         assert.ok(override.microChunks.length <= 12, override.id);
         assert.ok(override.microOrderGlosses.every(Boolean), override.id);
         assert.ok(override.orderGlosses.every(Boolean), override.id);
@@ -88,27 +88,33 @@ test('MAKE-unit cards use reviewed micro chunks, then reviewed phrase chunks, th
         const micro = engine.buildAdaptiveChunkPlan(card, 0);
         const next = engine.buildAdaptiveChunkPlan(card, 1);
 
-        assert.equal(micro.kind, 'micro', override.id);
-        assert.deepEqual(micro.chunks, override.microChunks, override.id);
-        assert.deepEqual(micro.orderGlosses, override.microOrderGlosses, override.id);
+        if (override.microChunks.length >= 2) {
+            assert.equal(micro.kind, 'micro', override.id);
+            assert.deepEqual(micro.chunks, override.microChunks, override.id);
+            assert.deepEqual(micro.orderGlosses, override.microOrderGlosses, override.id);
+        } else {
+            assert.equal(micro.mode, 'recall', override.id);
+        }
 
-        if (override.assemblyChunks.length >= 2) {
+        const stagesDiffer = JSON.stringify(override.microChunks) !== JSON.stringify(override.assemblyChunks);
+        if (override.assemblyChunks.length >= 2 && stagesDiffer) {
             const recall = engine.buildAdaptiveChunkPlan(card, 2);
             assert.equal(next.kind, 'canonical', override.id);
             assert.deepEqual(next.chunks, override.assemblyChunks, override.id);
             assert.deepEqual(next.orderGlosses, override.orderGlosses, override.id);
             assert.equal(recall.mode, 'recall', override.id);
         } else {
-            assert.equal(next.mode, 'recall', override.id);
+            assert.notEqual(next.kind, 'canonical', `${override.id} should skip a duplicate stage`);
+            assert.equal(joinChunks(next.chunks), source.english, override.id);
         }
     }
 });
 
 test('keeps the representative 30-sentence review set across all 15 verb groups', () => {
-    assert.equal(content.meaningFlowRulesVersion, 1);
+    assert.equal(content.meaningFlowRulesVersion, 2);
     assert.equal(content.meaningFlowReviewCount, 30);
     assert.equal(content.meaningFlowDirectReviewCount, 869);
-    assert.equal(meaningFlowOverrides.rulesVersion, 1);
+    assert.equal(meaningFlowOverrides.rulesVersion, 2);
     assert.equal(meaningFlowOverrides.reviewStatus, 'reviewed');
     assert.equal(meaningFlowOverrides.items.length, 30);
     assert.equal(new Set(meaningFlowOverrides.items.map(item => item.id)).size, 30);
@@ -124,9 +130,9 @@ test('keeps the representative 30-sentence review set across all 15 verb groups'
         assert.equal(item.orderGlosses.length, item.assemblyChunks.length, override.id);
         assert.ok(item.orderGlosses.every(value => value.trim()), override.id);
         assert.deepEqual(item.meaningFlow, {
-            rulesVersion: 1,
+            rulesVersion: 2,
             reviewStatus: 'reviewed',
-            reviewMethod: 'codex_direct_full_review',
+            reviewMethod: 'codex_theory_guided_full_review',
             pilot: true
         }, override.id);
         verbs.add(item.verb);
@@ -151,7 +157,7 @@ test('stores directly reviewed meaning flow for every sentence', () => {
 
     const reviewedIds = new Set(meaningFlowOverrides.items.map(item => item.id));
     const batchItems = meaningFlowBatches.flatMap(batch => {
-        assert.equal(batch.rulesVersion, 1);
+        assert.equal(batch.rulesVersion, 2);
         assert.equal(batch.reviewStatus, 'reviewed');
         return batch.items;
     });
@@ -166,9 +172,9 @@ test('stores directly reviewed meaning flow for every sentence', () => {
         assert.deepEqual(item.assemblyChunks, candidate.assemblyChunks, candidate.id);
         assert.deepEqual(item.orderGlosses, candidate.orderGlosses, candidate.id);
         assert.deepEqual(item.meaningFlow, {
-            rulesVersion: 1,
+            rulesVersion: 2,
             reviewStatus: 'reviewed',
-            reviewMethod: 'codex_direct_full_review',
+            reviewMethod: 'codex_theory_guided_full_review',
             pilot: false
         }, candidate.id);
     }
@@ -206,7 +212,7 @@ test('dedicated meaning-flow generation is resumable and cannot write English or
 test('every English sentence is reconstructed exactly from native chunks', () => {
     for (const item of content.items) {
         assert.ok(item.assemblyChunks.length >= 1 && item.assemblyChunks.length <= 10, item.id);
-        assert.ok(item.assemblyChunks.every(chunk => chunk.split(/\s+/).length <= 6), item.id);
+        assert.ok(item.assemblyChunks.every(chunk => chunk.split(/\s+/).length <= 12), item.id);
         assert.equal(joinChunks(item.assemblyChunks), item.english, item.id);
         assert.equal(item.orderGlosses.length, item.assemblyChunks.length, item.id);
         assert.ok(item.orderGlosses.every(Boolean), item.id);
@@ -214,10 +220,10 @@ test('every English sentence is reconstructed exactly from native chunks', () =>
     }
 });
 
-test('all 869 sentences store a finer first-pass chunk plan with matching Korean cues', () => {
-    assert.equal(content.microChunkRulesVersion, 1);
+test('all 869 sentences store a meaning-complete first-pass scaffold with matching Korean cues', () => {
+    assert.equal(content.microChunkRulesVersion, 2);
     assert.equal(content.microChunkReviewCount, 869);
-    assert.equal(content.microChunkReviewMethod, 'codex_full_pass_with_direct_exceptions');
+    assert.equal(content.microChunkReviewMethod, 'codex_theory_guided_full_review');
 
     for (const item of content.items) {
         assert.ok(Array.isArray(item.microChunks) && item.microChunks.length >= item.assemblyChunks.length, item.id);
@@ -225,31 +231,44 @@ test('all 869 sentences store a finer first-pass chunk plan with matching Korean
         assert.equal(item.microOrderGlosses.length, item.microChunks.length, item.id);
         assert.ok(item.microOrderGlosses.every(value => value.trim()), item.id);
         assert.deepEqual(item.microChunkReview, {
-            rulesVersion: 1,
+            rulesVersion: 2,
             reviewStatus: 'reviewed',
-            reviewMethod: 'codex_full_pass_with_direct_exceptions'
+            reviewMethod: 'codex_theory_guided_full_review'
         }, item.id);
     }
 });
 
-test('first-pass chunks stay short except for explicitly preserved fixed expressions', () => {
-    const preserved = new Set([
-        'in front of the camera.',
-        'would you like to come',
-        'to the Taylor Swift concert?',
-        'to the John Lee concert?',
-        'every once in a while.',
-        'for less than a week.',
-        'to get some fresh air.',
-        'Let’s call it a night.',
-        'let’s call it a night.',
-        'a pat on the back.'
-    ]);
+test('formulaic sequences stay inside one chunk instead of obeying a word-count cap', () => {
+    const protectedSequences = [
+        'a lot of', 'a couple of', 'a great deal of', 'be able to',
+        'make ends meet', 'call it a night', 'fill in', 'take care of',
+        'give it a shot', 'out of stock', 'back in stock', 'on my way',
+        'in front of', 'every once in a while', 'a pat on the back',
+        'cut down on'
+    ];
     const makeById = new Map(makeChunkOverrides.items.map(item => [item.id, item]));
+    const boundaryOffsets = chunks => {
+        const offsets = [];
+        let sentence = '';
+        chunks.forEach((chunk, index) => {
+            sentence = index === 0 ? chunk : `${sentence}${/[—–]$/.test(sentence) ? '' : ' '}${chunk}`;
+            if (index < chunks.length - 1) offsets.push(sentence.length);
+        });
+        return offsets;
+    };
     for (const item of content.items) {
-        const chunks = makeById.get(item.id)?.microChunks || item.microChunks;
-        for (const chunk of chunks) {
-            assert.ok(chunk.split(/\s+/).length <= 4 || preserved.has(chunk), `${item.id}: ${chunk}`);
+        const plans = [item.assemblyChunks, makeById.get(item.id)?.microChunks || item.microChunks];
+        for (const chunks of plans) {
+            const sentence = joinChunks(chunks).toLowerCase();
+            const boundaries = boundaryOffsets(chunks);
+            for (const phrase of protectedSequences) {
+                let start = sentence.indexOf(phrase);
+                while (start >= 0) {
+                    const end = start + phrase.length;
+                    assert.ok(!boundaries.some(offset => offset > start && offset < end), `${item.id}: ${phrase}`);
+                    start = sentence.indexOf(phrase, start + 1);
+                }
+            }
         }
     }
 });
@@ -306,19 +325,18 @@ test('every adaptive chunk stage preserves the source English exactly', () => {
     }
 });
 
-test('most learning chunks stay within the preferred one-to-four-word range', () => {
-    const chunks = content.items.flatMap(item => item.assemblyChunks);
-    const compactChunks = chunks.filter(chunk => chunk.split(/\s+/).length <= 4);
-    assert.ok(compactChunks.length / chunks.length >= 0.85);
+test('reviewed chunks remain practical on mobile without a hard four-word rule', () => {
+    const chunks = content.items.flatMap(item => [...item.assemblyChunks, ...item.microChunks]);
+    assert.ok(chunks.every(chunk => chunk.split(/\s+/).length <= 12));
 });
 
-test('AI draft chunks have no known placeholder or obvious broken boundary', () => {
-    assert.equal(content.qualityReviewModel, 'gemma4:26b');
+test('theory-reviewed chunks have no known placeholder or obvious broken boundary', () => {
+    assert.equal(content.reviewStatus, 'reviewed');
+    assert.equal(content.qualityReviewModel, 'codex_theory_guided_full_review');
     for (const item of content.items) {
+        assert.equal(item.reviewStatus, 'reviewed', item.id);
         assert.ok(item.orderGlosses.every(gloss => !/^(뜻 확인|이어서|확인 필요|번역 필요)$/.test(gloss)), item.id);
-        if (item.reviewStatus === 'ai_draft') {
-            assert.deepEqual(obviousDraftChunkIssues(item), [], item.id);
-        }
+        assert.deepEqual(obviousDraftChunkIssues(item), [], item.id);
     }
 });
 
@@ -352,12 +370,12 @@ test('reviewed examples preserve the agreed learning intent', () => {
     assert.equal(onMyWay.reviewStatus, 'reviewed');
 
     const airport = byEnglish.get('I barely made it to the airport on time, only to have my flight delayed.');
-    assert.deepEqual(airport.assemblyChunks, ['I barely', 'made it to', 'the airport', 'on time,', 'only to', 'have my flight delayed.']);
+    assert.deepEqual(airport.assemblyChunks, ['I barely made it', 'to the airport', 'on time,', 'only to have my flight delayed.']);
     assert.equal(airport.reviewStatus, 'reviewed');
 
     const client = byEnglish.get('She is currently with a client right now. May I take a message?');
-    assert.deepEqual(client.assemblyChunks, ['She', 'is currently', 'with a client', 'right now.', 'May I take', 'a message?']);
-    assert.equal(client.orderGlosses.length, 6);
+    assert.deepEqual(client.assemblyChunks, ['She is currently with a client', 'right now.', 'May I take a message?']);
+    assert.equal(client.orderGlosses.length, 3);
     assert.equal(client.reviewStatus, 'reviewed');
 
     const walkIns = byEnglish.get('We’re fully booked today, but we might be able to take a few walk-ins.');
@@ -365,7 +383,7 @@ test('reviewed examples preserve the agreed learning intent', () => {
         'We’re fully booked', 'today,', 'but', 'we might', 'be able to take', 'a few walk-ins.'
     ]);
     assert.deepEqual(walkIns.microOrderGlosses, [
-        '예약이 모두 찼습니다', '오늘은,', '그래도', '저희는 아마', '받을 수 있을 겁니다', '예약 없이 온 손님 몇 분을.'
+        '예약이 모두 찼습니다', '오늘은,', '그래도', '저희가 아마', '받을 수 있을 겁니다', '예약 없이 온 손님 몇 분을.'
     ]);
 });
 
@@ -440,11 +458,11 @@ test('the mobile review screen keeps word-level marking without error categories
     assert.match(html, /id="daily-session-progress"/);
     assert.match(app, /adaptiveLimit - dailyLearned/);
     assert.match(app, /const DAILY_NEW_LIMIT = 12/);
-    assert.match(app, /const APP_VERSION = '25'/);
+    assert.match(app, /const APP_VERSION = '26'/);
     assert.match(app, /Learning\.selectCoreVerbNewCards/);
     assert.match(app, /newByVerb/);
     assert.match(app, /register\(`sw\.js\?v=\$\{APP_VERSION\}`,[^)]*updateViaCache: 'none'/);
-    assert.match(html, /Core Verbs v25/);
+    assert.match(html, /Core Verbs v26/);
     assert.match(css, /\.self-check-controls\s*\{[^}]*margin-top:\s*10px;/s);
     assert.match(html, /id="completion-title"/);
     assert.match(html, /id="btn-extra-review"[^>]*onclick="startExtraReviewSession\(\)"/);

@@ -13,7 +13,7 @@ const PILOT_PATH = path.join(DATA_DIR, 'learning-content-pilot.json');
 const MEANING_FLOW_OVERRIDES_PATH = path.join(DATA_DIR, 'meaning-flow-overrides.json');
 const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSR1wby3k5QhlAL8f8MeH-Ni1qjGgRMu8ROHDoPCKci-GYrbpx1DzTsAvcr_l5qBcemui93D4cqMLa0/pub?output=tsv';
 const OLLAMA_URL = 'http://127.0.0.1:11434/api/chat';
-const CHUNK_RULES_VERSION = 2;
+const CHUNK_RULES_VERSION = 3;
 const MEANING_FLOW_RULES_VERSION = 1;
 const ERROR_TYPES = ['article', 'plural', 'preposition', 'koreanism', 'tense_auxiliary'];
 const REVIEWED_OVERRIDES = new Map([
@@ -372,16 +372,16 @@ const SYSTEM_PROMPT = `당신은 한국인 성인 학습자를 위한 미국 영
 
 assemblyChunks 규칙:
 - 원어민이 한 번에 처리하고 말하는 의미·문법·운율 단위로 나눈다. 문장이 길면 10개까지 만들 수 있으며, 기계적으로 같은 길이로 자르지 않는다.
-- 한 덩어리는 보통 1~4단어이며, 자연스러운 결합 표현에 필요한 경우에만 5단어까지 허용한다. 주어, 조동사 틀, 동사구, 목적어, 전치사구, 시간·장소 부사구가 눈에 보이도록 짧게 나눈다.
-- 구동사, 연어, 관용구는 5단어 안에서 가급적 같은 덩어리에 둔다. 영어 어순을 더 잘 드러내기 위해 경계를 가로지르면 corePatterns에는 전체 재사용 문형을 보존한다. 예: make it to / the airport, May I take / a message, make a big deal / out of it.
+- 단어 수 상한을 두지 않는다. 가장 작은 '형태+의미' 단위를 우선하되, 길이 때문에 통사 성분이나 공식 표현을 쪼개지 않는다. 실제 문장에서는 대체로 2~6단어가 되지만 더 긴 결합도 허용한다.
+- 구동사, 연어, 관용구, 조동·서술 연쇄, 한정사·수량사와 명사, 사역동사와 보충 구조는 보호 단위다. 예: make it to / the airport, May I take a message?, make a big deal out of / it, might / be able to take / a few walk-ins.
 - 쉼표, 세미콜론, 콜론, 문장 끝(.?!)에서는 원칙적으로 덩어리를 끝낸다. 문장부호는 앞 덩어리 끝에 붙인다. 다만 "Oh, me too!", "Hey, Billy," 같은 4단어 이하의 짧은 감탄·호칭은 하나의 말덩어리로 둘 수 있다.
 - 덩어리를 공백 하나로 연결하면 원문 영어와 글자·순서·문장부호가 정확히 같아야 한다. 단, 앞 덩어리가 em dash(—/–)로 끝나면 다음 덩어리는 공백 없이 이어진다. 단어를 고치거나 생략하거나 추가하지 않는다.
-- 의미 없는 한 단어 남발은 피한다. 다만 주어·조동사·담화표지처럼 영어 어순이나 오류 확인에 중요한 단어는 단독 덩어리가 가능하다.
+- 의미 없는 한 단어 남발은 피한다. 담화표지·대조 연결어 또는 학습상 의미가 선명한 주어+조동사 태도 단위만 짧은 덩어리로 둘 수 있다.
 
 orderGlosses 규칙:
 - assemblyChunks와 정확히 같은 개수이며, 영어가 앞에서부터 새로 펼치는 의미나 문법 기능을 짧은 한국어 단서로 쓴다.
 - 자연스러운 완성 번역을 잘라 놓거나 한국어 문장을 거꾸로 뒤집지 않는다. 각 단서를 순서대로 읽으면 의미가 계속 누적되어야 한다.
-- 조동사처럼 한국어로 따로 옮기기 어려운 청크는 '(과거 질문으로 시작)'처럼 기능을 알려도 된다.
+- 한국어 단서는 단어별 번역이 아니라 그 청크를 읽은 시점에 이해할 의미다. 자연스러운 한국어를 우선하고, 영어 순서를 보여 주려다 조사를 매달거나 미완성 번역을 만들지 않는다.
 - '나는 하지 않아 / 원하기를'처럼 단어를 기계적으로 대응한 문장과, 뒤 단서를 먼저 읽어야 이해되는 문장은 금지한다.
 - 자연스러운 완성 뜻은 입력의 naturalKo에 따로 있으므로 그대로 복제하지 않는다.
 
@@ -404,13 +404,13 @@ errorPoints 규칙:
 
 중요 예시:
 입력: I barely made it to the airport on time, only to have my flight delayed.
-assemblyChunks: ["I barely", "made it to", "the airport", "on time,", "only to", "have my flight delayed."]
-orderGlosses: ["나는 가까스로", "도착했어요", "공항에", "제시간에,", "그런데 결국", "내 항공편이 지연됐죠."]
+assemblyChunks: ["I barely made it", "to the airport", "on time,", "only to have my flight delayed."]
+orderGlosses: ["가까스로 도착했어요", "공항에", "제시간에,", "그런데 결국 항공편이 지연됐죠."]
 corePatterns: ["make it to + 장소", "on time", "only to + 동사원형", "have + 목적어 + 과거분사"]
 
 입력: Did you leave work yet?
-assemblyChunks: ["Did", "you leave work yet?"]
-orderGlosses: ["(과거 질문으로 시작)", "너는 벌써 퇴근했어?"]
+assemblyChunks: ["Did you leave work", "yet?"]
+orderGlosses: ["퇴근했어요", "벌써?"]
 errorPoints: [{"type":"tense_auxiliary","correct":"Did","distractor":"Do","tip":"오늘의 한 번뿐인 퇴근 여부를 묻는 과거 상황이므로 Did를 씁니다."}]
 
 설명이나 마크다운 없이 스키마에 맞는 JSON만 반환한다.`;
@@ -629,7 +629,7 @@ function chunkQualityReasons(item) {
         const words = String(chunk || '').toLowerCase().replace(/[^a-z'\s]/g, ' ').trim().split(/\s+/).filter(Boolean);
         const last = words.at(-1);
         if (determiners.has(last)) reasons.push(`${index + 1}번 청크가 한정사 ${last}에서 끝남`);
-        if (connectors.has(last) && !/^(yeah|yes|no|well|okay|ok|right)\s+(and|but|or)$/i.test(words.join(' '))) {
+        if (connectors.has(last) && words.length > 1 && !/^(yeah|yes|no|well|okay|ok|right)\s+(and|but|or)$/i.test(words.join(' '))) {
             reasons.push(`${index + 1}번 청크가 연결어 ${last}에서 끝남`);
         }
         if (words.length === 1 && prepositions.has(words[0])) reasons.push(`${index + 1}번 청크가 전치사 하나뿐임`);
@@ -667,8 +667,8 @@ async function askQualityReview(items, repairContext = '') {
                 role: 'system',
                 content: `당신은 한국인 학습자를 위한 미국 영어 청크의 최종 교정자다.
 각 영어 원문은 절대로 고치지 말고 assemblyChunks만 다시 나눈다. 청크를 공백 하나로 연결하면 원문과 글자·문장부호가 정확히 같아야 한다.
-청크는 원어민이 처리하는 짧은 의미·문법·운율 단위로 보통 1~4단어, 자연스러운 결합 표현만 최대 5단어다.
-관사·소유한정사는 뒤 명사와, 전치사는 가능하면 목적어와, and/but/or는 뒤 병렬 요소나 절과 묶는다. 담화표지 뒤 쉼표는 경계로 삼는다. 구동사와 고정 표현은 최대한 보존한다.
+청크는 원어민이 처리하는 형태·의미·문법·운율 단위다. 단어 수 상한은 없다. 대체로 2~6단어가 되지만, 길이 때문에 공식 표현이나 통사 성분을 자르지 않는다.
+관사·소유한정사·수량사는 뒤 명사와, 전치사는 가능하면 목적어와 묶는다. 구동사, 연어, 관용구, 조동·서술 연쇄, 사역동사와 보충 구조를 보존한다. and/but/or 하나가 대조 의미를 독립적으로 여는 경우에는 단독 담화 청크를 허용한다.
 orderGlosses는 영어 청크와 정확히 1:1이며, 영어가 앞에서부터 펼치는 의미나 문법 기능을 짧고 이해 가능한 한국어로 쓴다. 한국어를 거꾸로 뒤집거나 단어를 기계적으로 대응하지 말고, 순서대로 읽을 때 의미가 계속 누적되게 한다. 직역 때문에 뜻이 바뀌면 안 되며 임시 문구를 쓰지 않는다.
 입력의 reviewReasons를 모두 해소하고 모든 입력 id를 한 번씩 반환한다. JSON만 반환한다.`
             }, {
@@ -723,7 +723,7 @@ async function askModel(rows, repairContext = '') {
     process.stdout.write(`AI ${rows.length}문장: ${((Date.now() - startedAt) / 1000).toFixed(1)}초\n`);
     const sourcesById = new Map(rows.map(row => [row.id, row]));
     const normalized = (parsed.items || []).map(item => normalizeGeneratedItem(sourcesById.get(item.id), item));
-    return repairOverlongChunks(rows, normalized);
+    return normalized;
 }
 
 function splitGlossFallback(gloss, count) {
@@ -745,9 +745,9 @@ function splitGlossFallback(gloss, count) {
     return result;
 }
 
-function chooseChunkCut(words, remainingGroups) {
-    const maximumCut = Math.min(5, words.length - (remainingGroups - 1));
-    const minimumCut = Math.max(1, words.length - ((remainingGroups - 1) * 5));
+function chooseChunkCut(words, remainingGroups, maximumWords = 12) {
+    const maximumCut = Math.min(maximumWords, words.length - (remainingGroups - 1));
+    const minimumCut = Math.max(1, words.length - ((remainingGroups - 1) * maximumWords));
     const target = Math.round(words.length / remainingGroups);
     const strongStarts = new Set(['and', 'but', 'or', 'because', 'if', 'when', 'while', 'although', 'though', 'that', 'what', 'which', 'who', 'where', 'only']);
     const phraseStarts = new Set(['to', 'at', 'in', 'on', 'for', 'with', 'from', 'by', 'of', 'about', 'after', 'before', 'into', 'over', 'under', 'a', 'an', 'the', 'my', 'your', 'his', 'her', 'our', 'their', 'this', 'that', 'these', 'those']);
@@ -761,7 +761,7 @@ function chooseChunkCut(words, remainingGroups) {
         if (strongStarts.has(next)) score += 9;
         else if (phraseStarts.has(next)) score += 5;
         if (/[,:;.!?]["']?$/.test(previous)) score += 10;
-        if (cut >= 2 && cut <= 4) score += 2;
+        if (cut >= 2 && cut <= 6) score += 2;
         if (score > bestScore) {
             best = cut;
             bestScore = score;
@@ -770,7 +770,7 @@ function chooseChunkCut(words, remainingGroups) {
     return best;
 }
 
-function splitLongChunk(chunk, maximumWords = 5) {
+function splitLongChunk(chunk, maximumWords = 12) {
     const words = String(chunk || '').trim().split(/\s+/).filter(Boolean);
     if (words.length <= maximumWords) return [String(chunk || '').trim()];
     const groupCount = Math.ceil(words.length / maximumWords);
@@ -778,7 +778,7 @@ function splitLongChunk(chunk, maximumWords = 5) {
     let remaining = [...words];
 
     for (let group = groupCount; group > 1; group--) {
-        const cut = chooseChunkCut(remaining, group);
+        const cut = chooseChunkCut(remaining, group, maximumWords);
         result.push(remaining.slice(0, cut).join(' '));
         remaining = remaining.slice(cut);
     }
@@ -816,7 +816,7 @@ function enforceChunkLimit(source, item) {
 
     fixed.assemblyChunks.forEach((chunk, index) => {
         const boundaryChunks = splitMandatoryBoundaries(chunk);
-        const splitChunks = boundaryChunks.flatMap(part => splitLongChunk(part, 5));
+        const splitChunks = boundaryChunks.flatMap(part => splitLongChunk(part, 12));
         const splitGlosses = splitGlossFallback(fixed.orderGlosses?.[index], splitChunks.length);
         if (splitChunks.length > 1) changed = true;
         chunks.push(...splitChunks);
@@ -967,7 +967,7 @@ function validateItem(source, generated) {
         chunks.forEach((chunk, index) => {
             if (!chunk || chunk.trim() !== chunk || /\s{2,}/.test(chunk)) errors.push(`${index + 1}번 청크 공백 오류`);
             const wordCount = chunk.split(/\s+/).filter(Boolean).length;
-            if (wordCount > 5) errors.push(`${index + 1}번 청크가 5단어를 넘음`);
+            if (wordCount > 12) errors.push(`${index + 1}번 청크가 모바일 확인 범위인 12단어를 넘음`);
             const shortDiscourseChunk = wordCount <= 4 && /^(oh|hey|hi|hello|yes|no|yeah|well|okay|ok|please|sorry|thanks|thank you|good morning|good afternoon|good evening),/i.test(chunk);
             const shortParentheticalChunk = (wordCount <= 6 && /,\s+(though|however),["']?$/i.test(chunk))
                 || (wordCount <= 8 && /,\s+(though|however)[.!?]["']?$/i.test(chunk));

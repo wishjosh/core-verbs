@@ -5,7 +5,7 @@
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSR1wby3k5QhlAL8f8MeH-Ni1qjGgRMu8ROHDoPCKci-GYrbpx1DzTsAvcr_l5qBcemui93D4cqMLa0/pub?output=tsv";
 const CONTENT_URL = './data/learning-content.json';
 const MAKE_CHUNK_OVERRIDES_URL = './data/make-chunk-overrides.json';
-const APP_VERSION = '25';
+const APP_VERSION = '26';
 const pageParams = new URLSearchParams(window.location.search);
 const meaningFlowPilotMode = pageParams.get('pilot') === 'meaning-flow';
 const requestedVerbPilot = String(pageParams.get('verb') || '').trim().toUpperCase();
@@ -1009,7 +1009,7 @@ function loadCard() {
         practiceTitle.innerText = recallMode
             ? '🧠 선택지 없이 전체 문장을 떠올려 보세요'
             : (currentChunkPlan.kind === 'micro'
-                ? '🧠 짧은 조립 단위로 영어를 떠올려 보세요'
+                ? '🧠 의미 발판 청크로 영어를 떠올려 보세요'
                 : (currentChunkPlan.kind === 'merged'
                     ? '🧠 더 긴 조립 단위로 영어를 떠올려 보세요'
                     : '🧠 표현 청크로 영어를 떠올려 보세요'));
@@ -1023,7 +1023,7 @@ function loadCard() {
     if (practiceSlots) practiceSlots.innerHTML = '';
     if (practiceBank) practiceBank.innerHTML = '';
     if (practiceSlotsLabel) practiceSlotsLabel.innerText = currentChunkPlan.kind === 'micro'
-        ? '내가 만든 문장 · 짧은 조립 단위를 고르세요'
+        ? '내가 만든 문장 · 의미 발판 청크를 고르세요'
         : (currentChunkPlan.kind === 'merged'
             ? '내가 만든 문장 · 더 긴 조립 단위를 고르세요'
             : '내가 만든 문장 · 표현 청크를 고르세요');
@@ -1034,7 +1034,7 @@ function loadCard() {
         showAnswerBtn.innerText = recallMode
             ? '떠올린 뒤 영어 정답 확인'
             : (currentChunkPlan.kind === 'micro'
-                ? '짧은 영어 조립 단위 확인'
+                ? '의미 발판 청크 확인'
                 : (currentChunkPlan.kind === 'merged' ? '더 긴 영어 조립 단위 확인' : '영어 청크로 확인'));
         showAnswerBtn.style.display = 'inline-flex';
     }
@@ -1104,7 +1104,7 @@ function startPractice() {
 
     if (practiceWorkspace) practiceWorkspace.style.display = 'block';
     if (practiceTitle) practiceTitle.innerText = currentPractice.chunkKind === 'micro'
-        ? '🧩 짧은 조립 단위를 어순대로 고르세요'
+        ? '🧩 의미 발판 청크를 어순대로 고르세요'
         : (currentPractice.chunkKind === 'merged'
             ? '🧩 더 긴 조립 단위를 어순대로 고르세요'
             : '🧩 영어 청크를 어순대로 고르세요');
@@ -2311,7 +2311,7 @@ function exportMistakeHistory() {
             wordOrder: '청크 어순을 틀렸는지 여부',
             recall: '문장 전체를 떠올리지 못했는지 여부',
             practiceChunks: '이 시도에서 실제로 제시된 조립 단위',
-            chunkKind: 'micro(짧은 조립), canonical(검수 청크), merged(긴 조립), recall(전체 회상)',
+            chunkKind: 'micro(의미 발판), canonical(표현 청크), merged(긴 조립), recall(전체 회상)',
             chunkStage: '이 문장에서 사용한 자동 청크 단계의 0부터 시작하는 위치',
             note: '문법 유형은 앱이 단정하지 않습니다. 반복 패턴은 문장 문맥과 함께 분석하세요.'
         },

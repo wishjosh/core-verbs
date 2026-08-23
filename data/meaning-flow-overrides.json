@@ -1,7 +1,7 @@
 {
-  "rulesVersion": 1,
+  "rulesVersion": 2,
   "reviewStatus": "reviewed",
-  "description": "869문장 전수 검수 중 대표 문장에 우선 적용하는 직접 검수 자료",
+  "description": "형태·의미·운율 경계를 기준으로 869문장을 전수 검수한 대표 회귀 문장",
   "items": [
     {
       "id": "cv-0001",
@@ -45,20 +45,14 @@
       "id": "cv-0135",
       "english": "She is currently with a client right now. May I take a message?",
       "assemblyChunks": [
-        "She",
-        "is currently",
-        "with a client",
+        "She is currently with a client",
         "right now.",
-        "May I take",
-        "a message?"
+        "May I take a message?"
       ],
       "orderGlosses": [
-        "그분은",
-        "현재 함께 계세요",
-        "의뢰인 한 분과",
-        "지금은.",
-        "받아 둘까요",
-        "메시지를?"
+        "그분은 현재 의뢰인과 함께 계세요",
+        "바로 지금은요.",
+        "메시지를 받아 둘까요?"
       ]
     },
     {
@@ -79,8 +73,8 @@
       "assemblyChunks": [
         "If I don’t get",
         "a scholarship,",
-        "I won’t be able",
-        "to go this semester."
+        "I won’t be able to go",
+        "this semester."
       ],
       "orderGlosses": [
         "받지 못하면",
@@ -93,15 +87,13 @@
       "id": "cv-0218",
       "english": "To get to where I am, you’ll need to know what other departments do.",
       "assemblyChunks": [
-        "To get to",
-        "where I am,",
+        "To get to where I am,",
         "you’ll need to know",
         "what other departments do."
       ],
       "orderGlosses": [
-        "도달하려면",
-        "내가 있는 자리까지,",
-        "당신은 알아야 해요",
+        "내가 있는 자리까지 오려면,",
+        "알아야 해요",
         "다른 부서가 무슨 일을 하는지."
       ]
     },
@@ -110,13 +102,11 @@
       "english": "The area got really popular after that Netflix show was filmed there.",
       "assemblyChunks": [
         "The area got really popular",
-        "after that Netflix show",
-        "was filmed there."
+        "after that Netflix show was filmed there."
       ],
       "orderGlosses": [
         "그 지역은 정말 인기 있어졌어요",
-        "그 넷플릭스 드라마가",
-        "그곳에서 촬영된 뒤로."
+        "그 넷플릭스 드라마가 그곳에서 촬영된 뒤로."
       ]
     },
     {
@@ -179,20 +169,16 @@
       "id": "cv-0430",
       "english": "I barely made it to the airport on time, only to have my flight delayed.",
       "assemblyChunks": [
-        "I barely",
-        "made it to",
-        "the airport",
+        "I barely made it",
+        "to the airport",
         "on time,",
-        "only to",
-        "have my flight delayed."
+        "only to have my flight delayed."
       ],
       "orderGlosses": [
-        "나는 가까스로",
-        "도착했어요",
+        "가까스로 도착했어요",
         "공항에",
         "제시간에,",
-        "그런데 결국",
-        "내 항공편이 지연됐죠."
+        "그런데 결국 항공편이 지연됐죠."
       ]
     },
     {
@@ -336,14 +322,12 @@
       "english": "Really? I have been wanting to try the new instructor’s class.",
       "assemblyChunks": [
         "Really?",
-        "I have",
-        "been wanting to try",
+        "I have been wanting to try",
         "the new instructor’s class."
       ],
       "orderGlosses": [
         "정말요?",
-        "나는 계속",
-        "한번 들어 보고 싶었어요",
+        "계속 한번 들어 보고 싶었어요",
         "새 강사의 수업을."
       ]
     },
@@ -392,14 +376,12 @@
       "english": "Oh, perfect! That will give me enough time to grab some coffee.",
       "assemblyChunks": [
         "Oh, perfect!",
-        "That will give me",
-        "enough time",
+        "That will give me enough time",
         "to grab some coffee."
       ],
       "orderGlosses": [
         "오, 딱 좋네요!",
-        "그러면 내게 생겨요",
-        "충분한 시간이",
+        "그러면 내게 충분한 시간이 생겨요",
         "커피를 좀 사 올 만큼."
       ]
     },

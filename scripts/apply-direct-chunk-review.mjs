@@ -354,10 +354,189 @@ const corrections = {
   'cv-0861': [['True.', 'I’ll have to get', 'my luggage out.'], ['맞아.', '꺼내야겠어', '여행용 가방을.']],
 };
 
-// 처음 만나는 문장에서만 사용하는 최소 의미 청크다. 기본 assemblyChunks는
-// 다음 숙련 단계의 원어민식 표현 덩어리로 그대로 보존한다. 아래 문장들은
-// 일반 분할 규칙보다 문장 의미와 한국어 단서의 대응이 중요한 직접 검수 예외다.
-const microCorrections = {
+// 연구 검토 뒤 확정한 v2 교정이다. 단어 수 상한 대신 통사·운율 경계와
+// 공식 표현의 결속을 우선하고, 한국어는 각 영어 청크가 주는 의미 단서로 쓴다.
+const theoryCorrections = {
+  'cv-0003': [['I have', 'some friends living in Chicago.'], ['친구가 몇 명 있어요', '시카고에 사는 친구들이요.']],
+  'cv-0019': [["I'll have", 'the steak, please.'], ['주문할게요', '스테이크로 부탁해요.']],
+  'cv-0024': [['Just a banana.', 'I was in a rush.'], ['그냥 바나나 하나요.', '급했거든요.']],
+  'cv-0027': [['Oh, me too!', 'Want to grab something', 'together today?'], ['오, 나도요!', '뭐 좀 먹을래요', '오늘 같이?']],
+  'cv-0040': [['Are you still planning', 'to go to art school?'], ['아직 계획하고 있나요', '예술 학교에 진학할 생각인가요?']],
+  'cv-0044': [['Want to talk about it?'], ['그 일에 관해 이야기할래?']],
+  'cv-0047': [['I think', 'my phone fell out of my pocket', 'while I was getting off the bus.'], ['아무래도', '휴대폰이 주머니에서 빠진 것 같아요', '버스에서 내리던 중에.']],
+  'cv-0057': [['Oh, Costco is having a sale', 'on Samsonite luggage', 'right now.'], ['아, 코스트코가 세일 중이에요', '샘소나이트 여행 가방을', '바로 지금.']],
+  'cv-0058': [['How is life in Brazil treating you,', 'Junho?'], ['브라질 생활은 어떠세요,', '준호 씨?']],
+  'cv-0070': [['I have some chores to do', 'in the afternoon.'], ['할 집안일이 좀 있어요', '오후에.']],
+  'cv-0071': [['I have tons of work to do.'], ['해야 할 일이 산더미예요.']],
+  'cv-0072': [['I have a few emails to reply to.'], ['답장해야 할 이메일이 몇 통 있어요.']],
+  'cv-0073': [['I have some errands to run', 'this afternoon.'], ['봐야 할 볼일이 몇 가지 있어요', '오늘 오후에.']],
+  'cv-0074': [['We have a project to finish', 'by Friday.'], ['끝내야 할 프로젝트가 있어요', '금요일까지.']],
+  'cv-0075': [['I have some Christmas shopping to do.'], ['해야 할 크리스마스 쇼핑이 좀 있어요.']],
+  'cv-0077': [['Yes,', "sorry I'm late.", 'I had something to take care of.'], ['네,', '늦어서 미안해요.', '처리할 일이 있었어요.']],
+  'cv-0081': [['I just sold', 'five pairs of pants', 'on Joonggonara,', 'so I have a lot of packages to ship.'], ['방금 팔았어요', '바지 다섯 벌을', '중고나라에서,', '그래서 보낼 소포가 아주 많아요.']],
+  'cv-0083': [['My dad', 'needs to take better care of', 'his health.'], ['우리 아빠는', '좀 더 잘 챙겨야 해요', '자기 건강을.']],
+  'cv-0087': [['The Gion district in Kyoto', 'has a charming vibe.'], ['교토의 기온 거리는', '매력적인 분위기가 있어요.']],
+  'cv-0100': [['The Namsan Hyatt', 'has a great night view.'], ['남산 하얏트는', '야경이 아주 멋져요.']],
+  'cv-0105': [['Yeah,', 'and the second place', 'has parking,', 'but it’s', 'next to a busy street.'], ['응,', '그리고 두 번째 집은', '주차할 곳이 있지만,', '그 집은', '붐비는 도로 바로 옆이에요.']],
+  'cv-0110': [['It’s great', 'to have you back.', 'We missed you a lot.'], ['정말 좋아요', '당신이 돌아와서.', '당신이 많이 그리웠어요.']],
+  'cv-0111': [['Do you have any cash', 'on you?'], ['현금 좀 가지고 있나요', '지금?']],
+  'cv-0116': [['Of course.', 'I’ll be there.', 'Who else are you having over?'], ['물론이죠.', '저도 갈게요.', '그 밖에 누구를 집에 초대하나요?']],
+  'cv-0117': [['A couple friends', 'from high school,', 'but mostly work people.'], ['친구 두어 명은', '고등학교 때 친구들이고,', '대부분은 회사 사람들이에요.']],
+  'cv-0121': [['I need a few minutes', 'to finish this.'], ['몇 분만 필요해요', '이걸 마무리하는 데.']],
+  'cv-0123': [['My son', 'made several mistakes', 'on the test.'], ['내 아들은', '실수를 여러 개 했어요', '시험에서.']],
+  'cv-0129': [['Have him stop by', 'my office', 'and I’ll take a look at', 'his resume.'], ['그분에게 들르라고 하세요', '내 사무실에', '그러면 살펴볼게요', '그분의 이력서를.']],
+  'cv-0130': [['I was thinking of', 'having Andrew proofread', 'my draft.'], ['생각하고 있었어요', '앤드루에게 검토를 맡길까 하고', '내 초안을.']],
+  'cv-0132': [['You should have Nicholas', 'check it out.', 'He’s good with computers.'], ['니콜라스에게 부탁해 보세요', '그 컴퓨터를 살펴보라고.', '그 친구는 컴퓨터를 잘 다뤄요.']],
+  'cv-0133': [['Kim&Kim Law Office;', 'how may I direct', 'your call?'], ['김앤김 법률 사무소입니다;', '어디로 연결해', '드릴까요?']],
+  'cv-0135': [['She is currently with a client', 'right now.', 'May I take a message?'], ['그분은 현재 의뢰인과 함께 계세요', '바로 지금은요.', '메시지를 받아 둘까요?']],
+  'cv-0136': [['Yes,', 'I’m a client of hers—Kevin Lee.', 'Could you have her', 'call me back, please?'], ['네,', '그 변호사님의 의뢰인 케빈 리입니다.', '그분에게 부탁해 주시겠어요', '제게 다시 전화해 달라고?']],
+  'cv-0142': [['My boyfriend', 'got a ticket to the concert.'], ['내 남자 친구가', '그 콘서트 표를 구했어요.']],
+  'cv-0147': [['Where can I get a coffee', 'around here?'], ['어디서 커피를 살 수 있나요', '이 근처에서?']],
+  'cv-0155': [['The new hybrid model has', 'three times less carbon emissions', 'than the previous version.'], ['신형 하이브리드 모델은 배출해요', '탄소를 세 배나 적게', '이전 모델보다.']],
+  'cv-0157': [['This sandwich', 'has more than double the calories', 'of a Big Mac.'], ['이 샌드위치는', '열량이 두 배 넘게 많아요', '빅맥보다.']],
+  'cv-0162': [["If I don’t get", 'a scholarship,', 'I won’t be able to go', 'this semester.'], ['받지 못하면', '장학금을,', '다닐 수 없어요', '이번 학기에는.']],
+  'cv-0167': [['I’m so excited', 'to go to that restaurant', 'for my birthday.'], ['정말 기대돼요', '그 식당에 가는 게', '내 생일을 맞아.']],
+  'cv-0171': [['Did you get', 'tickets to the Taylor Swift concert?'], ['구했어요', '테일러 스위프트 콘서트 표를?']],
+  'cv-0179': [["It’s late,", "but I don’t feel tired."], ['시간이 늦었지만,', '전 피곤하지 않아요.']],
+  'cv-0191': [['We live in the same area,', 'so we get coffee', 'every once in a while.'], ['우리는 같은 동네에 살고,', '그래서 함께 커피를 마셔요', '가끔씩.']],
+  'cv-0205': [['Can I get', 'the same thing they’re having?'], ['저도 받을 수 있을까요', '저분들이 드시는 것과 같은 메뉴를?']],
+  'cv-0217': [['Well,', 'I’d like to get to where you are.', 'Do you have any advice?'], ['음,', '저도 팀장님이 있는 자리까지 가고 싶어요.', '조언해 주실 게 있나요?']],
+  'cv-0218': [['To get to where I am,', 'you’ll need to know', 'what other departments do.'], ['내가 있는 자리까지 오려면,', '알아야 해요', '다른 부서가 무슨 일을 하는지.']],
+  'cv-0225': [["I don’t get this math problem."], ['이 수학 문제를 이해 못하겠어.']],
+  'cv-0231': [["It’s Sarah’s birthday.", 'I need to get her flowers.'], ['오늘은 사라의 생일이야.', '사라에게 꽃을 사 줘야 해.']],
+  'cv-0239': [['I’m moving', 'to the U.S.', 'I got a job', 'there.'], ['나는 이사 가', '미국으로.', '일자리를 구했거든', '거기서.']],
+  'cv-0246': [['The area got really popular', 'after that Netflix show was filmed there.'], ['그 지역은 정말 인기 있어졌어요', '그 넷플릭스 드라마가 그곳에서 촬영된 뒤로.']],
+  'cv-0247': [['How was dinner with your boss', 'last night?'], ['상사와 저녁 식사는 어땠어요', '어젯밤?']],
+  'cv-0250': [["That’s good,", 'but you should keep in mind', 'that it gets a bit noisy', 'at night', 'with all the bars nearby.'], ['그건 좋지만,', '그래도 염두에 두세요', '조금 시끄러워진다는 걸', '밤에는', '근처에 술집이 많아서.']],
+  'cv-0254': [["I don’t think", 'you should read any more articles from the Economist.', 'All it does is', 'make your English awkward.'], ['좋지 않을 것 같아요', '이코노미스트 기사를 더 읽는 건.', '그게 하는 일이라곤', '당신의 영어를 어색하게 만드는 것뿐이에요.']],
+  'cv-0260': [["If you don’t cut down on sugar,", 'you’re going to get diabetes.'], ['설탕을 줄이지 않으면,', '당뇨병에 걸리게 될 거야.']],
+  'cv-0261': [['My mom got cancer', 'when I was in middle school.'], ['엄마가 암에 걸리셨어', '내가 중학생이었을 때.']],
+  'cv-0262': [['I try to read', 'a lot', 'so I won’t get dementia', 'when I’m older.'], ['책을 읽으려고 해', '많이', '치매에 걸리지 않도록', '나이 들었을 때.']],
+  'cv-0272': [['I need to get these groceries home.'], ['이 장 본 것들을 집으로 가져가야 해.']],
+  'cv-0280': [['What a crazy morning!', 'I overslept.'], ['정말 정신없는 아침이야!', '나 늦잠 잤어.']],
+  'cv-0282': [['I somehow managed', 'to get the kids to school', 'on time.'], ['어떻게든 해냈어', '아이들을 학교에 데려다주는 걸', '제시간에.']],
+  'cv-0283': [['Wow,', 'you got extra sleep', 'and no one was late.', 'Perfect.'], ['와,', '잠도 더 잤고', '아무도 늦지 않았네.', '완벽하다.']],
+  'cv-0291': [['We get a lot of tourists', 'in the summer.'], ['관광객이 많이 와요', '여름에는.']],
+  'cv-0294': [['Even on the weekend', 'we don’t get much foot traffic', 'these days.'], ['주말에도', '찾아오는 손님이 많지 않아요', '요즘에는.']],
+  'cv-0295': [['My apartment faces the ocean,', 'so we get a fresh sea breeze', 'most days.'], ['우리 아파트는 바다를 향하고 있어서,', '상쾌한 바닷바람이 들어와요', '거의 매일.']],
+  'cv-0300': [['But aren’t there walk-ins?'], ['그런데 예약 없이 오는 손님들도 있지 않아?']],
+  'cv-0301': [['Nope.', 'We don’t get much foot traffic,', 'even on Saturdays', 'now.'], ['아니.', '찾아오는 손님이 많지 않아,', '토요일에도', '요즘은.']],
+  'cv-0313': [['You got us', 'tickets to the John Lee concert?', 'How?'], ['우리에게 구해 줬다고', '존 리 콘서트 표를?', '어떻게?']],
+  'cv-0318': [['They were fully booked,', 'but the server managed to get us', 'a booth with a view of the river.'], ['예약이 다 찼는데,', '그래도 직원이 우리에게 마련해 줬어', '강이 보이는 부스석을.']],
+  'cv-0327': [['I need to get my windshield replaced', 'on my car.'], ['앞유리를 교체해야 해', '내 차에 있는 거예요.']],
+  'cv-0329': [['I need to get this document signed.'], ['이 서류에 서명을 받아야 해.']],
+  'cv-0333': [['Of course.', 'It should only take', 'about thirty minutes.'], ['물론이죠.', '걸리는 건 고작', '약 30분 정도예요.']],
+  'cv-0335': [['Really?', 'I still feel like', 'it’s lacking some polish.'], ['정말요?', '아직 그런 느낌이 들어요', '조금 더 다듬어야 할 것 같다는.']],
+  'cv-0338': [['That sounds like a better plan', 'to me.'], ['더 나은 계획 같아요', '제게는.']],
+  'cv-0340': [['That sounds like a perfect place for you.'], ['그곳이 당신에게 딱 맞는 것 같아요.']],
+  'cv-0344': [['I can’t get myself to wake up', 'at a decent time.'], ['도무지 일어나질 못하겠어요', '적당한 시간에.']],
+  'cv-0348': [['How am I going to finish', 'all this work?'], ['어떻게 끝내죠', '이 많은 일을?']],
+  'cv-0352': [['I know,', 'but I don’t want', 'to make a big deal out of', 'it.'], ['알아요,', '하지만 원하지 않아요', '크게 문제 삼는 걸', '이 일을.']],
+  'cv-0353': [['Still,', 'you should', 'get him to pay', 'for the damages!'], ['그래도,', '넌 꼭', '그 사람이 물어내게 해야 해', '손해를!']],
+  'cv-0357': [['Did you know', 'Sarah is a real estate agent now?'], ['알고 있었어', '사라가 이제 부동산 중개인이라는 걸?']],
+  'cv-0358': [['The girl from that K-pop group?', 'That’s random.'], ['그 K-pop 그룹의 여자애?', '정말 뜬금없네.']],
+  'cv-0386': [['Yeah,', "especially if you're on your phone", 'all day.'], ['응,', '특히 휴대폰을 쓰고 있다면', '하루 종일.']],
+  'cv-0395': [['My parents made me', 'study too much,', 'so I don’t make my children', 'do anything.'], ['우리 부모님은 나에게 시켰어요', '너무 많이 공부하게,', '그래서 나는 아이들에게 강요하지 않아요', '무엇이든 하라고.']],
+  'cv-0404': [['Back when we were kids,', 'my brother', 'made me clean', 'his room—', 'for ten years!'], ['우리가 어렸을 때,', '우리 형은', '나에게 청소를 시켰어요', '자기 방을,', '무려 10년 동안!']],
+  'cv-0407': [['I got Sarah', 'to fill in for me at work', 'so I could take the day off.'], ['사라에게 부탁했어요', '직장에서 나를 대신해 달라고', '그래서 내가 하루 휴가를 낼 수 있게.']],
+  'cv-0417': [['Not really.', 'Venting didn’t make me feel any better.'], ['별로 그렇지 않았어요.', '화를 쏟아 내도 기분이 전혀 나아지지 않았어요.']],
+  'cv-0419': [["It’s going OK,", 'but I miss the steady paycheck', 'sometimes.'], ['그럭저럭 잘돼 가요,', '하지만 안정적인 월급이 그리워요', '가끔은.']],
+  'cv-0426': [['I’m not much of a movie-goer.', 'I usually just stick to YouTube.'], ['영화관을 즐겨 찾는 편은 아니에요.', '보통은 그냥 유튜브만 봐요.']],
+  'cv-0428': [['Hey, guys.', 'I don’t think', 'I can make it to lunch.'], ['얘들아.', '아무래도', '점심 자리에 못 갈 것 같아.']],
+  'cv-0429': [['We’re having a party tomorrow;', 'do you think you can make it?'], ['우리 내일 파티를 해;', '올 수 있을 것 같아?']],
+  'cv-0430': [['I barely made it', 'to the airport', 'on time,', 'only to have my flight delayed.'], ['가까스로 도착했어요', '공항에', '제시간에,', '그런데 결국 항공편이 지연됐죠.']],
+  'cv-0431': [['I get irritable', 'on days', 'when I can’t make it to the gym.'], ['나는 예민해져요', '그런 날에는', '헬스장에 못 갈 때.']],
+  'cv-0434': [['Do you think', 'we can make it there', 'in time?'], ['어떻게 생각해', '우리가 거기 도착할 수 있을까', '제시간에?']],
+  'cv-0437': [['Pretty good!', 'Do you think you can make it', 'this weekend?'], ['꽤 좋아!', '올 수 있을 것 같아', '이번 주말에?']],
+  'cv-0442': [['I was thinking of quitting', 'every week.', 'I’m so glad', 'I kept studying,', 'and that I made it', 'to the end of the semester.'], ['포기할까 생각했어요', '매주.', '정말 다행이에요', '공부를 계속했고,', '그리고 버텼다는 것도', '학기 끝까지.']],
+  'cv-0443': [['The conference is a little over two weeks away,', 'and we need to verify', 'our guest list.', 'Please respond', 'and let me know ASAP', 'if you CANNOT make it.'], ['회의까지 2주 조금 넘게 남았고,', '확인해야 합니다', '참석자 명단을.', '회신해 주세요', '그리고 최대한 빨리 알려 주세요', '참석할 수 없다면.']],
+  'cv-0449': [['My grandma always', 'used to tell me', 'to learn to cook.', 'Otherwise,', 'I wouldn’t make a good wife.'], ['우리 할머니는 늘', '내게 말씀하곤 하셨어요', '요리를 배우라고.', '그러지 않으면,', '좋은 아내가 되지 못할 거라고.']],
+  'cv-0450': [['I can’t put this book down.', 'It would make a great movie.'], ['이 책을 도저히 내려놓을 수가 없어.', '멋진 영화가 될 거야.']],
+  'cv-0456': [['They suggested', 'a bunch of places to eat', 'at the front desk.'], ['추천해 줬어요', '먹을 만한 곳을 여러 군데', '프런트에서.']],
+  'cv-0466': [['Sure!', 'Take as many as you want.'], ['물론이지!', '원하는 만큼 가져가.']],
+  'cv-0484': [['Hi,', 'I’d like to make a reservation', 'for two', 'this Friday.'], ['안녕하세요,', '예약하고 싶습니다', '두 명 자리로', '이번 주 금요일에.']],
+  'cv-0490': [["We’re fully booked", 'today,', 'but', 'we might', 'be able to take', 'a few walk-ins.'], ['예약이 모두 찼습니다', '오늘은,', '그래도', '저희가 아마', '받을 수 있을 겁니다', '예약 없이 온 손님 몇 분을.']],
+  'cv-0492': [['Sorry, we don’t accept walk-ins.', 'You’ll need to make an appointment.'], ['죄송하지만, 비예약 방문은 받지 않습니다.', '미리 예약하셔야 합니다.']],
+  'cv-0501': [["I didn’t think", 'my boss would actually take my advice,', 'but he did!'], ['생각지 못했어', '상사가 정말 내 조언을 받아들일 줄은,', '그런데 정말 받아들였어!']],
+  'cv-0502': [['I’m sorry', 'I have to quit so suddenly,', 'but I need to take this opportunity.'], ['미안해요', '이렇게 갑자기 그만둬야 해서,', '하지만 이 기회는 꼭 잡아야 해요.']],
+  'cv-0503': [["If I don’t take a chance now,", 'it might be too late.'], ['지금 기회를 잡지 않으면,', '너무 늦을지도 몰라요.']],
+  'cv-0510': [["My brother can’t make ends meet,", 'so I’m going to lend him some money.'], ['내 동생은 생활비를 감당하지 못해서,', '내가 돈을 좀 빌려주려고 해.']],
+  'cv-0513': [['I have a lot of bills to pay', 'every month.', 'It’s impossible to save.'], ['내야 할 고지서가 아주 많아요', '매달.', '저축은 불가능해요.']],
+  'cv-0518': [["It doesn’t take much", 'to make a bad first impression.'], ['별로 많은 게 필요하지 않아', '나쁜 첫인상을 남기는 데.']],
+  'cv-0519': [['It took a lot of blood, sweat, and tears', 'to finish my book.'], ['정말 많은 피땀과 눈물이 들었어', '내 책을 끝내는 데.']],
+  'cv-0522': [['The team’s been doing so much better', 'since Vincent took over.'], ['팀 성과가 훨씬 좋아졌어요', '빈센트가 맡은 뒤로.']],
+  'cv-0525': [['Agreed.', 'He knows how to bring people together.'], ['동감해.', '그는 사람들을 하나로 모으는 법을 알아.']],
+  'cv-0529': [['My cousin spent a great deal of time', 'in Chile,', 'so she speaks Spanish.'], ['내 사촌은 아주 오랜 시간을 보냈어', '칠레에서,', '그래서 스페인어를 해.']],
+  'cv-0531': [['Yeah, actually.', 'My cousin is a developer', 'with a great deal of knowledge and experience.'], ['응, 사실은.', '내 사촌이 개발자야', '지식과 경험이 아주 풍부한.']],
+  'cv-0544': [['Some say', 'painting is a relaxing hobby.'], ['어떤 사람들은 말해', '그림 그리기가 마음이 편해지는 취미라고.']],
+  'cv-0546': [['Working on the farm', 'is demanding,', 'but it puts me at ease', 'to work with my hands.'], ['농장에서 일하는 건', '힘들지만,', '그래도 마음이 편해져요', '손으로 일하면.']],
+  'cv-0550': [['Watching you walk around the house', 'all day', 'stresses me out.'], ['네가 집 안을 돌아다니는 걸 보면', '하루 종일', '정말 스트레스받아.']],
+  'cv-0552': [['I’ll take that as a compliment.'], ['그 말은 칭찬으로 받아들일게.']],
+  'cv-0553': [['My son failed his test,', 'and he’s taking it really hard.'], ['아들이 시험에 떨어졌고,', '그 일을 몹시 힘들어하고 있어.']],
+  'cv-0558': [['Internet trolls.', 'He takes YouTube comments so personally.'], ['악플러들 때문이지.', '그는 유튜브 댓글을 너무 개인적으로 받아들여.']],
+  'cv-0569': [['I do a lot of admin work', 'at my job.'], ['일반 행정 업무를 많이 해요', '직장에서.']],
+  'cv-0573': [['I do the grocery shopping', 'when my husband is out of town.'], ['내가 장을 봐', '남편이 다른 지역에 가 있을 때.']],
+  'cv-0579': [["Sure, I’ll take it,", 'but I don’t like', 'paying for things', 'I can do myself.'], ['그래, 그 명함은 받을게,', '하지만 좋아하지 않아', '돈을 내는 걸', '내가 직접 할 수 있는 일에.']],
+  'cv-0582': [['Online banking', 'saves us a trip to the bank.'], ['온라인 뱅킹은', '은행에 한 번 가지 않아도 되게 해요.']],
+  'cv-0588': [['My cat likes', 'to knock things off the table.'], ['우리 고양이는 좋아해', '테이블의 물건을 쳐서 떨어뜨리는 걸.']],
+  'cv-0589': [['I like to study,', 'but I’m not cut out for', 'the medical field.'], ['나는 공부하는 걸 좋아하지만,', '잘 맞는 사람은 아니에요', '의료 분야에.']],
+  'cv-0595': [['Yeah,', 'but he likes to spend most of the session', 'talking about politics,', 'and I can’t stand it', 'anymore.'], ['응,', '그런데 그는 수업 대부분을 보내길 좋아해', '정치 얘기를 하면서,', '그리고 나는 그걸 참을 수 없어', '더는.']],
+  'cv-0600': [['I hate', 'when they put corn on cheese pizza', 'without any warning on the menu.'], ['정말 싫어요', '치즈 피자에 옥수수를 올려놓는 게', '메뉴에 아무런 안내도 없이.']],
+  'cv-0617': [['Do you see the difference', 'between the two options?'], ['차이가 보이나요', '두 선택지를 비교했을 때요?']],
+  'cv-0621': [['I know', 'a good place not far from here.'], ['내가 알아요', '여기서 멀지 않은 괜찮은 곳을.']],
+  'cv-0637': [['Wait,', 'I smell something cooking.', 'Smells great.'], ['잠깐,', '뭔가 요리하는 냄새가 나.', '냄새 좋다.']],
+  'cv-0643': [['Acupuncture', 'really works', 'for me.', 'Why don’t you give it a shot?'], ['침은', '정말 효과가 있어', '나에게.', '당신도 한번 해 보는 게 어때?']],
+  'cv-0649': [["Don’t we have a wedding to go to", 'at 4?'], ['우리 가야 할 결혼식 있지 않아', '4시에?']],
+  'cv-0653': [['Maybe not today,', 'but if you trained for it,', 'you could.', 'Give it a shot!'], ['오늘 당장은 아닐지라도,', '하지만 그에 맞춰 훈련한다면,', '할 수 있을 거야.', '도전해 봐!']],
+  'cv-0658': [['Let me have a try—', 'I went to the gym today.'], ['내가 한번 해 볼게', '나 오늘 헬스장 다녀왔거든.']],
+  'cv-0659': [['Dating', 'doesn’t work that way', 'anymore.', 'Times have changed.'], ['연애는', '그런 식으로 통하지 않아', '이제는.', '시대가 바뀌었어.']],
+  'cv-0660': [['You can’t force someone', 'to love you—', 'it doesn’t work that way.'], ['누군가를 억지로 만들 순 없어', '너를 사랑하게—', '사랑은 그런 식으로 되지 않아.']],
+  'cv-0662': [['Sorry,', 'but the app doesn’t work that way.'], ['죄송하지만,', '그 앱은 그런 식으로 쓰는 게 아니에요.']],
+  'cv-0669': [['Not a problem.', 'If something comes up, though,', 'is it possible for me to get', 'my deposit back?'], ['괜찮습니다.', '그런데 무슨 일이 생기면,', '제가 돌려받을 수 있을까요', '계약금을?']],
+  'cv-0700': [['He went crazy', 'when the Dodgers won the World Series.'], ['그는 열광했어', '다저스가 월드 시리즈에서 우승했을 때.']],
+  'cv-0708': [['I have new aches and pains', 'all the time', 'these days.', 'We’re getting old.'], ['새로 쑤시고 아픈 데가 생겨요', '늘', '요즘에는.', '우리 늙어가네.']],
+  'cv-0717': [['Excuse me,', 'where should these expense reports go', 'when I’m done?'], ['실례합니다,', '이 경비 보고서들을 어디에 둬야 하나요', '제가 끝낸 뒤에?']],
+  'cv-0739': [['Yes,', 'we’re sorry about that,', 'but we don’t take reservations', 'for those tables.'], ['네,', '그 점은 죄송하지만,', '저희는 예약을 받지 않아요', '그 자리들에 대해서는.']],
+  'cv-0741': [['Really?', 'I have been wanting to try', 'the new instructor’s class.'], ['정말요?', '계속 한번 들어 보고 싶었어요', '새 강사의 수업을.']],
+  'cv-0744': [['My mom has been wanting to meet you.'], ['우리 엄마는 계속 너를 만나고 싶어 하셨어.']],
+  'cv-0748': [['The app says', 'I need to update my password.'], ['앱에 나와요', '비밀번호를 바꿔야 한다고.']],
+  'cv-0751': [['What does it say', 'on the back of the book?'], ['뭐라고 적혀 있어', '책 뒤표지에?']],
+  'cv-0757': [['Further down,', 'it says', 'they should have it back in stock', 'next week.'], ['더 아래쪽에는,', '적혀 있어', '그 상품이 다시 들어올 거라고', '다음 주에.']],
+  'cv-0784': [['My boss refuses to let me work', 'from home.'], ['내 상사는 제가 일하는 걸 허락하지 않아요', '집에서.']],
+  'cv-0792': [['I know!', 'I thought', 'they were going to kick us out,', 'though.'], ['그러게!', '나는 생각했어', '그들이 우리를 쫓아내려는 줄,', '그런데 말이야.']],
+  'cv-0800': [['I can’t let nasty comments discourage me.'], ['악플이 나를 기죽이게 둘 순 없어.']],
+  'cv-0803': [['Don’t let', 'the breakup mess with your studies.'], ['그냥 두지 마', '그 이별이 네 공부를 망치도록.']],
+  'cv-0806': [['Andrew,', 'why aren’t you going on more dates?'], ['앤드루,', '왜 데이트를 더 하지 않는 거야?']],
+  'cv-0815': [['I applied to YouTube,', 'but I haven’t heard anything back,', 'yet.'], ['유튜브에 지원했지만,', '아무 답도 받지 못했어요,', '아직.']],
+  'cv-0825': [['Oh, perfect!', 'That will give me enough time', 'to grab some coffee.'], ['오, 딱 좋네요!', '그러면 내게 충분한 시간이 생겨요', '커피를 좀 사 올 만큼.']],
+  'cv-0827': [['You think so?', 'I don’t think I’d get it.'], ['그렇게 생각해?', '내가 될 것 같진 않아.']],
+  'cv-0832': [['Guys,', 'I don’t think I can make it', 'this week.'], ['얘들아,', '참석할 수 없을 것 같아', '이번 주에는.']],
+  'cv-0839': [['Go ahead', 'and give yourself a pat on the back.'], ['어서 해 봐', '그리고 스스로 잘했다고 칭찬해.']],
+  'cv-0843': [['Hey,', 'just to give you a heads-up—', 'a couple people', 'are coming over tonight.'], ['있잖아,', '미리 알려 두는데—', '두어 명이', '오늘 밤 놀러 올 거야.']],
+  'cv-0849': [['Just to update you,', 'we found a buyer,', 'and we hope to move', 'into your place', 'by the end of the month.'], ['상황을 알려 드리자면,', '저희 집 구매자를 찾았고,', '저희는 이사하고 싶어요', '당신 댁으로', '이달 말까지.']],
+  'cv-0857': [["I don’t keep", 'emails that are more than a year old.'], ['보관하지 않아요', '1년이 넘은 이메일은.']],
+  'cv-0859': [["No, no, that’s OK.", 'Just keep it', 'until I see you next time.'], ['아니야, 아니야, 괜찮아.', '그냥 가지고 있어', '다음에 만날 때까지.']],
+  'cv-0861': [['True.', 'I’ll have to get my luggage out.'], ['맞아.', '여행용 가방을 꺼내야겠어.']],
+  'cv-0867': [['The pilot turned the plane around.'], ['조종사가 비행기의 기수를 돌렸어요.']],
+  'cv-0084': [['I have some work to take care of', 'before I start my vacation.'], ['처리할 일이 좀 있어요', '휴가를 시작하기 전에.']],
+  'cv-0252': [['OK,', 'I have some quieter places to show you.'], ['좋아요,', '보여 드릴 더 조용한 곳들이 있어요.']],
+  'cv-0487': [['My team and I', 'are working on a proposal that we will present very soon.'], ['저와 저희 팀은', '곧 발표할 계획안을 준비 중입니다.']],
+  'cv-0632': [['I saw some people filming a news report', 'on my street', 'yesterday.'], ['뉴스 리포트를 촬영하는 사람 몇 명을 봤어', '우리 동네에서', '어제.']],
+  'cv-0691': [['There is something about old pop songs', 'that I find so comforting.'], ['옛날 팝송에는 뭔가 있어요', '내 마음을 아주 편안하게 하는 게.']],
+  'cv-0692': [['There’s something about ramyeon', 'that upsets my stomach.'], ['라면에는 뭔가 있어요', '내 속을 불편하게 하는 게.']],
+  'cv-0693': [['Something about this place', 'feels so familiar.'], ['이곳의 뭔가가', '아주 익숙하게 느껴져요.']],
+  'cv-0694': [['Something about his attitude', 'bothers me.'], ['그의 태도에서 느껴지는 뭔가가', '나를 거슬리게 해요.']],
+  'cv-0740': [['I signed up for a Pilates class', 'at the gym.'], ['필라테스 수업을 신청했어', '헬스장에서.']],
+  'cv-0745': [['I’ve been wanting', 'to try that new cafe next to the palace.'], ['계속 가 보고 싶었어', '궁 바로 옆의 그 새 카페에.']],
+  'cv-0816': [['Have you applied', 'to any schools on the East Coast?'], ['지원한 적 있나요', '미 동부 쪽 학교 어디에라도?']],
+  'cv-0826': [['Hey, Jiho,', 'you should apply for', 'the position in San Francisco.'], ['있잖아, 지호야,', '지원해 보는 게 좋겠어', '샌프란시스코에 있는 그 자리에.']],
+  // THEORY_CORRECTIONS_END
+};
+
+// 첫 학습 단계는 단어 수가 아니라 형태와 의미가 함께 처리되는 단위로 나눈다.
+// 숙련 청크보다 더 나누는 것이 실제로 도움이 되는 문장만 여기에 둔다.
+// 나머지는 검수된 assemblyChunks를 그대로 사용하며 중복 단계는 앱이 건너뛴다.
+const legacyScaffoldCorrections = {
   'cv-0003': [['I have', 'some friends', 'living', 'in Chicago.'], ['내게는 있어요', '친구들이 몇 명', '살고 있는', '시카고에.']],
   'cv-0007': [['Are you glad', 'the project', 'is over?'], ['기쁘세요', '그 프로젝트가', '끝나서?']],
   'cv-0012': [['A few,', 'but I try', 'not to think', 'about it', 'too much.'], ['조금은 있어,', '하지만 애써', '생각하지 않으려고 해', '그 일은', '너무 깊이는.']],
@@ -471,99 +650,24 @@ const microCorrections = {
   'cv-0346': [["I can’t get", 'this grease', 'to come off.'], ['나는 떼어 낼 수 없어요', '이 기름때를', '떨어지게.']],
 };
 
-const preservedFiveWordChunks = new Set([
-  // 다섯 단어여도 통째로 익힐 가치가 큰 관용구·고정 전치사구다.
-  "let’s call it a night.",
-  'in front of the camera.',
-  'every once in a while.',
-  'for less than a week.',
-  'when I was a kid.',
-  'to get some fresh air.',
-  'a pat on the back.',
-]);
-
-function wordCount(value) {
-  return String(value).trim().split(/\s+/).filter(Boolean).length;
-}
-
-function chooseEnglishSplit(words) {
-  const lower = words.map(word => word.toLowerCase().replace(/^[^a-z]+|[^a-z'’]+$/g, ''));
-  let best = { index: Math.ceil(words.length / 2), score: -Infinity };
-  const determiners = new Set(['a', 'an', 'the', 'this', 'that', 'these', 'those', 'my', 'your', 'his', 'her', 'our', 'their', 'some', 'any']);
-  const prepositions = new Set(['about', 'after', 'at', 'before', 'by', 'for', 'from', 'in', 'into', 'of', 'on', 'over', 'through', 'to', 'under', 'with', 'without']);
-  const clauses = new Set(['and', 'but', 'because', 'if', 'only', 'that', 'when', 'where', 'which', 'while', 'who', 'why']);
-  const auxiliaries = new Set(['am', 'are', 'is', 'was', 'were', 'be', 'been', 'being', 'can', 'could', 'do', 'does', 'did', 'have', 'has', 'had', 'may', 'might', 'must', 'shall', 'should', 'will', 'would']);
-  const phrasalParticles = new Set(['back', 'down', 'in', 'off', 'on', 'out', 'over', 'through', 'up']);
-
-  for (let index = 2; index <= words.length - 2; index += 1) {
-    const left = lower[index - 1];
-    const right = lower[index];
-    const leftSize = index;
-    const rightSize = words.length - index;
-    let score = -Math.abs(leftSize - rightSize) * 0.7;
-    if (leftSize >= 2 && rightSize >= 2) score += 2;
-    if (clauses.has(right)) score += 4;
-    if (prepositions.has(right) && index >= 2) score += 2.5;
-    if (determiners.has(right) && !prepositions.has(left)) score += 2;
-    if (auxiliaries.has(left)) score -= 3;
-    if (prepositions.has(left)) score -= 4;
-    if (determiners.has(left)) score -= 4;
-    if (phrasalParticles.has(right)) score -= 2.5;
-    if (left === 'to') score -= 5;
-    if (right === 'to' && index >= 2) score += 1;
-    if ((left === 'no' && right === 'one') || (left === 'one' && right === 'else')) score -= 6;
-    if (/^[A-Z]/.test(words[index - 1]) && /^[A-Z]/.test(words[index])) score -= 5;
-    if (score > best.score) best = { index, score };
-  }
-  return best.index;
-}
-
-function splitKoreanGloss(gloss, ratio = 0.5) {
-  const words = String(gloss).trim().split(/\s+/).filter(Boolean);
-  if (words.length < 2) return [gloss];
-  let best = { index: Math.max(1, Math.min(words.length - 1, Math.round(words.length * ratio))), score: -Infinity };
-  const preferredEnding = /(은|는|이|가|도|만|을|를|에|에서|에게|한테|로|으로|와|과|하고|라면|다면|지만|고|며|면|때|뒤|후)[,;:]?$/;
-  for (let index = 1; index < words.length; index += 1) {
-    const left = words[index - 1];
-    const leftSize = index;
-    const rightSize = words.length - index;
-    let score = -Math.abs(index / words.length - ratio) * 5;
-    if (leftSize >= 1 && rightSize >= 1) score += 1;
-    if (preferredEnding.test(left)) score += 2;
-    if (/[,;:]$/.test(left)) score += 4;
-    if (/[.!?]$/.test(left)) score += 5;
-    if (score > best.score) best = { index, score };
-  }
-  return [words.slice(0, best.index).join(' '), words.slice(best.index).join(' ')];
-}
+// v2에서 직접 남긴 초급 발판 청크다. 조동사 태도 단위나 담화 표지처럼
+// 짧게 떼어도 의미가 선명한 경우만 숙련 청크보다 한 단계 더 나눈다.
+const scaffoldCorrections = {
+  'cv-0031': [['I saw the game', 'on the TV', 'at the bar,', 'but', "I didn't watch it."], ['경기가 나오는 건 봤어요', 'TV로', '그 술집에서,', '하지만', '제대로 보진 않았어요.']],
+  'cv-0133': [['Kim&Kim Law Office;', 'how', 'may I direct', 'your call?'], ['김앤김 법률 사무소입니다;', '어디로', '연결해', '드릴까요?']],
+  'cv-0135': [['She', 'is currently with a client', 'right now.', 'May I take a message?'], ['그분은', '현재 의뢰인과 함께 계세요', '바로 지금은요.', '메시지를 받아 둘까요?']],
+  'cv-0353': [['Still,', 'you should', 'get him to pay', 'for the damages!'], ['그래도,', '넌 꼭', '그 사람이 물어내게 해야 해', '손해를!']],
+  'cv-0400': [['Your girlfriend', 'is already making you', 'wear matching outfits?'], ['네 여자친구가', '벌써 너에게 시키고 있어', '커플 룩을 입으라고?']],
+  'cv-0430': [['I barely made it', 'to the airport', 'on time,', 'only to have my flight delayed.'], ['가까스로 도착했어요', '공항에', '제시간에,', '그런데 결국 항공편이 지연됐죠.']],
+  'cv-0490': [["We’re fully booked", 'today,', 'but', 'we might', 'be able to take', 'a few walk-ins.'], ['예약이 모두 찼습니다', '오늘은,', '그래도', '저희가 아마', '받을 수 있을 겁니다', '예약 없이 온 손님 몇 분을.']],
+  'cv-0660': [['You can’t force someone', 'to love you—', 'it doesn’t work', 'that way.'], ['누군가를 억지로 만들 순 없어', '너를 사랑하게—', '사랑은 되지 않아', '그런 식으로.']],
+  'cv-0843': [['Hey,', 'just to give you a heads-up—', 'a couple people', 'are coming over', 'tonight.'], ['있잖아,', '미리 알려 두는데—', '두어 명이', '놀러 올 거야', '오늘 밤.']],
+};
 
 function buildMicroChunks(item) {
-  const correction = microCorrections[item.id];
+  const correction = scaffoldCorrections[item.id];
   if (correction) return correction;
-
-  const microChunks = [];
-  const microOrderGlosses = [];
-  item.assemblyChunks.forEach((chunk, index) => {
-    const gloss = item.orderGlosses[index];
-    const normalized = String(chunk).toLowerCase().replace(/[“”]/g, '"').trim();
-    if (wordCount(chunk) <= 4 || preservedFiveWordChunks.has(normalized) || wordCount(gloss) < 2) {
-      microChunks.push(chunk);
-      microOrderGlosses.push(gloss);
-      return;
-    }
-    const words = String(chunk).trim().split(/\s+/);
-    const splitAt = chooseEnglishSplit(words);
-    if (!splitAt) {
-      microChunks.push(chunk);
-      microOrderGlosses.push(gloss);
-      return;
-    }
-    const parts = [words.slice(0, splitAt).join(' '), words.slice(splitAt).join(' ')];
-    const glossParts = splitKoreanGloss(gloss, splitAt / words.length);
-    microChunks.push(...parts);
-    microOrderGlosses.push(...glossParts);
-  });
-  return [microChunks, microOrderGlosses];
+  return [item.assemblyChunks.slice(), item.orderGlosses.slice()];
 }
 
 function joinChunks(chunks) {
@@ -582,7 +686,7 @@ function cleanGloss(gloss) {
 
 function applyToItem(item) {
   if (Array.isArray(item.orderGlosses)) item.orderGlosses = item.orderGlosses.map(cleanGloss);
-  const correction = corrections[item.id];
+  const correction = theoryCorrections[item.id] ?? corrections[item.id];
   if (!correction) return false;
   const [assemblyChunks, orderGlosses] = correction;
   if (joinChunks(assemblyChunks) !== item.english) {
@@ -612,34 +716,41 @@ async function updateJson(file) {
       }
       item.microChunks = microChunks;
       item.microOrderGlosses = microOrderGlosses.map(cleanGloss);
+      item.reviewStatus = 'reviewed';
       item.microChunkReview = {
-        rulesVersion: 1,
+        rulesVersion: 2,
         reviewStatus: 'reviewed',
-        reviewMethod: 'codex_full_pass_with_direct_exceptions',
+        reviewMethod: 'codex_theory_guided_full_review',
       };
       item.meaningFlow = {
-        rulesVersion: 1,
+        rulesVersion: 2,
         reviewStatus: 'reviewed',
-        reviewMethod: 'codex_direct_full_review',
+        reviewMethod: 'codex_theory_guided_full_review',
         pilot: pilotIds.has(item.id),
       };
     }
     if (JSON.stringify([item.assemblyChunks, item.orderGlosses, item.microChunks, item.microOrderGlosses]) !== before) changed += 1;
   }
   if (path.basename(file) === 'learning-content.json') {
+    document.chunkRulesVersion = 3;
+    document.reviewStatus = 'reviewed';
+    document.qualityReviewModel = 'codex_theory_guided_full_review';
+    document.meaningFlowRulesVersion = 2;
     document.meaningFlowReviewCount = pilotIds.size;
     document.meaningFlowDirectReviewCount = document.items.length;
     document.meaningFlowAiCheckedCount = 0;
     document.meaningFlowDraftCount = 0;
     document.meaningFlowTotal = document.items.length;
-    document.meaningFlowModel = 'codex_direct_full_review';
-    document.microChunkRulesVersion = 1;
+    document.meaningFlowModel = 'codex_theory_guided_full_review';
+    document.microChunkRulesVersion = 2;
     document.microChunkReviewCount = document.items.length;
-    document.microChunkReviewMethod = 'codex_full_pass_with_direct_exceptions';
+    document.microChunkReviewMethod = 'codex_theory_guided_full_review';
   } else if (file.includes(`${path.sep}meaning-flow-batches${path.sep}`)) {
+    document.rulesVersion = 2;
     document.reviewStatus = 'reviewed';
   } else if (path.basename(file) === 'meaning-flow-overrides.json') {
-    document.description = '869문장 전수 검수 중 대표 문장에 우선 적용하는 직접 검수 자료';
+    document.rulesVersion = 2;
+    document.description = '형태·의미·운율 경계를 기준으로 869문장을 전수 검수한 대표 회귀 문장';
   }
   await writeFile(file, `${JSON.stringify(document, null, 2)}\n`, 'utf8');
   return changed;
@@ -656,4 +767,24 @@ const targets = [
 
 let total = 0;
 for (const target of targets) total += await updateJson(target);
-process.stdout.write(`직접 검수 교정 적용 완료: ${Object.keys(corrections).length}문장, ${total}개 저장 위치 갱신\n`);
+
+const reviewedContent = JSON.parse(await readFile(path.join(DATA, 'learning-content.json'), 'utf8'));
+const makeItems = reviewedContent.items
+  .filter(item => item.verb === 'MAKE')
+  .map(item => ({
+    id: item.id,
+    microChunks: item.microChunks,
+    microOrderGlosses: item.microOrderGlosses,
+    assemblyChunks: item.assemblyChunks,
+    orderGlosses: item.orderGlosses,
+  }));
+await writeFile(path.join(DATA, 'make-chunk-overrides.json'), `${JSON.stringify({
+  schemaVersion: 2,
+  verb: 'MAKE',
+  reviewStatus: 'reviewed',
+  reviewMethod: 'codex_theory_guided_full_review',
+  reviewCount: makeItems.length,
+  items: makeItems,
+}, null, 2)}\n`, 'utf8');
+
+process.stdout.write(`이론 기반 전수 교정 적용 완료: ${Object.keys(theoryCorrections).length}개 v2 교정, ${total}개 저장 위치 갱신\n`);
