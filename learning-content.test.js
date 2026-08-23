@@ -397,6 +397,7 @@ test('all 869 stored items keep one-to-one Korean and English chunk boundaries f
 test('the mobile review screen keeps word-level marking without error categories or a core phrase panel', () => {
     const html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
     const app = fs.readFileSync(path.join(__dirname, 'app.js'), 'utf8');
+    const css = fs.readFileSync(path.join(__dirname, 'style.css'), 'utf8');
     assert.match(html, /영어 청크로 확인/);
     assert.match(html, /영어 의미 전개 순서/);
     assert.match(app, /의미 단서를 앞에서부터 따라가며/);
@@ -431,11 +432,12 @@ test('the mobile review screen keeps word-level marking without error categories
     assert.match(html, /id="daily-session-progress"/);
     assert.match(app, /adaptiveLimit - dailyLearned/);
     assert.match(app, /const DAILY_NEW_LIMIT = 12/);
-    assert.match(app, /const APP_VERSION = '23'/);
+    assert.match(app, /const APP_VERSION = '24'/);
     assert.match(app, /Learning\.selectCoreVerbNewCards/);
     assert.match(app, /newByVerb/);
     assert.match(app, /register\(`sw\.js\?v=\$\{APP_VERSION\}`,[^)]*updateViaCache: 'none'/);
-    assert.match(html, /Core Verbs v23/);
+    assert.match(html, /Core Verbs v24/);
+    assert.match(css, /\.self-check-controls\s*\{[^}]*margin-top:\s*10px;/s);
     assert.match(html, /id="completion-title"/);
     assert.match(html, /id="btn-extra-review"[^>]*onclick="startExtraReviewSession\(\)"/);
     assert.match(html, /id="btn-demo-session"[^>]*onclick="startDemoSession\(\)"/);
