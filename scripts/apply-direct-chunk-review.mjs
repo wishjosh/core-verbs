@@ -473,7 +473,7 @@ const theoryCorrections = {
   'cv-0550': [['Watching you walk around the house', 'all day', 'stresses me out.'], ['네가 집 안을 돌아다니는 걸 보면', '하루 종일', '정말 스트레스받아.']],
   'cv-0552': [['I’ll take that as a compliment.'], ['그 말은 칭찬으로 받아들일게.']],
   'cv-0553': [['My son failed his test,', 'and he’s taking it really hard.'], ['아들이 시험에 떨어졌고,', '그 일을 몹시 힘들어하고 있어.']],
-  'cv-0558': [['Internet trolls.', 'He takes YouTube comments so personally.'], ['악플러들 때문이지.', '그는 유튜브 댓글을 너무 개인적으로 받아들여.']],
+  'cv-0558': [['Internet trolls.', 'He', 'takes YouTube comments so personally.'], ['악플러들 때문이지.', '그는', '유튜브 댓글을 너무 개인적인 공격으로 받아들여.']],
   'cv-0569': [['I do a lot of admin work', 'at my job.'], ['일반 행정 업무를 많이 해요', '직장에서.']],
   'cv-0573': [['I do the grocery shopping', 'when my husband is out of town.'], ['내가 장을 봐', '남편이 다른 지역에 가 있을 때.']],
   'cv-0579': [["Sure, I’ll take it,", 'but I don’t like', 'paying for things', 'I can do myself.'], ['그래, 그 명함은 받을게,', '하지만 좋아하지 않아', '돈을 내는 걸', '내가 직접 할 수 있는 일에.']],
@@ -660,6 +660,7 @@ const scaffoldCorrections = {
   'cv-0400': [['Your girlfriend', 'is already making you', 'wear matching outfits?'], ['네 여자친구가', '벌써 너에게 시키고 있어', '커플 룩을 입으라고?']],
   'cv-0430': [['I barely made it', 'to the airport', 'on time,', 'only to have my flight delayed.'], ['가까스로 도착했어요', '공항에', '제시간에,', '그런데 결국 항공편이 지연됐죠.']],
   'cv-0490': [["We’re fully booked", 'today,', 'but', 'we might', 'be able to take', 'a few walk-ins.'], ['예약이 모두 찼습니다', '오늘은,', '그래도', '저희가 아마', '받을 수 있을 겁니다', '예약 없이 온 손님 몇 분을.']],
+  'cv-0558': [['Internet trolls.', 'He', 'takes YouTube comments', 'so personally.'], ['악플러들 때문이지.', '그는', '유튜브 댓글을 받아들여', '너무 개인적인 공격으로.']],
   'cv-0660': [['You can’t force someone', 'to love you—', 'it doesn’t work', 'that way.'], ['누군가를 억지로 만들 순 없어', '너를 사랑하게—', '사랑은 되지 않아', '그런 식으로.']],
   'cv-0843': [['Hey,', 'just to give you a heads-up—', 'a couple people', 'are coming over', 'tonight.'], ['있잖아,', '미리 알려 두는데—', '두어 명이', '놀러 올 거야', '오늘 밤.']],
 };

@@ -385,6 +385,14 @@ test('reviewed examples preserve the agreed learning intent', () => {
     assert.deepEqual(walkIns.microOrderGlosses, [
         '예약이 모두 찼습니다', '오늘은,', '그래도', '저희가 아마', '받을 수 있을 겁니다', '예약 없이 온 손님 몇 분을.'
     ]);
+
+    const youtubeComments = byEnglish.get('Internet trolls. He takes YouTube comments so personally.');
+    assert.deepEqual(youtubeComments.microChunks, [
+        'Internet trolls.', 'He', 'takes YouTube comments', 'so personally.'
+    ]);
+    assert.deepEqual(youtubeComments.assemblyChunks, [
+        'Internet trolls.', 'He', 'takes YouTube comments so personally.'
+    ]);
 });
 
 test('all 869 stored items build an answerable practice question', () => {
@@ -458,11 +466,11 @@ test('the mobile review screen keeps word-level marking without error categories
     assert.match(html, /id="daily-session-progress"/);
     assert.match(app, /adaptiveLimit - dailyLearned/);
     assert.match(app, /const DAILY_NEW_LIMIT = 12/);
-    assert.match(app, /const APP_VERSION = '26'/);
+    assert.match(app, /const APP_VERSION = '27'/);
     assert.match(app, /Learning\.selectCoreVerbNewCards/);
     assert.match(app, /newByVerb/);
     assert.match(app, /register\(`sw\.js\?v=\$\{APP_VERSION\}`,[^)]*updateViaCache: 'none'/);
-    assert.match(html, /Core Verbs v26/);
+    assert.match(html, /Core Verbs v27/);
     assert.match(css, /\.self-check-controls\s*\{[^}]*margin-top:\s*10px;/s);
     assert.match(html, /id="completion-title"/);
     assert.match(html, /id="btn-extra-review"[^>]*onclick="startExtraReviewSession\(\)"/);

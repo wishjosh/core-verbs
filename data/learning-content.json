@@ -23809,11 +23809,13 @@
       "english": "Internet trolls. He takes YouTube comments so personally.",
       "assemblyChunks": [
         "Internet trolls.",
-        "He takes YouTube comments so personally."
+        "He",
+        "takes YouTube comments so personally."
       ],
       "orderGlosses": [
         "악플러들 때문이지.",
-        "그는 유튜브 댓글을 너무 개인적으로 받아들여."
+        "그는",
+        "유튜브 댓글을 너무 개인적인 공격으로 받아들여."
       ],
       "corePatterns": [
         "take + 목적어 + 부사"
@@ -23828,11 +23830,15 @@
       },
       "microChunks": [
         "Internet trolls.",
-        "He takes YouTube comments so personally."
+        "He",
+        "takes YouTube comments",
+        "so personally."
       ],
       "microOrderGlosses": [
         "악플러들 때문이지.",
-        "그는 유튜브 댓글을 너무 개인적으로 받아들여."
+        "그는",
+        "유튜브 댓글을 받아들여",
+        "너무 개인적인 공격으로."
       ],
       "microChunkReview": {
         "rulesVersion": 2,
