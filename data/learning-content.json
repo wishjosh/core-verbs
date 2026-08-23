@@ -12401,7 +12401,7 @@
       "id": "cv-0282",
       "day": 17,
       "verb": "GET",
-      "naturalKo": "어찌어찌해서 애들은 학교에 늦지 않게 등교시켰어.",
+      "naturalKo": "어찌어찌해서 애들을 제시간에 학교에 보냈어.",
       "english": "I somehow managed to get the kids to school on time.",
       "assemblyChunks": [
         "I somehow managed",
@@ -12409,8 +12409,8 @@
         "on time."
       ],
       "orderGlosses": [
-        "어떻게든 해냈어",
-        "아이들을 학교에 데려다주는 걸",
+        "어찌어찌 해냈어",
+        "아이들을 학교에 보내는 걸",
         "제시간에."
       ],
       "corePatterns": [
@@ -12426,15 +12426,15 @@
         "pilot": false
       },
       "microChunks": [
-        "I somehow managed",
-        "to get the kids",
-        "to school",
+        "I",
+        "somehow managed",
+        "to get the kids to school",
         "on time."
       ],
       "microOrderGlosses": [
-        "어떻게든 해냈어",
-        "아이들을",
-        "학교에",
+        "나는",
+        "어찌어찌 해냈어",
+        "아이들을 학교에 보내는 걸",
         "제시간에."
       ],
       "microChunkReview": {
