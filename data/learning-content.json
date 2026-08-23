@@ -21701,13 +21701,13 @@
       "english": "We’re fully booked today, but we might be able to take a few walk-ins.",
       "assemblyChunks": [
         "We’re fully booked today,",
-        "but we might be able",
-        "to take a few walk-ins."
+        "but we might be able to",
+        "take a few walk-ins."
       ],
       "orderGlosses": [
-        "오늘 예약이 모두 찼지만,",
-        "그래도 가능할지 모릅니다",
-        "예약 없이 온 손님 몇 분을 받는 건."
+        "오늘은 예약이 모두 찼습니다,",
+        "그래도 받을 수 있을지도 모릅니다",
+        "예약 없이 온 손님 몇 분을."
       ],
       "corePatterns": [
         "be fully booked",
@@ -21722,18 +21722,20 @@
         "pilot": false
       },
       "microChunks": [
-        "We’re fully booked today,",
-        "but we",
-        "might be able",
-        "to take",
+        "We’re fully booked",
+        "today,",
+        "but",
+        "we might",
+        "be able to take",
         "a few walk-ins."
       ],
       "microOrderGlosses": [
-        "오늘 예약이 모두 찼지만,",
+        "예약이 모두 찼습니다",
+        "오늘은,",
         "그래도",
-        "가능할지 모릅니다",
-        "예약 없이",
-        "온 손님 몇 분을 받는 건."
+        "저희는 아마",
+        "받을 수 있을 겁니다",
+        "예약 없이 온 손님 몇 분을."
       ],
       "microChunkReview": {
         "rulesVersion": 1,
