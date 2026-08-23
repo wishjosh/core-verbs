@@ -5,7 +5,7 @@
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSR1wby3k5QhlAL8f8MeH-Ni1qjGgRMu8ROHDoPCKci-GYrbpx1DzTsAvcr_l5qBcemui93D4cqMLa0/pub?output=tsv";
 const CONTENT_URL = './data/learning-content.json';
 const MAKE_CHUNK_OVERRIDES_URL = './data/make-chunk-overrides.json';
-const APP_VERSION = '31';
+const APP_VERSION = '32';
 const pageParams = new URLSearchParams(window.location.search);
 const meaningFlowPilotMode = pageParams.get('pilot') === 'meaning-flow';
 const requestedVerbPilot = String(pageParams.get('verb') || '').trim().toUpperCase();

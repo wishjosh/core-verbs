@@ -401,6 +401,33 @@ test('reviewed examples preserve the agreed learning intent', () => {
         '나는 어찌어찌 해냈어', '아이들을 보내는 것을', '학교에', '제시간에.'
     ]);
     assert.equal(schoolRun.naturalKo, '어찌어찌해서 애들을 제시간에 학교에 보냈어.');
+
+    const userReviewedScaffolds = new Map([
+        ['I had a weird morning yesterday.', [
+            ['I had', 'a weird morning', 'yesterday.'],
+            ['나는 겪었어요', '좀 이상한 아침을', '어제.']
+        ]],
+        ['I think I have a bad connection.', [
+            ['I think', 'I have', 'a bad connection.'],
+            ['나는 생각해요', '내가 가지고 있다고', '좋지 않은 연결 상태를.']
+        ]],
+        ['Are you still planning to go to art school?', [
+            ['Are you still planning', 'to go', 'to art school?'],
+            ['아직도 계획하고 있나요', '진학하는 것을', '예술 학교에?']
+        ]],
+        ['I know… I had a rough week, emotionally.', [
+            ['I know…', 'I had', 'a rough week,', 'emotionally.'],
+            ['그러게…', '나는 보냈어', '힘든 한 주를,', '심적으로.']
+        ]],
+        ['I think my phone fell out of my pocket while I was getting off the bus.', [
+            ['I think', 'my phone fell out', 'of my pocket', 'while I was getting off', 'the bus.'],
+            ['아무래도', '휴대폰이 빠진 것 같아요', '내 주머니에서', '내가 내리고 있던 중에', '버스에서.']
+        ]]
+    ]);
+    for (const [english, [microChunks, microOrderGlosses]] of userReviewedScaffolds) {
+        assert.deepEqual(byEnglish.get(english).microChunks, microChunks, english);
+        assert.deepEqual(byEnglish.get(english).microOrderGlosses, microOrderGlosses, english);
+    }
 });
 
 test('all 869 stored items build an answerable practice question', () => {
@@ -476,14 +503,14 @@ test('the mobile review screen keeps word-level marking without error categories
     assert.match(html, /id="daily-session-progress"/);
     assert.match(app, /adaptiveLimit - dailyLearned/);
     assert.match(app, /const DAILY_NEW_LIMIT = 12/);
-    assert.match(app, /const APP_VERSION = '31'/);
-    assert.match(html, /href="style\.css\?v=31"/);
-    assert.match(html, /src="learning-engine\.js\?v=31"/);
-    assert.match(html, /src="app\.js\?v=31"/);
+    assert.match(app, /const APP_VERSION = '32'/);
+    assert.match(html, /href="style\.css\?v=32"/);
+    assert.match(html, /src="learning-engine\.js\?v=32"/);
+    assert.match(html, /src="app\.js\?v=32"/);
     assert.match(app, /Learning\.selectCoreVerbNewCards/);
     assert.match(app, /newByVerb/);
     assert.match(app, /register\(`sw\.js\?v=\$\{APP_VERSION\}`,[^)]*updateViaCache: 'none'/);
-    assert.match(html, /Core Verbs v31/);
+    assert.match(html, /Core Verbs v32/);
     assert.match(css, /\.self-check-controls\s*\{[^}]*margin-top:\s*10px;/s);
     assert.match(html, /id="completion-title"/);
     assert.match(html, /id="btn-extra-review"[^>]*onclick="startExtraReviewSession\(\)"/);

@@ -10,7 +10,15 @@ const DATA = path.join(ROOT, 'data');
 // 원어민 표현 단위가 다시 합쳐지도록 한다.
 const manualCorrections = {
   'cv-0003': [['I have', 'some friends', 'living in Chicago.'], ['내게는 있어요', '친구가 몇 명', '시카고에 사는.']],
-  'cv-0021': [['You should have', 'something', 'before you leave.'], ['뭐라도 먹는 게 좋아요', '조금은', '떠나기 전에.']],
+  'cv-0008': [["Honestly,", 'I have mixed feelings.', "I'm relieved", 'we finished the work,', "but I'll miss", 'the team.'], ['솔직히,', '마음이 시원섭섭해요.', '홀가분하기도 한데', '우리가 일을 끝내서,', '하지만 그리워할 거예요', '그 팀을.']],
+  'cv-0012': [['A few,', 'but I try', 'not to think', 'about it', 'too much.'], ['조금은 있어,', '하지만 나는 노력하고 있어', '생각하지 않으려고', '그 일에 대해', '너무 많이.']],
+  'cv-0021': [['You should have', 'something', 'before you leave.'], ['먹는 게 나을 거예요', '뭐라도', '떠나기 전에.']],
+  'cv-0023': [['Did you have', 'anything', 'before class?'], ['먹었니', '뭐 좀', '수업 전에?']],
+  'cv-0034': [['I had', 'a weird morning', 'yesterday.'], ['나는 겪었어요', '좀 이상한 아침을', '어제.']],
+  'cv-0037': [['I think', 'I have', 'a bad connection.'], ['나는 생각해요', '내가 가지고 있다고', '좋지 않은 연결 상태를.']],
+  'cv-0040': [['Are you still planning', 'to go', 'to art school?'], ['아직도 계획하고 있나요', '진학하는 것을', '예술 학교에?']],
+  'cv-0043': [['I know…', 'I had', 'a rough week,', 'emotionally.'], ['그러게…', '나는 보냈어', '힘든 한 주를,', '심적으로.']],
+  'cv-0047': [['I think', 'my phone fell out', 'of my pocket', 'while I was getting off', 'the bus.'], ['아무래도', '휴대폰이 빠진 것 같아요', '내 주머니에서', '내가 내리고 있던 중에', '버스에서.']],
   'cv-0024': [['Just a banana.', 'I', 'was in a rush.'], ['그냥 바나나 하나요.', '나는', '무척 바빴거든요.']],
   'cv-0044': [['Want to talk', 'about it?'], ['이야기할래', '그 일에 관해?']],
   'cv-0057': [['Oh,', 'Costco is having', 'a sale', 'on Samsonite luggage', 'right now.'], ['아,', '코스트코가 진행 중이에요', '할인 행사를', '샘소나이트 여행 가방에', '바로 지금.']],

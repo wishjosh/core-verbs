@@ -312,7 +312,7 @@
       "orderGlosses": [
         "솔직히,",
         "마음이 시원섭섭해요.",
-        "홀가분하긴 해요",
+        "홀가분하기도 한데",
         "우리가 일을 끝내서,",
         "하지만 그리워할 거예요",
         "그 팀을."
@@ -341,7 +341,7 @@
       "microOrderGlosses": [
         "솔직히,",
         "마음이 시원섭섭해요.",
-        "홀가분하긴 해요",
+        "홀가분하기도 한데",
         "우리가 일을 끝내서,",
         "하지만 그리워할 거예요",
         "그 팀을."
@@ -493,9 +493,9 @@
       ],
       "orderGlosses": [
         "조금은 있어,",
-        "하지만 애써",
-        "그 일을 생각하지 않으려고 해",
-        "너무 깊이는."
+        "하지만 나는 노력하고 있어",
+        "그 일에 대해 생각하지 않으려고",
+        "너무 많이."
       ],
       "corePatterns": [
         "try not to + 동사원형",
@@ -518,10 +518,10 @@
       ],
       "microOrderGlosses": [
         "조금은 있어,",
-        "하지만 애써",
-        "생각하지 않으려고 해",
-        "그 일은",
-        "너무 깊이는."
+        "하지만 나는 노력하고 있어",
+        "생각하지 않으려고",
+        "그 일에 대해",
+        "너무 많이."
       ],
       "microChunkReview": {
         "rulesVersion": 3,
@@ -887,7 +887,7 @@
         "before you leave."
       ],
       "orderGlosses": [
-        "뭐라도 먹어야 해요",
+        "뭐라도 먹는 게 나을 거예요",
         "떠나기 전에."
       ],
       "corePatterns": [
@@ -908,8 +908,8 @@
         "before you leave."
       ],
       "microOrderGlosses": [
-        "뭐라도 먹는 게 좋아요",
-        "조금은",
+        "먹는 게 나을 거예요",
+        "뭐라도",
         "떠나기 전에."
       ],
       "microChunkReview": {
@@ -973,7 +973,7 @@
         "before class?"
       ],
       "orderGlosses": [
-        "뭐라도 먹었어요",
+        "뭐 좀 먹었니",
         "수업 전에?"
       ],
       "corePatterns": [
@@ -1001,8 +1001,8 @@
         "before class?"
       ],
       "microOrderGlosses": [
-        "너는 먹었니",
-        "무언가를",
+        "먹었니",
+        "뭐 좀",
         "수업 전에?"
       ],
       "microChunkReview": {
@@ -1471,7 +1471,7 @@
       ],
       "orderGlosses": [
         "나는 겪었어요",
-        "별일 많은 아침을",
+        "좀 이상한 아침을",
         "어제."
       ],
       "corePatterns": [
@@ -1493,7 +1493,7 @@
       ],
       "microOrderGlosses": [
         "나는 겪었어요",
-        "별일 많은 아침을",
+        "좀 이상한 아침을",
         "어제."
       ],
       "microChunkReview": {
@@ -1602,8 +1602,8 @@
         "I have a bad connection."
       ],
       "orderGlosses": [
-        "아무래도",
-        "접속 상태가 안 좋은 것 같아요."
+        "나는 생각해요",
+        "내가 좋지 않은 연결 상태를 가지고 있다고."
       ],
       "corePatterns": [
         "think + 주어 + 동사",
@@ -1623,9 +1623,9 @@
         "a bad connection."
       ],
       "microOrderGlosses": [
-        "아무래도",
-        "내 쪽은",
-        "연결 상태가 안 좋아요."
+        "나는 생각해요",
+        "내가 가지고 있다고",
+        "좋지 않은 연결 상태를."
       ],
       "microChunkReview": {
         "rulesVersion": 3,
@@ -1730,8 +1730,8 @@
         "to go to art school?"
       ],
       "orderGlosses": [
-        "아직 계획하고 있나요",
-        "예술 학교에 진학할 생각인가요?"
+        "아직도 계획하고 있나요",
+        "예술 학교에 진학하는 것을?"
       ],
       "corePatterns": [
         "still planning + to부정사",
@@ -1747,11 +1747,13 @@
       },
       "microChunks": [
         "Are you still planning",
-        "to go to art school?"
+        "to go",
+        "to art school?"
       ],
       "microOrderGlosses": [
-        "아직 계획하고 있나요",
-        "예술 학교에 진학할 생각인가요?"
+        "아직도 계획하고 있나요",
+        "진학하는 것을",
+        "예술 학교에?"
       ],
       "microChunkReview": {
         "rulesVersion": 3,
@@ -1865,7 +1867,7 @@
       "orderGlosses": [
         "그러게…",
         "힘든 한 주를 보냈어,",
-        "마음고생이 많았거든."
+        "심적으로."
       ],
       "corePatterns": [
         "have + 명사",
@@ -1889,7 +1891,7 @@
         "그러게…",
         "나는 보냈어",
         "힘든 한 주를,",
-        "마음고생이 많았거든."
+        "심적으로."
       ],
       "microChunkReview": {
         "rulesVersion": 3,
@@ -2037,8 +2039,8 @@
       ],
       "orderGlosses": [
         "아무래도",
-        "휴대폰이 주머니에서 빠진 것 같아요",
-        "버스에서 내리던 중에."
+        "휴대폰이 내 주머니에서 빠진 것 같아요",
+        "내가 버스에서 내리고 있던 중에."
       ],
       "corePatterns": [
         "fall out of + 장소",
@@ -2056,15 +2058,15 @@
         "I think",
         "my phone fell out",
         "of my pocket",
-        "while I was",
-        "getting off the bus."
+        "while I was getting off",
+        "the bus."
       ],
       "microOrderGlosses": [
         "아무래도",
         "휴대폰이 빠진 것 같아요",
-        "주머니에서",
-        "내가 한창",
-        "버스에서 내리던 중에."
+        "내 주머니에서",
+        "내가 내리고 있던 중에",
+        "버스에서."
       ],
       "microChunkReview": {
         "rulesVersion": 3,
