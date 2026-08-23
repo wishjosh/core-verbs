@@ -261,6 +261,20 @@ test('records an added word at the exact source-word boundary without marking co
     });
     assert.equal(engine.buildInsertionMistake(card, '', 1), null);
     assert.equal(engine.buildInsertionMistake(card, 'ever', 99), null);
+
+    assert.deepEqual(engine.buildInsertionMistake(card, 'ever', null), {
+        operation: 'insertion',
+        start: null,
+        end: null,
+        text: 'ever',
+        insertedText: 'ever',
+        afterTokenIndex: null,
+        beforeTokenIndex: null,
+        leftContext: '',
+        rightContext: '',
+        tokenIndexes: [],
+        chunkIndexes: []
+    });
 });
 
 test('prefers directly reviewed micro chunks and their matching English-order glosses', () => {

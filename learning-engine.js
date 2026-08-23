@@ -775,6 +775,23 @@
         if (!text) return null;
 
         const tokens = buildReviewTokens(card).flatMap(chunk => chunk.tokens);
+        const positionUnknown = afterTokenIndex === null || afterTokenIndex === undefined || afterTokenIndex === '';
+        if (positionUnknown) {
+            return {
+                operation: 'insertion',
+                start: null,
+                end: null,
+                text,
+                insertedText: text,
+                afterTokenIndex: null,
+                beforeTokenIndex: null,
+                leftContext: '',
+                rightContext: '',
+                tokenIndexes: [],
+                chunkIndexes: []
+            };
+        }
+
         const after = Number(afterTokenIndex);
         if (!Number.isInteger(after) || after < -1 || after >= tokens.length) return null;
 

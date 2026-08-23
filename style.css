@@ -771,6 +771,12 @@ button.mistake-summary-chip {
     font-weight: 800;
 }
 
+.optional-label {
+    color: #7c3aed;
+    font-size: 0.66rem;
+    font-weight: 700;
+}
+
 .insertion-editor input,
 .insertion-editor select {
     width: 100%;

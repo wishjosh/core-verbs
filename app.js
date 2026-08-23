@@ -5,7 +5,7 @@
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSR1wby3k5QhlAL8f8MeH-Ni1qjGgRMu8ROHDoPCKci-GYrbpx1DzTsAvcr_l5qBcemui93D4cqMLa0/pub?output=tsv";
 const CONTENT_URL = './data/learning-content.json';
 const MAKE_CHUNK_OVERRIDES_URL = './data/make-chunk-overrides.json';
-const APP_VERSION = '28';
+const APP_VERSION = '29';
 const pageParams = new URLSearchParams(window.location.search);
 const meaningFlowPilotMode = pageParams.get('pilot') === 'meaning-flow';
 const requestedVerbPilot = String(pageParams.get('verb') || '').trim().toUpperCase();
@@ -1326,6 +1326,7 @@ function getCurrentReviewTokens() {
 }
 
 function getInsertionPositionLabel(mistake) {
+    if (!Number.isInteger(mistake.afterTokenIndex)) return '위치 미지정';
     if (mistake.afterTokenIndex === -1) return '문장 맨 앞';
     if (!mistake.rightContext) return `“${mistake.leftContext}” 뒤 · 문장 끝`;
     return `“${mistake.leftContext}” 뒤 · “${mistake.rightContext}” 앞`;
@@ -1349,7 +1350,7 @@ function renderInsertionEditor() {
     positionSelect.innerHTML = '';
     const placeholder = document.createElement('option');
     placeholder.value = '';
-    placeholder.innerText = '추가한 위치를 선택하세요';
+    placeholder.innerText = '위치는 모르겠어요 · 선택하지 않아도 됨';
     positionSelect.appendChild(placeholder);
     const positions = [
         { value: -1, label: tokens.length ? `문장 맨 앞 · “${tokens[0].text}” 앞` : '문장 맨 앞' },
@@ -1388,10 +1389,10 @@ function addInsertionMistake() {
     const mistake = Learning.buildInsertionMistake(
         card,
         textInput?.value,
-        positionValue === '' || positionValue === undefined ? Number.NaN : Number(positionValue)
+        positionValue === '' || positionValue === undefined ? null : Number(positionValue)
     );
     if (!mistake) {
-        if (help) help.innerText = '더 말했던 단어와 위치를 확인해 주세요.';
+        if (help) help.innerText = '정답에 덧붙여 말했던 단어를 입력해 주세요.';
         return;
     }
 
@@ -1405,6 +1406,15 @@ function addInsertionMistake() {
         ? '같은 추가 단어가 이미 기록되어 있어요.'
         : `“${mistake.insertedText}” 추가를 기록에 넣었어요.`;
     updateMistakeReview();
+    return mistake;
+}
+
+function saveInsertionMistake() {
+    const mistake = addInsertionMistake();
+    if (!mistake) return;
+    saveSelectedMistakes();
+    const help = document.getElementById('insertion-help');
+    if (help) help.innerText = `“${mistake.insertedText}” 추가 오류를 저장했습니다.`;
 }
 
 function removeInsertionMistake(index) {
@@ -1463,7 +1473,7 @@ function updateMistakeReview() {
     }
     renderInsertionEditor();
     if (saveButton) {
-        saveButton.style.display = hasManualMistake ? 'block' : 'none';
+        saveButton.style.display = hasManualMistake && !currentAssessmentRecorded ? 'block' : 'none';
         saveButton.disabled = currentAssessmentRecorded || !hasManualMistake;
     }
     if (noMistakesButton) {
@@ -2306,8 +2316,8 @@ function exportMistakeHistory() {
             selectedTokenIndexes: '영어 문장의 0부터 시작하는 단어 위치',
             selections: '실제 오답 원자료. operation이 source_token이면 정답 단어 선택, insertion이면 정답에 없는 말 추가',
             insertedText: '학습자가 정답에 덧붙여 생각하거나 말한 단어 또는 짧은 구문',
-            afterTokenIndex: '추가한 말 바로 앞 정답 단어의 위치. -1이면 문장 맨 앞',
-            beforeTokenIndex: '추가한 말 바로 뒤 정답 단어의 위치. null이면 문장 끝',
+            afterTokenIndex: '추가한 말 바로 앞 정답 단어의 위치. -1이면 문장 맨 앞, null이면 위치 미지정',
+            beforeTokenIndex: '추가한 말 바로 뒤 정답 단어의 위치. afterTokenIndex도 null이면 위치 미지정, 앞 위치만 있으면 문장 끝',
             wordOrder: '청크 어순을 틀렸는지 여부',
             recall: '문장 전체를 떠올리지 못했는지 여부',
             practiceChunks: '이 시도에서 실제로 제시된 조립 단위',

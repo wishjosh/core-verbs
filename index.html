@@ -23,7 +23,7 @@
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
 
     <!-- 🎨 역할 분리: 외부 스타일시트 불러오기 -->
-    <link rel="stylesheet" href="style.css?v=26">
+    <link rel="stylesheet" href="style.css?v=29">
 </head>
 <body>
     
@@ -126,21 +126,21 @@
             <div id="english" aria-label="영어 정답"></div>
             <div id="mistake-review" class="mistake-review">
                 <span class="mistake-review-label">나의 오류 체크</span>
-                <div class="mistake-review-help">정답과 다르게 말한 단어만 누르세요. 정답에 없는 말을 덧붙였다면 아래 버튼으로 그 단어만 기록하세요.</div>
+                <div class="mistake-review-help">정답과 다르게 말한 단어만 누르세요. 정답에 없는 말을 덧붙였다면 아래에서 입력하고 바로 저장할 수 있어요.</div>
                 <div id="mistake-summary" class="mistake-summary empty" aria-live="polite">선택한 오류가 아직 없습니다.</div>
                 <button id="btn-toggle-insertion" class="insertion-toggle" type="button" onclick="event.stopPropagation(); toggleInsertionEditor();">＋ 정답에 없는 말을 더했어요</button>
                 <div id="insertion-editor" class="insertion-editor" hidden>
                     <label for="insertion-text">더 말했던 단어</label>
                     <input id="insertion-text" type="text" maxlength="60" autocomplete="off" autocapitalize="none" placeholder="예: ever">
-                    <label for="insertion-position">어디에 넣었나요?</label>
+                    <label for="insertion-position">어디에 넣었나요? <span class="optional-label">선택 사항</span></label>
                     <select id="insertion-position"></select>
-                    <button class="insertion-add" type="button" onclick="event.stopPropagation(); addInsertionMistake();">추가 오류 기록</button>
-                    <p id="insertion-help" class="insertion-help" aria-live="polite">문장 전체가 아니라 덧붙인 말만 입력하면 됩니다.</p>
+                    <button class="insertion-add" type="button" onclick="event.stopPropagation(); saveInsertionMistake();">이 추가 오류 저장</button>
+                    <p id="insertion-help" class="insertion-help" aria-live="polite">덧붙인 말만 입력하세요. 위치를 몰라도 저장할 수 있습니다.</p>
                 </div>
                 <div class="self-check-controls">
                     <button class="self-check-btn recall-fail" type="button" onclick="event.stopPropagation(); markRecallFailure();">전체 문장 실패</button>
                     <button class="self-check-btn no-mistakes" type="button" onclick="event.stopPropagation(); markNoMistakes();">모두 맞았어요</button>
-                    <button id="btn-save-mistakes" class="self-check-btn save-mistakes" type="button" onclick="event.stopPropagation(); saveSelectedMistakes();" disabled>선택한 오류 저장</button>
+                    <button id="btn-save-mistakes" class="self-check-btn save-mistakes" type="button" onclick="event.stopPropagation(); saveSelectedMistakes();" disabled>선택한 단어 오류 저장</button>
                 </div>
                 <p id="practice-result-tip" aria-live="polite"></p>
             </div>
@@ -276,12 +276,12 @@
             </div>
         </div>
         <div class="settings-footer">
-            Core Verbs v28 © 2026<br>자연스러운 인토네이션 학습 모드
+            Core Verbs v29 © 2026<br>자연스러운 인토네이션 학습 모드
         </div>
     </div>
 
     <!-- 🧠 학습 문제 생성·배정 규칙과 애플리케이션 화면 로직 -->
-    <script src="learning-engine.js?v=26"></script>
-    <script src="app.js?v=26"></script>
+    <script src="learning-engine.js?v=29"></script>
+    <script src="app.js?v=29"></script>
 </body>
 </html>

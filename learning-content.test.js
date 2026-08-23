@@ -457,7 +457,9 @@ test('the mobile review screen keeps word-level marking without error categories
     assert.match(html, /id="insertion-text"/);
     assert.match(html, /id="insertion-position"/);
     assert.match(app, /function addInsertionMistake\(\)/);
+    assert.match(app, /function saveInsertionMistake\(\)/);
     assert.match(app, /Learning\.buildInsertionMistake/);
+    assert.match(html, /onclick="event\.stopPropagation\(\); saveInsertionMistake\(\);">이 추가 오류 저장/);
     assert.match(app, /operation: 'source_token'/);
     assert.match(app, /insertedText:/);
     assert.match(html, /id="daily-new-progress"/);
@@ -465,11 +467,14 @@ test('the mobile review screen keeps word-level marking without error categories
     assert.match(html, /id="daily-session-progress"/);
     assert.match(app, /adaptiveLimit - dailyLearned/);
     assert.match(app, /const DAILY_NEW_LIMIT = 12/);
-    assert.match(app, /const APP_VERSION = '28'/);
+    assert.match(app, /const APP_VERSION = '29'/);
+    assert.match(html, /href="style\.css\?v=29"/);
+    assert.match(html, /src="learning-engine\.js\?v=29"/);
+    assert.match(html, /src="app\.js\?v=29"/);
     assert.match(app, /Learning\.selectCoreVerbNewCards/);
     assert.match(app, /newByVerb/);
     assert.match(app, /register\(`sw\.js\?v=\$\{APP_VERSION\}`,[^)]*updateViaCache: 'none'/);
-    assert.match(html, /Core Verbs v28/);
+    assert.match(html, /Core Verbs v29/);
     assert.match(css, /\.self-check-controls\s*\{[^}]*margin-top:\s*10px;/s);
     assert.match(html, /id="completion-title"/);
     assert.match(html, /id="btn-extra-review"[^>]*onclick="startExtraReviewSession\(\)"/);
